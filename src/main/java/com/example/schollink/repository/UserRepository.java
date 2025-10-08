@@ -9,4 +9,6 @@ import com.example.schollink.model.User;
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByEmail(String email);
+
+    User findByEmailAndSenha(String email, String senha);
 }
