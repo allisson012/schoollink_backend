@@ -36,7 +36,7 @@ public class AuthController {
             return ResponseEntity.ok(response);
         }
 
-        response.put("message", "email ou senha inválidos");
+        response.put("message", "Email ou senha inválidos");
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
     }
 }
