@@ -1,5 +1,6 @@
 package com.example.schollink.service;
 
+import java.util.Optional;
 import java.util.logging.Logger;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +16,7 @@ public class AuthService {
     @Autowired
     private UserRepository userRepository;
 
-     public User autenticarUsuario(String email, String password) {
-        return userRepository.findByEmailAndSenha(email, password);
+     public Optional<User> autenticarUsuario(String email) {
+        return userRepository.findByEmail(email);
     }
 }
