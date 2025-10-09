@@ -1,9 +1,12 @@
 package com.example.schollink.model;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+
 
 @Entity
 public class User {
@@ -15,6 +18,12 @@ public class User {
     private String nome;
     private String email;
     private String senha;
+    private byte[] hash;
+    private byte[] salt;
+    @Enumerated(EnumType.STRING)
+    private UserRole userRole;
+    private String cpf;
+    private String telefone;
 
     public Long getId() {
         return id;
@@ -46,6 +55,46 @@ public class User {
 
     public void setSenha(String senha) {
         this.senha = senha;
+    }
+
+    public byte[] getHash() {
+        return hash;
+    }
+
+    public void setHash(byte[] hash) {
+        this.hash = hash;
+    }
+
+    public byte[] getSalt() {
+        return salt;
+    }
+
+    public void setSalt(byte[] salt) {
+        this.salt = salt;
+    }
+
+    public UserRole getUserRole() {
+        return userRole;
+    }
+
+    public void setUserRole(UserRole userRole) {
+        this.userRole = userRole;
+    }
+
+    public String getCpf() {
+        return cpf;
+    }
+
+    public void setCpf(String cpf) {
+        this.cpf = cpf;
+    }
+
+    public String getTelefone() {
+        return telefone;
+    }
+
+    public void setTelefone(String telefone) {
+        this.telefone = telefone;
     }
 
 }
