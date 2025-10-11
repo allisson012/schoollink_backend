@@ -9,4 +9,7 @@ import com.example.schollink.model.User;
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByEmail(String email);
+    // Optional<User> createUser(String nome,String email , byte[] salt, byte []
+    // hash);
+
 }

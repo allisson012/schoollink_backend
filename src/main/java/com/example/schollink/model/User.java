@@ -17,7 +17,6 @@ public class User {
 
     private String nome;
     private String email;
-    private String senha;
     private byte[] hash;
     private byte[] salt;
     @Enumerated(EnumType.STRING)
@@ -47,14 +46,6 @@ public class User {
 
     public void setEmail(String email) {
         this.email = email;
-    }
-
-    public String getSenha() {
-        return senha;
-    }
-
-    public void setSenha(String senha) {
-        this.senha = senha;
     }
 
     public byte[] getHash() {

@@ -16,7 +16,19 @@ public class AuthService {
     @Autowired
     private UserRepository userRepository;
 
-     public Optional<User> autenticarUsuario(String email) {
-        return userRepository.findByEmail(email);
+    @Autowired
+    private PasswordService passwordService;
+
+    public Optional<User> autenticarUsuario(String email, String senha) {
+        Optional<User> userOpt = userRepository.findByEmail(email);
+
+        if (userOpt.isPresent()) {
+            User user = userOpt.get();
+            boolean senhaValida = passwordService.compararSenha(senha, user.getHash(), user.getSalt());
+            if (senhaValida) {
+                return Optional.of(user);
+            }
+        }
+        return Optional.empty();
     }
 }
