@@ -27,10 +27,10 @@ public class AuthController {
         String email = loginRequest.get("email");
         String password = loginRequest.get("password");
 
-        Optional<User> usuario = authService.autenticarUsuario(email);
+        Optional<User> usuario = authService.autenticarUsuario(email, password);
 
         Map<String, String> response = new HashMap<>();
-        if (usuario.isPresent() && usuario.get().getSenha().equals(password)) {
+        if (usuario.isPresent()) {
             response.put("message", "Login bem sucedido");
             response.put("id", String.valueOf(usuario.get().getId()));
             response.put("nome", usuario.get().getNome());
