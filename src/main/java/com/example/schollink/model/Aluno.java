@@ -2,6 +2,7 @@ package com.example.schollink.model;
 
 import java.time.LocalDate;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -16,7 +17,7 @@ public class Aluno {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long idAluno;
 
-    @OneToOne
+    @OneToOne()
     @JoinColumn(name = "idUser", referencedColumnName = "id")
     private User user; // FK para a tabela user
 
@@ -25,7 +26,7 @@ public class Aluno {
     @ManyToOne
     @JoinColumn(name = "idTurma", referencedColumnName = "id")
     private Turma turma;
-    // turma , serie , ano 
+    // turma , serie , ano
     @OneToOne
     @JoinColumn(name = "idFiliacao", referencedColumnName = "id")
     private Filiacao filiacao;
@@ -36,7 +37,6 @@ public class Aluno {
     private LocalDate dataIngresso;
     // foto
     private String statusMatricula;
-    
 
     public Long getIdAluno() {
         return idAluno;
@@ -109,5 +109,5 @@ public class Aluno {
     public void setStatusMatricula(String statusMatricula) {
         this.statusMatricula = statusMatricula;
     }
-    
+
 }

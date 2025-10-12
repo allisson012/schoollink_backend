@@ -9,6 +9,7 @@ import com.example.schollink.model.Aluno;
 import com.example.schollink.model.User;
 import com.example.schollink.repository.AlunoRepository;
 import com.example.schollink.repository.UserRepository;
+import com.example.schollink.util.BeanUtilsCopy;
 
 @Service
 public class AlunoService {
@@ -27,5 +28,53 @@ public class AlunoService {
         User userCreate = userRepository.save(user);
         aluno.setUser(userCreate);
         alunoRepository.save(aluno);
+    }
+
+    public Aluno editarAluno(Aluno alunoNovo, Long id) {
+        Optional<Aluno> alunoOpt = alunoRepository.findById(id);
+        if (alunoOpt.isEmpty()) {
+            throw new RuntimeException("Aluno não encontrado");
+        }
+
+        Aluno alunoExistente = alunoOpt.get();
+
+        // Atualiza os campos de String do Aluno
+        if (alunoNovo.getMatricula() != null && !alunoNovo.getMatricula().isBlank()) {
+            alunoExistente.setMatricula(alunoNovo.getMatricula());
+        }
+        if (alunoNovo.getTelefoneResponsavel() != null && !alunoNovo.getTelefoneResponsavel().isBlank()) {
+            alunoExistente.setTelefoneResponsavel(alunoNovo.getTelefoneResponsavel());
+        }
+        if (alunoNovo.getStatusMatricula() != null && !alunoNovo.getStatusMatricula().isBlank()) {
+            alunoExistente.setStatusMatricula(alunoNovo.getStatusMatricula());
+        }
+
+        // Atualiza apenas campos de String do User
+        if (alunoNovo.getUser() != null) {
+            User userNovo = alunoNovo.getUser();
+            User userExistente = alunoExistente.getUser();
+
+            if (userNovo.getNome() != null && !userNovo.getNome().isBlank()) {
+                userExistente.setNome(userNovo.getNome());
+            }
+            if (userNovo.getEmail() != null && !userNovo.getEmail().isBlank()) {
+                userExistente.setEmail(userNovo.getEmail());
+            }
+            if (userNovo.getCpf() != null && !userNovo.getCpf().isBlank()) {
+                userExistente.setCpf(userNovo.getCpf());
+            }
+            if (userNovo.getTelefone() != null && !userNovo.getTelefone().isBlank()) {
+                userExistente.setTelefone(userNovo.getTelefone());
+            }
+            if (userNovo.getGenero() != null && !userNovo.getGenero().isBlank()) {
+                userExistente.setGenero(userNovo.getGenero());
+            }
+
+            // Salva explicitamente o User
+            userRepository.save(userExistente);
+        }
+
+        // Salva o Aluno
+        return alunoRepository.save(alunoExistente);
     }
 }

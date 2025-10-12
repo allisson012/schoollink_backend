@@ -5,6 +5,8 @@ public class AlunoDto {
     private String email;
     private String senha;
     private String matricula;
+    private String statusMatricula;
+    private String telefone;
 
     public void setNome(String nome) {
         this.nome = nome;
@@ -37,4 +39,21 @@ public class AlunoDto {
     public String getMatricula() {
         return this.matricula;
     }
+
+    public String getStatusMatricula() {
+        return statusMatricula;
+    }
+
+    public void setStatusMatricula(String statusMatricula) {
+        this.statusMatricula = statusMatricula;
+    }
+
+    public String getTelefone() {
+        return telefone;
+    }
+
+    public void setTelefone(String telefone) {
+        this.telefone = telefone;
+    }
+
 }
