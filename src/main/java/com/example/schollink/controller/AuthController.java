@@ -29,7 +29,7 @@ public class AuthController {
 
     @PostMapping("/login/usuario")
     public ResponseEntity<Map<String, String>> loginUser(@RequestBody Map<String, String> loginRequest,
-            HttpSession session) {
+        HttpSession session) {
         String email = loginRequest.get("email");
         String password = loginRequest.get("password");
 
