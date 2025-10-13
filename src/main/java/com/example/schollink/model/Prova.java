@@ -13,27 +13,30 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 
 @Entity
 public class Prova {
-    
+
     @Id
-    @GeneratedValue(strategy= GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long idProva;
     private float nota;
     @Enumerated(EnumType.STRING)
     private TipoProva tipo;
-    @JoinColumn(name="idTurma", referencedColumnName="id")
+    @ManyToOne
+    @JoinColumn(name = "idTurma", referencedColumnName = "id")
     private Turma turma;
-    @JoinColumn(name="idDisciplina", referencedColumnName="id")
+    @ManyToOne
+    @JoinColumn(name = "idDisciplina", referencedColumnName = "id")
     private Disciplina disciplina;
     @Enumerated(EnumType.STRING)
     private Periodo periodo;
 
     @ManyToOne
-    @JoinColumn(name="idAluno", referencedColumnName="id")
+    @JoinColumn(name = "idAluno", referencedColumnName = "idAluno")
     private Aluno aluno;
-
 
     public Prova(Long idProva, float nota, TipoProva tipo, Turma turma, Periodo periodo) {
         this.idProva = idProva;
@@ -46,7 +49,6 @@ public class Prova {
     public Prova() {
     }
 
-    
     public Disciplina getDisciplina() {
         return this.disciplina;
     }
@@ -102,6 +104,5 @@ public class Prova {
     public void setPeriodo(Periodo periodo) {
         this.periodo = periodo;
     }
-
 
 }

@@ -38,7 +38,6 @@ public class AlunoService {
 
         Aluno alunoExistente = alunoOpt.get();
 
-        // Atualiza os campos de String do Aluno
         if (alunoNovo.getMatricula() != null && !alunoNovo.getMatricula().isBlank()) {
             alunoExistente.setMatricula(alunoNovo.getMatricula());
         }
@@ -49,7 +48,6 @@ public class AlunoService {
             alunoExistente.setStatusMatricula(alunoNovo.getStatusMatricula());
         }
 
-        // Atualiza apenas campos de String do User
         if (alunoNovo.getUser() != null) {
             User userNovo = alunoNovo.getUser();
             User userExistente = alunoExistente.getUser();
@@ -69,12 +67,15 @@ public class AlunoService {
             if (userNovo.getGenero() != null && !userNovo.getGenero().isBlank()) {
                 userExistente.setGenero(userNovo.getGenero());
             }
-
-            // Salva explicitamente o User
             userRepository.save(userExistente);
         }
-
-        // Salva o Aluno
         return alunoRepository.save(alunoExistente);
+    }
+
+    public void excluirAluno(Long id) {
+        Aluno aluno = alunoRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Aluno não encontrado"));
+        //userRepository.delete(aluno.getUser());
+        alunoRepository.delete(aluno);
     }
 }

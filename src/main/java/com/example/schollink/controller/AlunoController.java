@@ -7,10 +7,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.schollink.Dto.AlunoDto;
@@ -51,6 +53,21 @@ public class AlunoController {
             return ResponseEntity.ok(Map.of("message", "Aluno atualizado com sucesso",
                     "id", String.valueOf(
                             atualizado.getIdAluno())));
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", e.getMessage()));
+        }
+    }
+
+    @DeleteMapping("/excluir")
+    public ResponseEntity<?> excluirAluno(HttpSession session, @RequestParam Long idAluno) {
+        Long id = (Long) session.getAttribute("idUser");
+        if (id == null || idAluno == null) {
+            ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("message", "Usuário não logado ou ID do aluno não informado"));
+        }
+        try {
+            alunoService.excluirAluno(idAluno);
+            return ResponseEntity.ok().body(Map.of("message", "Aluno excluido com sucesso"));
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", e.getMessage()));
         }

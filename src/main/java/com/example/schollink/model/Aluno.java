@@ -10,7 +10,6 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
@@ -20,7 +19,7 @@ public class Aluno {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long idAluno;
-    @OneToOne()
+    @OneToOne(cascade = CascadeType.REMOVE)
     @JoinColumn(name = "idUser", referencedColumnName = "id")
     private User user; // FK para a tabela user
 
@@ -30,9 +29,7 @@ public class Aluno {
     @JoinColumn(name = "idTurma", referencedColumnName = "id")
     private Turma turma;
     // turma , serie , ano
-    @OneToOne
-    @JoinColumn(name = "idFiliacao", referencedColumnName = "id")
-    private Filiacao filiacao;
+    private String nomeResponsavel;
 
     public List<Prova> getProva() {
         return this.prova;
@@ -41,6 +38,7 @@ public class Aluno {
     public void setProva(List<Prova> prova) {
         this.prova = prova;
     }
+
     @OneToOne
     @JoinColumn(name = "idEndereco", referencedColumnName = "id")
     private Endereco endereco;
@@ -52,7 +50,6 @@ public class Aluno {
     @OneToMany(mappedBy = "aluno", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Prova> prova = new ArrayList<>();
 
-
     public Turma getTurma() {
         return this.turma;
     }
@@ -60,7 +57,7 @@ public class Aluno {
     public void setTurma(Turma turma) {
         this.turma = turma;
     }
-    
+
     public Long getIdAluno() {
         return idAluno;
     }
@@ -93,14 +90,6 @@ public class Aluno {
         this.dataMatricula = dataMatricula;
     }
 
-    public Filiacao getFiliacao() {
-        return filiacao;
-    }
-
-    public void setFiliacao(Filiacao filiacao) {
-        this.filiacao = filiacao;
-    }
-
     public Endereco getEndereco() {
         return endereco;
     }
@@ -131,6 +120,14 @@ public class Aluno {
 
     public void setStatusMatricula(String statusMatricula) {
         this.statusMatricula = statusMatricula;
+    }
+
+    public String getNomeResponsavel() {
+        return nomeResponsavel;
+    }
+
+    public void setNomeResponsavel(String nomeResponsavel) {
+        this.nomeResponsavel = nomeResponsavel;
     }
 
 }

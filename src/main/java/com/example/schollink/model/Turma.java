@@ -23,6 +23,8 @@ public class Turma {
     private String nome;
     @OneToMany(mappedBy = "turma")
     private List<Aluno> alunos;
+    @OneToMany(mappedBy = "turma")
+    private List<Prova> provas;
     private int anoLetivo;
     @Enumerated(EnumType.STRING)
     private Anos anoEscolar;
