@@ -30,6 +30,9 @@ public class HistoricoAula {
     private LocalDate dataAula;
     private String conteudoMinistrado;
 
+    private Boolean tarefa;
+    private String descricaoTarefa;
+
     public Long getId() {
         return id;
     }
@@ -76,6 +79,27 @@ public class HistoricoAula {
 
     public void setConteudoMinistrado(String conteudoMinistrado) {
         this.conteudoMinistrado = conteudoMinistrado;
+    }
+
+
+    public Boolean isTarefa() {
+        return this.tarefa;
+    }
+
+    public Boolean getTarefa() {
+        return this.tarefa;
+    }
+
+    public void setTarefa(Boolean tarefa) {
+        this.tarefa = tarefa;
+    }
+
+    public String getDescricaoTarefa() {
+        return this.descricaoTarefa;
+    }
+
+    public void setDescricaoTarefa(String descricaoTarefa) {
+        this.descricaoTarefa = descricaoTarefa;
     }
 
 }

@@ -6,10 +6,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.example.schollink.model.Aluno;
+import com.example.schollink.model.StatusMatricula;
 import com.example.schollink.model.User;
 import com.example.schollink.repository.AlunoRepository;
 import com.example.schollink.repository.UserRepository;
-import com.example.schollink.util.BeanUtilsCopy;
 
 @Service
 public class AlunoService {
@@ -44,7 +44,7 @@ public class AlunoService {
         if (alunoNovo.getTelefoneResponsavel() != null && !alunoNovo.getTelefoneResponsavel().isBlank()) {
             alunoExistente.setTelefoneResponsavel(alunoNovo.getTelefoneResponsavel());
         }
-        if (alunoNovo.getStatusMatricula() != null && !alunoNovo.getStatusMatricula().isBlank()) {
+        if (alunoNovo.getStatusMatricula() != null) {
             alunoExistente.setStatusMatricula(alunoNovo.getStatusMatricula());
         }
 
@@ -75,7 +75,10 @@ public class AlunoService {
     public void excluirAluno(Long id) {
         Aluno aluno = alunoRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Aluno não encontrado"));
-        //userRepository.delete(aluno.getUser());
-        alunoRepository.delete(aluno);
+        
+        if(aluno.getStatusMatricula().equals(StatusMatricula.ATIVA)){
+            aluno.setStatusMatricula(StatusMatricula.INATIVA);
+            alunoRepository.save(aluno);
+        }
     }
 }

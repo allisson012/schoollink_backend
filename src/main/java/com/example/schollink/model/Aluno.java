@@ -6,6 +6,8 @@ import java.util.List;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -19,6 +21,9 @@ public class Aluno {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long idAluno;
+    
+    private String rf_id;
+
     @OneToOne(cascade = CascadeType.REMOVE)
     @JoinColumn(name = "idUser", referencedColumnName = "id")
     private User user; // FK para a tabela user
@@ -29,15 +34,7 @@ public class Aluno {
     @JoinColumn(name = "idTurma", referencedColumnName = "id")
     private Turma turma;
     // turma , serie , ano
-    private String nomeResponsavel;
-
-    public List<Prova> getProva() {
-        return this.prova;
-    }
-
-    public void setProva(List<Prova> prova) {
-        this.prova = prova;
-    }
+    private String nomeResponsavel;    
 
     @OneToOne
     @JoinColumn(name = "idEndereco", referencedColumnName = "id")
@@ -45,10 +42,22 @@ public class Aluno {
     private String telefoneResponsavel;
     private LocalDate dataIngresso;
     // foto
-    private String statusMatricula;
+    @Enumerated(EnumType.STRING)
+    private StatusMatricula statusMatricula;
 
     @OneToMany(mappedBy = "aluno", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Prova> prova = new ArrayList<>();
+
+    @OneToMany(mappedBy = "aluno")
+    private List<Presenca> presencas;
+
+    public List<Presenca> getPresencas() {
+        return presencas;
+    }
+
+    public void setPresencas(List<Presenca> presencas) {
+        this.presencas = presencas;
+    }
 
     public Turma getTurma() {
         return this.turma;
@@ -114,11 +123,11 @@ public class Aluno {
         this.dataIngresso = dataIngresso;
     }
 
-    public String getStatusMatricula() {
+    public StatusMatricula getStatusMatricula() {
         return statusMatricula;
     }
 
-    public void setStatusMatricula(String statusMatricula) {
+    public void setStatusMatricula(StatusMatricula statusMatricula) {
         this.statusMatricula = statusMatricula;
     }
 
@@ -130,4 +139,11 @@ public class Aluno {
         this.nomeResponsavel = nomeResponsavel;
     }
 
+    public List<Prova> getProva() {
+        return this.prova;
+    }
+
+    public void setProva(List<Prova> prova) {
+        this.prova = prova;
+    }
 }
