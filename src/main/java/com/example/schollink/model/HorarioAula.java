@@ -2,7 +2,10 @@ package com.example.schollink.model;
 
 import java.time.DayOfWeek;
 import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.List;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -11,6 +14,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 
 @Entity
 public class HorarioAula {
@@ -35,6 +39,10 @@ public class HorarioAula {
 
     private LocalTime horaInicio;
     private LocalTime horaFim;
+
+    @OneToMany(mappedBy = "horarioAula", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Presenca> presencas =  new ArrayList<>();
+
     public Long getId() {
         return id;
     }

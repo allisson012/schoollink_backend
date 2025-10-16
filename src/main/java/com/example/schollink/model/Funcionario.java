@@ -1,47 +1,56 @@
 package com.example.schollink.model;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 
 @Entity
-public class User {
-
+public class Funcionario {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long idFuncionario;
 
+    private String rf_id;
     private String nome;
     private String email;
-    private byte[] hash;
-    private byte[] salt;
-    @Enumerated(EnumType.STRING)
-    private UserRole userRole;
     private String cpf;
     private String telefone;
     private LocalDate dataNascimento;
     private String genero;
+
     @OneToOne
     @JoinColumn(name = "idEndereco", referencedColumnName = "id")
     private Endereco endereco;
 
-    public Long getId() {
-        return id;
+    @OneToMany(mappedBy = "funcionario")
+    private List<Ponto> pontos = new ArrayList<>();
+
+    public List<Ponto> getPontos() {
+        return pontos;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setPontos(List<Ponto> pontos) {
+        this.pontos = pontos;
+    }
+
+    public Long getIdFuncionario() {
+        return this.idFuncionario;
+    }
+
+    public void setIdFuncionario(Long idFuncionario) {
+        this.idFuncionario = idFuncionario;
     }
 
     public String getNome() {
-        return nome;
+        return this.nome;
     }
 
     public void setNome(String nome) {
@@ -49,39 +58,15 @@ public class User {
     }
 
     public String getEmail() {
-        return email;
+        return this.email;
     }
 
     public void setEmail(String email) {
         this.email = email;
     }
 
-    public byte[] getHash() {
-        return hash;
-    }
-
-    public void setHash(byte[] hash) {
-        this.hash = hash;
-    }
-
-    public byte[] getSalt() {
-        return salt;
-    }
-
-    public void setSalt(byte[] salt) {
-        this.salt = salt;
-    }
-
-    public UserRole getUserRole() {
-        return userRole;
-    }
-
-    public void setUserRole(UserRole userRole) {
-        this.userRole = userRole;
-    }
-
     public String getCpf() {
-        return cpf;
+        return this.cpf;
     }
 
     public void setCpf(String cpf) {
@@ -89,7 +74,7 @@ public class User {
     }
 
     public String getTelefone() {
-        return telefone;
+        return this.telefone;
     }
 
     public void setTelefone(String telefone) {
@@ -97,7 +82,7 @@ public class User {
     }
 
     public LocalDate getDataNascimento() {
-        return dataNascimento;
+        return this.dataNascimento;
     }
 
     public void setDataNascimento(LocalDate dataNascimento) {
@@ -105,7 +90,7 @@ public class User {
     }
 
     public String getGenero() {
-        return genero;
+        return this.genero;
     }
 
     public void setGenero(String genero) {
@@ -113,7 +98,7 @@ public class User {
     }
 
     public Endereco getEndereco() {
-        return endereco;
+        return this.endereco;
     }
 
     public void setEndereco(Endereco endereco) {

@@ -24,6 +24,10 @@ public class Professor {
     @JoinColumn(name = "idUser", referencedColumnName = "id")
     private User user;
 
+    @OneToOne
+    @JoinColumn(name = "idFuncionario", referencedColumnName = "idFuncionario")
+    private Funcionario funcionario;
+
     private LocalDate dataContratacao;
     private String formacaoAcademica;
     @OneToMany(mappedBy = "professor")
@@ -45,7 +49,7 @@ public class Professor {
         return this.id;
     }
 
-    public void setId() {
+    public void setId(Long id) {
         this.id = id;
     }
 
