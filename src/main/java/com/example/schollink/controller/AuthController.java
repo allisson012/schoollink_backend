@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.schollink.model.Admin;
 import com.example.schollink.model.User;
 import com.example.schollink.service.AuthService;
 
@@ -29,7 +30,7 @@ public class AuthController {
 
     @PostMapping("/login/usuario")
     public ResponseEntity<Map<String, String>> loginUser(@RequestBody Map<String, String> loginRequest,
-        HttpSession session) {
+            HttpSession session) {
         String email = loginRequest.get("email");
         String password = loginRequest.get("password");
 
@@ -45,6 +46,25 @@ public class AuthController {
             return ResponseEntity.ok(response);
         }
 
+        response.put("message", "Email ou senha inválidos");
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+    }
+
+    @PostMapping("/login/admin")
+    public ResponseEntity<Map<String, String>> loginAdmin(@RequestBody Map<String, String> loginRequest,
+            HttpSession session) {
+        String email = loginRequest.get("email");
+        String password = loginRequest.get("password");
+
+        Optional<Admin> adminOpt = authService.autenticarAdmin(email, password);
+
+        Map<String, String> response = new HashMap<>();
+        if (adminOpt.isPresent()) {
+            session.setAttribute("userId", adminOpt.get().getId_admin());
+            response.put("message", "Login bem sucedido");
+            response.put("id", String.valueOf(adminOpt.get().getId_admin()));
+            return ResponseEntity.ok(response);
+        }
         response.put("message", "Email ou senha inválidos");
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
     }

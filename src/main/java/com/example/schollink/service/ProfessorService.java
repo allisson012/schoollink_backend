@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.example.schollink.model.Professor;
 import com.example.schollink.model.User;
+import com.example.schollink.model.UserRole;
 import com.example.schollink.repository.ProfessorRepository;
 import com.example.schollink.repository.UserRepository;
 import com.example.schollink.service.PasswordService;
@@ -12,15 +13,19 @@ import com.example.schollink.model.Turno;
 
 @Service
 public class ProfessorService {
-    @Autowired private PasswordService passwordService;
-    @Autowired private UserRepository userRepository;
-    @Autowired private ProfessorRepository professorRepository;
+    @Autowired
+    private PasswordService passwordService;
+    @Autowired
+    private UserRepository userRepository;
+    @Autowired
+    private ProfessorRepository professorRepository;
 
     public void cadastrarProfessor(User user, Professor professor, String senha) {
         byte salt[] = passwordService.gerarSalt();
         byte hash[] = passwordService.gerarHash(senha, salt);
         user.setSalt(salt);
         user.setHash(hash);
+        user.setUserRole(UserRole.PROFESSOR);
         User savedUser = userRepository.save(user);
         professor.setUser(savedUser);
         professorRepository.save(professor);
@@ -28,7 +33,7 @@ public class ProfessorService {
 
     public Professor editarProfessor(Professor novo, Long id) {
         Optional<Professor> profOpt = professorRepository.findById(id);
-        if (profOpt.isEmpty()){
+        if (profOpt.isEmpty()) {
             throw new RuntimeException("Professor não encontrado");
         }
 
@@ -70,7 +75,7 @@ public class ProfessorService {
 
     public void deletarProfessor(Long id) {
         Optional<Professor> profOpt = professorRepository.findById(id);
-        if (profOpt.isEmpty()){
+        if (profOpt.isEmpty()) {
             throw new RuntimeException("Professor não encontrado");
         }
         Professor existente = profOpt.get();
