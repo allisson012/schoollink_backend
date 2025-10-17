@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import com.example.schollink.model.Aluno;
 import com.example.schollink.model.StatusMatricula;
 import com.example.schollink.model.User;
+import com.example.schollink.model.UserRole;
 import com.example.schollink.repository.AlunoRepository;
 import com.example.schollink.repository.UserRepository;
 
@@ -25,6 +26,7 @@ public class AlunoService {
         byte hash[] = passwordService.gerarHash(senha, salt);
         user.setSalt(salt);
         user.setHash(hash);
+        user.setUserRole(UserRole.ALUNO);
         User userCreate = userRepository.save(user);
         aluno.setUser(userCreate);
         alunoRepository.save(aluno);
