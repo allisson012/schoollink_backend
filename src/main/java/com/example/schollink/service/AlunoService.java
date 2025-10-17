@@ -83,4 +83,11 @@ public class AlunoService {
             alunoRepository.save(aluno);
         }
     }
+
+    public Aluno verAluno(Long id){        
+        Aluno aluno = alunoRepository.findByUserId(id)
+                .orElseThrow(() -> new RuntimeException("Aluno não encontrado"));
+
+        return aluno;
+    }
 }
