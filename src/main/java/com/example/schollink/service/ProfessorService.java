@@ -26,7 +26,7 @@ public class ProfessorService {
         professorRepository.save(professor);
     }
 
-    public void editarProfessor(Professor novo, Long id) {
+    public Professor editarProfessor(Professor novo, Long id) {
         Optional<Professor> profOpt = professorRepository.findById(id);
         if (profOpt.isEmpty()){
             throw new RuntimeException("Professor não encontrado");
@@ -65,6 +65,7 @@ public class ProfessorService {
 
             userRepository.save(userExistente);
         }
+        return professorRepository.save(existente);
     }
 
     public void deletarProfessor(Long id) {
