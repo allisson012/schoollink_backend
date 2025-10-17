@@ -1,0 +1,67 @@
+package com.example.schollink.controller;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.*;
+import org.springframework.web.bind.annotation.*;
+import jakarta.servlet.http.HttpSession;
+import java.util.*;
+
+import com.example.schollink.dto.ProfessorDto;
+import com.example.schollink.model.*;
+import com.example.schollink.service.ProfessorService;
+import com.example.schollink.enums.Turno;
+
+@RestController
+@RequestMapping("/professor")
+@CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
+public class ProfessorController{
+    @Autowired 
+    private ProfessorService professorService;
+
+    @PostMapping("/cadastrar")
+    public ResponseEntity<Map<String, String>> cadastrarProfessor(@RequestBody ProfessorDto dto) {
+        User user = new User();
+        user.setNome(dto.getNome());
+        user.setEmail(dto.getEmail());
+
+        Professor professor = new Professor();
+        professor.setFormacaoAcademica(dto.getFormacaoAcademica());
+        professor.setRegistroProfissional(dto.getRegistroProfissional());
+        professor.setCargaHorariaSem(dto.getCargaHorariaSem());
+        professor.setSalario(dto.getSalario());
+        professor.setTurno(Turno.valueOf(dto.getTurno().toUpperCase()));
+
+        professorService.cadastrarProfessor(user, professor, dto.getSenha());
+        return ResponseEntity.ok(Map.of("mensagem", "Professor cadastrado com sucesso"));
+    }
+
+    @PutMapping("/editar")
+    public ResponseEntity<?> editarProfessor(@RequestBody Professor novo, HttpSession session){
+        Long id = (Long) session.getAttribute("userId");
+        if (id == null)
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(Map.of("message", "Usuário não logado"));
+
+        try {
+            Professor atualizado = professorService.editarProfessor(novo, id);
+            return ResponseEntity.ok(Map.of("message", "Professor atualizado", "id", String.valueOf(atualizado.getId())));
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", e.getMessage()));
+        }
+    }
+
+    @DeleteMapping("/deletar")
+    ublic ResponseEntity<?> excluirProfessor(HttpSession session, @RequestParam Long idProfessor) {
+        Long id = (Long) session.getAttribute("userId");
+        if (id == null)
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(Map.of("message", "Usuário não logado"));
+
+        try {
+            professorService.excluirProfessor(idProfessor);
+            return ResponseEntity.ok(Map.of("message", "Professor excluído com sucesso"));
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", e.getMessage()));
+        }
+    }
+}
