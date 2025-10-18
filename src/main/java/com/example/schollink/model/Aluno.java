@@ -21,8 +21,8 @@ public class Aluno {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long idAluno;
-    
-    private String rf_id;
+
+    private String rfid;
 
     @OneToOne(cascade = CascadeType.REMOVE)
     @JoinColumn(name = "idUser", referencedColumnName = "id")
@@ -34,7 +34,7 @@ public class Aluno {
     @JoinColumn(name = "idTurma", referencedColumnName = "id")
     private Turma turma;
     // turma , serie , ano
-    private String nomeResponsavel;    
+    private String nomeResponsavel;
 
     @OneToOne
     @JoinColumn(name = "idEndereco", referencedColumnName = "id")
@@ -146,4 +146,13 @@ public class Aluno {
     public void setProva(List<Prova> prova) {
         this.prova = prova;
     }
+
+    public String getRfid() {
+        return rfid;
+    }
+
+    public void setRfid(String rfid) {
+        this.rfid = rfid;
+    }
+
 }

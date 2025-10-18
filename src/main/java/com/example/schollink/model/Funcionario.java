@@ -25,7 +25,6 @@ public class Funcionario {
     private String telefone;
     private LocalDate dataNascimento;
     private String genero;
-
     @OneToOne
     @JoinColumn(name = "idEndereco", referencedColumnName = "id")
     private Endereco endereco;
@@ -103,6 +102,14 @@ public class Funcionario {
 
     public void setEndereco(Endereco endereco) {
         this.endereco = endereco;
+    }
+
+    public String getRf_id() {
+        return rf_id;
+    }
+
+    public void setRf_id(String rf_id) {
+        this.rf_id = rf_id;
     }
 
 }
