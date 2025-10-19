@@ -12,4 +12,5 @@ import java.util.Optional;
 public interface AlunoRepository extends JpaRepository<Aluno, Long> {
     //public void createAluno(Long idUser, String matricula);
     Optional<Aluno> findByUserId(Long userId);
-}
+    Optional<Aluno> findByRfid(String rfid);
+ }

@@ -28,13 +28,35 @@ public class AuthController {
     @Autowired
     private AuthService authService;
 
-    @PostMapping("/login/usuario")
+    @PostMapping("/login/professor")
     public ResponseEntity<Map<String, String>> loginUser(@RequestBody Map<String, String> loginRequest,
             HttpSession session) {
         String email = loginRequest.get("email");
         String password = loginRequest.get("password");
 
-        Optional<User> usuario = authService.autenticarUsuario(email, password);
+        Optional<User> usuario = authService.autenticarProfessor(email, password);
+
+        Map<String, String> response = new HashMap<>();
+        if (usuario.isPresent()) {
+            session.setAttribute("userId", usuario.get().getId());
+            session.setAttribute("nome", usuario.get().getNome());
+            response.put("message", "Login bem sucedido");
+            response.put("id", String.valueOf(usuario.get().getId()));
+            response.put("nome", usuario.get().getNome());
+            return ResponseEntity.ok(response);
+        }
+
+        response.put("message", "Email ou senha inválidos");
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+    }
+
+    @PostMapping("/login/aluno")
+    public ResponseEntity<Map<String, String>> loginAluno(@RequestBody Map<String, String> loginRequest,
+            HttpSession session) {
+        String email = loginRequest.get("email");
+        String password = loginRequest.get("password");
+
+        Optional<User> usuario = authService.autenticarAluno(email, password);
 
         Map<String, String> response = new HashMap<>();
         if (usuario.isPresent()) {

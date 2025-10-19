@@ -117,4 +117,13 @@ public class Professor {
         this.disciplinas = disciplinas;
     }
 
+    public Funcionario getFuncionario() {
+        return funcionario;
+    }
+
+    public void setFuncionario(Funcionario funcionario) {
+        this.funcionario = funcionario;
+    }
+
+    
 }

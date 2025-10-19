@@ -6,7 +6,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
 
 @Entity
 public class Presenca {
@@ -17,7 +16,7 @@ public class Presenca {
     @ManyToOne
     @JoinColumn(name = "idAluno", referencedColumnName = "idAluno")
     private Aluno aluno;
-    private Boolean presente;
+    private Boolean presente = false;
 
     @ManyToOne
     @JoinColumn(name = "horarioAula_id")
@@ -31,7 +30,6 @@ public class Presenca {
     public void setHorarioAula(HorarioAula horarioAula) {
         this.horarioAula = horarioAula;
     }
-
 
     public Long getIdPresenca() {
         return idPresenca;

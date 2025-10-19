@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import com.example.schollink.model.Admin;
 import com.example.schollink.model.User;
+import com.example.schollink.model.UserRole;
 import com.example.schollink.repository.AdminRepository;
 import com.example.schollink.repository.UserRepository;
 
@@ -22,13 +23,26 @@ public class AuthService {
     @Autowired
     private PasswordService passwordService;
 
-    public Optional<User> autenticarUsuario(String email, String senha) {
+    public Optional<User> autenticarProfessor(String email, String senha) {
         Optional<User> userOpt = userRepository.findByEmail(email);
 
         if (userOpt.isPresent()) {
             User user = userOpt.get();
             boolean senhaValida = passwordService.compararSenha(senha, user.getHash(), user.getSalt());
-            if (senhaValida) {
+            if (senhaValida && user.getUserRole() != null && user.getUserRole().equals(UserRole.PROFESSOR)) {
+                return Optional.of(user);
+            }
+        }
+        return Optional.empty();
+    }
+
+    public Optional<User> autenticarAluno(String email, String senha) {
+        Optional<User> userOpt = userRepository.findByEmail(email);
+
+        if (userOpt.isPresent()) {
+            User user = userOpt.get();
+            boolean senhaValida = passwordService.compararSenha(senha, user.getHash(), user.getSalt());
+            if (senhaValida && user.getUserRole() != null && user.getUserRole().equals(UserRole.ALUNO)) {
                 return Optional.of(user);
             }
         }

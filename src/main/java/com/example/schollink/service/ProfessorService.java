@@ -3,13 +3,13 @@ package com.example.schollink.service;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import com.example.schollink.model.Funcionario;
 import com.example.schollink.model.Professor;
 import com.example.schollink.model.User;
 import com.example.schollink.model.UserRole;
 import com.example.schollink.repository.ProfessorRepository;
 import com.example.schollink.repository.UserRepository;
-import com.example.schollink.service.PasswordService;
-import com.example.schollink.model.Turno;
 
 @Service
 public class ProfessorService {
@@ -19,6 +19,8 @@ public class ProfessorService {
     private UserRepository userRepository;
     @Autowired
     private ProfessorRepository professorRepository;
+    @Autowired
+    private FuncionarioService funcionarioService;
 
     public void cadastrarProfessor(User user, Professor professor, String senha) {
         byte salt[] = passwordService.gerarSalt();
@@ -27,7 +29,16 @@ public class ProfessorService {
         user.setHash(hash);
         user.setUserRole(UserRole.PROFESSOR);
         User savedUser = userRepository.save(user);
+        Funcionario funcionario = new Funcionario();
+        funcionario.setNome(user.getNome());
+        funcionario.setEmail(user.getEmail());
+        funcionario.setGenero(user.getGenero());
+        funcionario.setCpf(user.getCpf());
+        funcionario.setTelefone(user.getTelefone());
+        Funcionario funcionarioSalvo = funcionarioService.cadastrarFuncionario(funcionario);
+        professor.setFuncionario(funcionarioSalvo);
         professor.setUser(savedUser);
+
         professorRepository.save(professor);
     }
 
