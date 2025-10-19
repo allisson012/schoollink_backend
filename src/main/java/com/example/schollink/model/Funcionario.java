@@ -18,7 +18,7 @@ public class Funcionario {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long idFuncionario;
 
-    private String rf_id;
+    private String rfid;
     private String nome;
     private String email;
     private String cpf;
@@ -104,12 +104,12 @@ public class Funcionario {
         this.endereco = endereco;
     }
 
-    public String getRf_id() {
-        return rf_id;
+    public String getRfid() {
+        return rfid;
     }
 
-    public void setRf_id(String rf_id) {
-        this.rf_id = rf_id;
+    public void setRfid(String rfid) {
+        this.rfid = rfid;
     }
 
 }
