@@ -16,7 +16,7 @@ public class RfidController {
     @Autowired
     private RfidService rfidService;
 
-    @PostMapping("/ponto")
+    @PostMapping("/pontoAluno")
     public ResponseEntity<String> registrarPonto(@RequestBody RfidDto rfidDto) {
         rfidService.registrarPonto(rfidDto.getRfidCodigo());
         return ResponseEntity.ok("Ponto registrado: " + rfidDto.getRfidCodigo());

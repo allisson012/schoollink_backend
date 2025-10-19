@@ -1,5 +1,8 @@
 package com.example.schollink.service;
 
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,33 +25,30 @@ public class RfidService {
     private HorarioAulaRepository horarioAulaRepository;
 
     public boolean registrarPonto(String rfid) {
-        System.out.println("Dentro do service " + rfid);
         Optional<Aluno> alunoOpt = alunoRepository.findByRfid(rfid);
-        if (alunoOpt.isPresent()) {
-            Aluno aluno = new Aluno();
-            aluno = alunoOpt.get();
-            System.out.println("aluno rfid" + aluno.getRfid());
-            Presenca presenca = new Presenca();
-            presenca.setAluno(aluno);
-            presenca.setPresente(true);
-            Optional<HorarioAula> horarioAulaOpt;
-            Long id = 1L;
-            horarioAulaOpt = horarioAulaRepository.findById(id);
-            HorarioAula horarioAula = new HorarioAula();
-            if (horarioAulaOpt.isPresent()) {
-                horarioAula = horarioAulaOpt.get();
-                System.out.println("horario de aula = " + horarioAula.getDiaSemana());
-                presenca.setHorarioAula(horarioAula);
-                aluno.getPresencas().add(presenca);
-                alunoRepository.save(aluno);
-                presencaRepository.save(presenca);
-                return true;
-            } else {
-                return false;
-            }
-            // as aulas vou ter que pegar pelo dia e atribuir a presença para elas
-            // salvar presença
+        if (alunoOpt.isEmpty()) {
+            return false;
         }
-        return false;
+    
+        Aluno aluno = alunoOpt.get();
+        LocalDate dataAtual = LocalDate.now();
+        List<HorarioAula> aulasDoDia = horarioAulaRepository.findByDataAndTurma(dataAtual, aluno.getTurma());
+    
+        if (aulasDoDia.isEmpty()) {
+            return false;
+        }
+    
+        for (HorarioAula horarioAula : aulasDoDia) {
+            boolean jaRegistrada = presencaRepository.existsByAlunoAndHorarioAula(aluno, horarioAula);
+            if (!jaRegistrada) {
+                Presenca presenca = new Presenca();
+                presenca.setAluno(aluno);
+                presenca.setPresente(true);
+                presenca.setHorarioAula(horarioAula);
+                presencaRepository.save(presenca);
+            }
+        }
+        return true;
     }
+    
 }
