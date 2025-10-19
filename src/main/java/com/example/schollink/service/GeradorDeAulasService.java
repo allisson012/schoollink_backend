@@ -23,8 +23,7 @@ public class GeradorDeAulasService {
     @Autowired
     private HorarioAulaRepository horarioAulaRepository;
 
-    // roda todo domingo às 00:00 (você pode mudar pra manual depois)
-    @Scheduled(cron = "0 0 0 * * SUN")
+    @Scheduled(cron = "0 0 21 * * SUN", zone = "America/Sao_Paulo")
     public void gerarAulasDaSemana() {
         LocalDate hoje = LocalDate.now();
         LocalDate proximaSegunda = hoje.with(TemporalAdjusters.next(DayOfWeek.MONDAY));

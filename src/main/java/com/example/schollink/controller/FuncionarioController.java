@@ -14,19 +14,19 @@ import com.example.schollink.service.FuncionarioService;
 @RestController()
 @RequestMapping("/funcionario")
 public class FuncionarioController {
-@Autowired
-private FuncionarioService funcionarioService;
+    @Autowired
+    private FuncionarioService funcionarioService;
 
-@PostMapping("/cadastrar")
-public ResponseEntity<?> cadastrarFuncionario(@RequestBody FuncionarioDto funcionarioDto){
-    Funcionario funcionario = new Funcionario();
-    funcionario.setNome(funcionarioDto.getNome());
-    funcionario.setEmail(funcionarioDto.getEmail());
-    funcionario.setGenero(funcionarioDto.getGenero());
-    funcionario.setCpf(funcionarioDto.getCpf());
-    funcionario.setTelefone(funcionarioDto.getTelefone());
-    funcionario.setRf_id(funcionarioDto.getRf_id());
-    funcionarioService.cadastrarFuncionario(funcionario);
-    return null;
-}
+    @PostMapping("/cadastrar")
+    public ResponseEntity<?> cadastrarFuncionario(@RequestBody FuncionarioDto funcionarioDto) {
+        Funcionario funcionario = new Funcionario();
+        funcionario.setNome(funcionarioDto.getNome());
+        funcionario.setEmail(funcionarioDto.getEmail());
+        funcionario.setGenero(funcionarioDto.getGenero());
+        funcionario.setCpf(funcionarioDto.getCpf());
+        funcionario.setTelefone(funcionarioDto.getTelefone());
+        funcionario.setRfid(funcionarioDto.getRfid());
+        funcionarioService.cadastrarFuncionario(funcionario);
+        return null;
+    }
 }
