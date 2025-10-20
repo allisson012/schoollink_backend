@@ -1,7 +1,10 @@
 package com.example.schollink.controller;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -17,10 +20,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.schollink.Dto.ProfessorDto;
+import com.example.schollink.model.Disciplina;
 import com.example.schollink.model.Professor;
 import com.example.schollink.model.Turno;
 import com.example.schollink.model.User;
 import com.example.schollink.service.ProfessorService;
+import com.example.schollink.service.DisciplinaService;
 
 import jakarta.servlet.http.HttpSession;
 
@@ -30,6 +35,8 @@ import jakarta.servlet.http.HttpSession;
 public class ProfessorController {
     @Autowired
     private ProfessorService professorService;
+    @Autowired
+    private DisciplinaService disciplinaService;
 
     @PostMapping("/cadastrar")
     public ResponseEntity<Map<String, String>> cadastrarProfessor(@RequestBody ProfessorDto dto) {
@@ -43,8 +50,22 @@ public class ProfessorController {
         professor.setCargaHorariaSem(dto.getCargaHorariaSem());
         professor.setSalario(dto.getSalario());
         // professor.setTurno(Turno.valueOf(dto.getTurno().toUpperCase()));
+        List<Disciplina> disciplinas = new ArrayList<>();
 
-        professorService.cadastrarProfessor(user, professor, dto.getSenha());
+        if (dto.getDisciplinaIds() != null) {
+            disciplinas = dto.getDisciplinaIds().stream()
+                .map(id -> disciplinaService.buscarDisciplinaPorId(id)
+                    .orElseThrow(() -> new RuntimeException("Disciplina não encontrada: " + id)))
+                .collect(Collectors.toList());
+        }
+        else {
+            professor.setDisciplinas(new ArrayList<>());
+        }
+
+        professor.setDisciplinas(disciplinas);
+
+        professorService.cadastrarProfessor(user, professor, dto.getSenha(), dto.getDisciplinaIds());
+
         return ResponseEntity.ok(Map.of("mensagem", "Professor cadastrado com sucesso"));
     }
 

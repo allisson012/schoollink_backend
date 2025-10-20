@@ -1,15 +1,22 @@
 package com.example.schollink.service;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.example.schollink.model.Disciplina;
 import com.example.schollink.model.Funcionario;
 import com.example.schollink.model.Professor;
 import com.example.schollink.model.User;
 import com.example.schollink.model.UserRole;
 import com.example.schollink.repository.ProfessorRepository;
 import com.example.schollink.repository.UserRepository;
+
+import jakarta.transaction.Transactional;
 
 @Service
 public class ProfessorService {
@@ -21,10 +28,13 @@ public class ProfessorService {
     private ProfessorRepository professorRepository;
     @Autowired
     private FuncionarioService funcionarioService;
+    @Autowired
+    private DisciplinaService disciplinaService;
 
-    public void cadastrarProfessor(User user, Professor professor, String senha) {
-        byte salt[] = passwordService.gerarSalt();
-        byte hash[] = passwordService.gerarHash(senha, salt);
+    @Transactional
+    public void cadastrarProfessor(User user, Professor professor, String senha, List<Long> disciplinaIds) {
+        byte[] salt = passwordService.gerarSalt();
+        byte[] hash = passwordService.gerarHash(senha, salt);
         user.setSalt(salt);
         user.setHash(hash);
         user.setUserRole(UserRole.PROFESSOR);
@@ -36,11 +46,24 @@ public class ProfessorService {
         funcionario.setCpf(user.getCpf());
         funcionario.setTelefone(user.getTelefone());
         Funcionario funcionarioSalvo = funcionarioService.cadastrarFuncionario(funcionario);
-        professor.setFuncionario(funcionarioSalvo);
+
         professor.setUser(savedUser);
+        professor.setFuncionario(funcionarioSalvo);
+
+        List<Disciplina> disciplinas = new ArrayList<>();
+        if (disciplinaIds != null) {
+            for (Long id : disciplinaIds) {
+                Disciplina d = disciplinaService.buscarDisciplinaPorId(id)
+                    .orElseThrow(() -> new RuntimeException("Disciplina não encontrada: " + id));
+                disciplinas.add(d);
+            }
+        }
+
+        professor.setDisciplinas(disciplinas);
 
         professorRepository.save(professor);
     }
+
 
     public Professor editarProfessor(Professor novo, Long id) {
         Optional<Professor> profOpt = professorRepository.findById(id);

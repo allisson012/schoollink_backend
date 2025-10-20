@@ -1,6 +1,7 @@
 package com.example.schollink.controller;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +16,9 @@ import com.example.schollink.Dto.DisciplinaDto;
 import com.example.schollink.model.Disciplina;
 import com.example.schollink.service.DisciplinaService;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
 
 @RestController()
 @RequestMapping("/disciplina")
@@ -24,12 +28,12 @@ public class DisciplinaController {
 
     @PostMapping("/cadastrar")
     public ResponseEntity<Map<String, String>> cadastrarDisciplina(@RequestBody DisciplinaDto disciplinaDto) {
-        if (disciplinaDto.getNome() == null || disciplinaDto.getIdProfessor() == null) {
-            return ResponseEntity.badRequest().body(Map.of("mensagem", "Nome e ID do professor são obrigatórios"));
+        if (disciplinaDto.getNome() == null ) {
+            return ResponseEntity.badRequest().body(Map.of("mensagem", "Nome da disciplina é obrigatório"));
         }
         Disciplina disciplina = new Disciplina();
         disciplina.setNome(disciplinaDto.getNome());
-        boolean sucesso = disciplinaService.cadastrarDisciplina(disciplina, disciplinaDto.getIdProfessor());
+        boolean sucesso = disciplinaService.cadastrarDisciplina(disciplina);
         if (sucesso) {
             return ResponseEntity.ok(Map.of("mensagem", "Disciplina cadastrada com sucesso"));
         } else {
@@ -37,4 +41,14 @@ public class DisciplinaController {
                     .body(Map.of("mensagem", "Professor não encontrado, não foi possível cadastrar a disciplina"));
         }
     }
+
+    @GetMapping("/buscar-todas")
+    public ResponseEntity<List<DisciplinaDto>> buscarTodasDisciplinas() {
+        List<DisciplinaDto> disciplinas = disciplinaService.buscarTodasDisciplinas();
+        if(disciplinas.isEmpty()){
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        }
+        return ResponseEntity.ok(disciplinas);
+    }
+    
 }

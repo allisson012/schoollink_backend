@@ -1,5 +1,7 @@
 package com.example.schollink.Dto;
 
+import java.util.List;
+
 public class ProfessorDto{
     private String nome;
     private String email;
@@ -9,6 +11,7 @@ public class ProfessorDto{
     private double cargaHorariaSem;
     private String turno;
     private double salario;
+    private List<Long> disciplinaIds;
 
     public void setNome(String nome){
         this.nome = nome;
@@ -72,5 +75,13 @@ public class ProfessorDto{
 
     public void setSalario(double salario) {
         this.salario = salario;
+    }
+
+    public List<Long> getDisciplinaIds() {
+        return disciplinaIds;
+    }
+
+    public void setDisciplinaIds(List<Long> disciplinaIds) {
+        this.disciplinaIds = disciplinaIds;
     }
 }

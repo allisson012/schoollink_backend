@@ -11,6 +11,8 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 
@@ -30,8 +32,15 @@ public class Professor {
 
     private LocalDate dataContratacao;
     private String formacaoAcademica;
-    @OneToMany(mappedBy = "professor")
+
+    @ManyToMany
+    @JoinTable(
+        name = "professor_disciplina",
+        joinColumns = @JoinColumn(name = "professor_id"),
+        inverseJoinColumns = @JoinColumn(name = "disciplina_id")
+    )
     private List<Disciplina> disciplinas = new ArrayList<>();
+
     // disciplinas que leciona
     // turmas estou pensando em colocar todas turmas que o professor ministra para o
     // acesso a elas ficar mais simples
