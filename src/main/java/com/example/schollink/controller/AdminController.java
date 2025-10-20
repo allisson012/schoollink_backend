@@ -29,7 +29,7 @@ public class AdminController {
         String senha = adminDto.getSenha();
         adminService.cadastrarAdmin(admin, senha);
         Map<String, String> response = new HashMap<>();
-        response.put("mensagem", "Aluno Cadastrado com sucesso");
+        response.put("mensagem", "Administrador Cadastrado com sucesso");
         return ResponseEntity.ok(response);
     }
 

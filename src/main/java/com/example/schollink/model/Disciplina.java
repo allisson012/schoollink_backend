@@ -8,6 +8,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 
@@ -17,9 +18,10 @@ public class Disciplina {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String nome;
-    @ManyToOne
-    @JoinColumn(name = "professorId", referencedColumnName = "id")
-    private Professor professor;
+
+    @ManyToMany(mappedBy = "disciplinas")
+    private List<Professor> professores = new ArrayList<>();
+
     @OneToMany(mappedBy = "disciplina")
     private List<Prova> provas = new ArrayList<>();
 
@@ -39,12 +41,22 @@ public class Disciplina {
         this.nome = nome;
     }
 
-    public Professor getProfessor() {
-        return professor;
+
+    public List<Professor> getProfessores() {
+        return this.professores;
     }
 
-    public void setProfessor(Professor professor) {
-        this.professor = professor;
+    public void setProfessores(List<Professor> professores) {
+        this.professores = professores;
     }
+
+    public List<Prova> getProvas() {
+        return this.provas;
+    }
+
+    public void setProvas(List<Prova> provas) {
+        this.provas = provas;
+    }
+    
 
 }
