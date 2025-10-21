@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.example.schollink.Dto.AlunoDto;
 import com.example.schollink.model.Aluno;
 import com.example.schollink.model.User;
+import com.example.schollink.model.UserRole;
 import com.example.schollink.service.AlunoService;
 
 import jakarta.servlet.http.HttpSession;
@@ -41,6 +42,28 @@ public class AlunoController {
         Map<String, String> response = new HashMap<>();
         response.put("mensagem", "Aluno Cadastrado com sucesso");
         return ResponseEntity.ok(response);
+    }
+
+    // cadastrar usando userRole precisa de alguns ajustes no front para funcionar
+    @PostMapping("/cadastrar/verificar")
+    public ResponseEntity<Map<String, String>> CadastrarAlunoComVerificacao(@RequestBody AlunoDto alunoDto,
+            HttpSession session) {
+        User user = new User();
+        user.setNome(alunoDto.getNome());
+        user.setEmail(alunoDto.getEmail());
+        Aluno aluno = new Aluno();
+        UserRole userRole = (UserRole) session.getAttribute("UserRole");
+        if (userRole != null && userRole.equals(UserRole.ADMIN)) {
+            aluno.setMatricula(alunoDto.getMatricula());
+            alunoService.cadastrarAluno(user, aluno, alunoDto.getSenha());
+            Map<String, String> response = new HashMap<>();
+            response.put("mensagem", "Aluno Cadastrado com sucesso");
+            return ResponseEntity.ok(response);
+        } else {
+            Map<String, String> response = new HashMap<>();
+            response.put("mensagem", "Somente usuários do tipo ADMIN podem realizar essa ação");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+        }
     }
 
     @PutMapping("/editar")
@@ -75,32 +98,30 @@ public class AlunoController {
     }
 
     @GetMapping("/me")
-    public ResponseEntity<?> verAluno(HttpSession session){
+    public ResponseEntity<?> verAluno(HttpSession session) {
         Long id = (Long) session.getAttribute("userId");
         if (id == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(Map.of("message", "Usuário não logado ou ID do aluno não informado"));
         }
-        try{
+        try {
             Aluno aluno = alunoService.verAluno(id);
-            return ResponseEntity.ok().body(Map.of("nome", aluno.getUser().getNome())); 
-        }
-        catch (RuntimeException e) {
+            return ResponseEntity.ok().body(Map.of("nome", aluno.getUser().getNome()));
+        } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", e.getMessage()));
         }
     }
 
     @GetMapping("/buscarAluno/{idAluno}")
-    public ResponseEntity<?> buscarAluno(HttpSession session, @PathVariable Long idAluno){        
+    public ResponseEntity<?> buscarAluno(HttpSession session, @PathVariable Long idAluno) {
         if (idAluno == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(Map.of("message", "ID do aluno não informado"));
         }
-        try{
+        try {
             Aluno aluno = alunoService.verAluno(idAluno);
-            return ResponseEntity.ok().body(aluno); 
-        }
-        catch (RuntimeException e) {
+            return ResponseEntity.ok().body(aluno);
+        } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", e.getMessage()));
         }
     }

@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.schollink.model.Admin;
 import com.example.schollink.model.User;
+import com.example.schollink.model.UserRole;
 import com.example.schollink.service.AuthService;
 
 import jakarta.servlet.http.HttpSession;
@@ -40,6 +41,7 @@ public class AuthController {
         if (usuario.isPresent()) {
             session.setAttribute("userId", usuario.get().getId());
             session.setAttribute("nome", usuario.get().getNome());
+            session.setAttribute("UserRole", usuario.get().getUserRole());
             response.put("message", "Login bem sucedido");
             response.put("id", String.valueOf(usuario.get().getId()));
             response.put("nome", usuario.get().getNome());
@@ -62,6 +64,7 @@ public class AuthController {
         if (usuario.isPresent()) {
             session.setAttribute("userId", usuario.get().getId());
             session.setAttribute("nome", usuario.get().getNome());
+            session.setAttribute("UserRole", usuario.get().getUserRole());
             response.put("message", "Login bem sucedido");
             response.put("id", String.valueOf(usuario.get().getId()));
             response.put("nome", usuario.get().getNome());
@@ -83,6 +86,7 @@ public class AuthController {
         Map<String, String> response = new HashMap<>();
         if (adminOpt.isPresent()) {
             session.setAttribute("userId", adminOpt.get().getId_admin());
+            session.setAttribute("UserRole", adminOpt.get().getUserRole());
             response.put("message", "Login bem sucedido");
             response.put("id", String.valueOf(adminOpt.get().getId_admin()));
             return ResponseEntity.ok(response);
