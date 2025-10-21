@@ -64,7 +64,7 @@ public class ProfessorController {
 
         professor.setDisciplinas(disciplinas);
 
-        professorService.cadastrarProfessor(user, professor, dto.getSenha(), dto.getDisciplinaIds());
+        professorService.cadastrarProfessor(user, professor, dto.getSenha());
 
         return ResponseEntity.ok(Map.of("mensagem", "Professor cadastrado com sucesso"));
     }
