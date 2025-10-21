@@ -1,7 +1,9 @@
 package com.example.schollink.controller;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -104,4 +106,20 @@ public class AlunoController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", e.getMessage()));
         }
     }
+
+    @GetMapping("/buscar")
+    public ResponseEntity<?> buscarAlunos(
+        @RequestParam(required = false) String nome,
+        @RequestParam(required = false) String matricula,
+        @RequestParam(required = false) String email
+    ) {
+        Optional<List<Aluno>> aluno = alunoService.buscar(nome, matricula, email);
+        
+        if (aluno.isPresent()) {
+            return ResponseEntity.ok(aluno.get());
+        } else {
+            return ResponseEntity.status(404).body("Aluno não encontrado");
+        }
+    }
+
 }
