@@ -32,7 +32,7 @@ public class ProfessorService {
     private DisciplinaService disciplinaService;
 
     @Transactional
-    public void cadastrarProfessor(User user, Professor professor, String senha, List<Long> disciplinaIds) {
+    public void cadastrarProfessor(User user, Professor professor, String senha ) {
         byte[] salt = passwordService.gerarSalt();
         byte[] hash = passwordService.gerarHash(senha, salt);
         user.setSalt(salt);
@@ -49,17 +49,6 @@ public class ProfessorService {
 
         professor.setUser(savedUser);
         professor.setFuncionario(funcionarioSalvo);
-
-        List<Disciplina> disciplinas = new ArrayList<>();
-        if (disciplinaIds != null) {
-            for (Long id : disciplinaIds) {
-                Disciplina d = disciplinaService.buscarDisciplinaPorId(id)
-                    .orElseThrow(() -> new RuntimeException("Disciplina não encontrada: " + id));
-                disciplinas.add(d);
-            }
-        }
-
-        professor.setDisciplinas(disciplinas);
 
         professorRepository.save(professor);
     }
