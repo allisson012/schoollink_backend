@@ -1,59 +1,73 @@
 package com.example.schollink.Dto;
 
+import java.time.LocalDate;
+
+
 public class AlunoDto {
-    private String nome;
-    private String email;
-    private String senha;
+    private UserDto userDto;
     private String matricula;
+    private LocalDate dataMatricula;
     private String statusMatricula;
-    private String telefone;
+    private String nomeResponsavel;
+    private String telefoneResponsavel;
+    private EnderecoDto enderecoDto;
 
-    public void setNome(String nome) {
-        this.nome = nome;
+
+    public UserDto getUserDto() {
+        return this.userDto;
     }
 
-    public String getNome() {
-        return this.nome;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getEmail() {
-        return this.email;
-    }
-
-    public void setSenha(String senha) {
-        this.senha = senha;
-    }
-
-    public String getSenha() {
-        return this.senha;
-    }
-
-    public void setMatricula(String matricula) {
-        this.matricula = matricula;
+    public void setUserDto(UserDto userDto) {
+        this.userDto = userDto;
     }
 
     public String getMatricula() {
         return this.matricula;
     }
 
+    public void setMatricula(String matricula) {
+        this.matricula = matricula;
+    }
+
+    public LocalDate getDataMatricula() {
+        return this.dataMatricula;
+    }
+
+    public void setDataMatricula(LocalDate dataMatricula) {
+        this.dataMatricula = dataMatricula;
+    }
+
     public String getStatusMatricula() {
-        return statusMatricula;
+        return this.statusMatricula;
     }
 
     public void setStatusMatricula(String statusMatricula) {
         this.statusMatricula = statusMatricula;
     }
 
-    public String getTelefone() {
-        return telefone;
+    public String getNomeResponsavel() {
+        return this.nomeResponsavel;
     }
 
-    public void setTelefone(String telefone) {
-        this.telefone = telefone;
+    public void setNomeResponsavel(String nomeResponsavel) {
+        this.nomeResponsavel = nomeResponsavel;
     }
+
+    public String getTelefoneResponsavel() {
+        return this.telefoneResponsavel;
+    }
+
+    public void setTelefoneResponsavel(String telefoneResponsavel) {
+        this.telefoneResponsavel = telefoneResponsavel;
+    }
+
+    public EnderecoDto getEnderecoDto() {
+        return this.enderecoDto;
+    }
+
+    public void setEnderecoDto(EnderecoDto enderecoDto) {
+        this.enderecoDto = enderecoDto;
+    }
+
 
 }
