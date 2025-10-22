@@ -71,13 +71,13 @@ public class AlunoController {
     public ResponseEntity<Map<String, String>> CadastrarAlunoComVerificacao(@RequestBody AlunoDto alunoDto,
             HttpSession session) {
         User user = new User();
-        user.setNome(alunoDto.getNome());
-        user.setEmail(alunoDto.getEmail());
+        user.setNome(alunoDto.getUserDto().getNome());
+        user.setEmail(alunoDto.getUserDto().getEmail());
         Aluno aluno = new Aluno();
         UserRole userRole = (UserRole) session.getAttribute("UserRole");
         if (userRole != null && userRole.equals(UserRole.ADMIN)) {
             aluno.setMatricula(alunoDto.getMatricula());
-            alunoService.cadastrarAluno(user, aluno, alunoDto.getSenha());
+            alunoService.cadastrarAluno(user, aluno, alunoDto.getUserDto().getSenha());
             Map<String, String> response = new HashMap<>();
             response.put("mensagem", "Aluno Cadastrado com sucesso");
             return ResponseEntity.ok(response);
