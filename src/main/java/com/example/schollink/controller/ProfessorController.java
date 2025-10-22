@@ -99,4 +99,11 @@ public class ProfessorController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", e.getMessage()));
         }
     }
+
+    // buscar aulas do dia
+
+    @PostMapping("chamada")
+    public ResponseEntity<?> chamadaAula(@RequestBody Long idProfessor , Long idHorarioAula){
+      return null;
+    }
 }
