@@ -1,5 +1,7 @@
 package com.example.schollink.service;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -90,4 +92,19 @@ public class AlunoService {
 
         return aluno;
     }
+
+     public Optional<List<Aluno>> buscar(String nome, String matricula, String email) {
+        List<Aluno> alunos = new ArrayList<>();
+
+        if (email != null && !email.isEmpty()) {
+            alunos = alunoRepository.findByUserEmailContainingIgnoreCase(email);
+        } else if (matricula != null && !matricula.isEmpty()) {
+            alunos = alunoRepository.findByMatriculaContainingIgnoreCase(matricula);
+        } else if (nome != null && !nome.isEmpty()) {
+            alunos = alunoRepository.findByUserNomeContainingIgnoreCase(nome);
+        }
+
+        return alunos.isEmpty() ? Optional.empty() : Optional.of(alunos);
+    }
+
 }

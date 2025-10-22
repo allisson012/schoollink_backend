@@ -35,10 +35,7 @@ public class Aluno {
     private Turma turma;
     // turma , serie , ano
     private String nomeResponsavel;
-
-    @OneToOne
-    @JoinColumn(name = "idEndereco", referencedColumnName = "id")
-    private Endereco endereco;
+    
     private String telefoneResponsavel;
     private LocalDate dataIngresso;
     // foto
@@ -98,15 +95,7 @@ public class Aluno {
     public void setDataMatricula(LocalDate dataMatricula) {
         this.dataMatricula = dataMatricula;
     }
-
-    public Endereco getEndereco() {
-        return endereco;
-    }
-
-    public void setEndereco(Endereco endereco) {
-        this.endereco = endereco;
-    }
-
+    
     public String getTelefoneResponsavel() {
         return telefoneResponsavel;
     }

@@ -1,7 +1,9 @@
 package com.example.schollink.controller;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -18,6 +20,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.schollink.Dto.AlunoDto;
 import com.example.schollink.model.Aluno;
+import com.example.schollink.model.Endereco;
+import com.example.schollink.model.StatusMatricula;
 import com.example.schollink.model.User;
 import com.example.schollink.model.UserRole;
 import com.example.schollink.service.AlunoService;
@@ -34,11 +38,29 @@ public class AlunoController {
     @PostMapping("/cadastrar")
     public ResponseEntity<Map<String, String>> CadastrarAluno(@RequestBody AlunoDto alunoDto) {
         User user = new User();
-        user.setNome(alunoDto.getNome());
-        user.setEmail(alunoDto.getEmail());
+        user.setNome(alunoDto.getUserDto().getNome());
+        user.setEmail(alunoDto.getUserDto().getEmail());
+        user.setCpf(alunoDto.getUserDto().getCpf());
+        user.setDataNascimento(alunoDto.getUserDto().getDataNascimento());
+        user.setGenero(alunoDto.getUserDto().getGenero());     
+        user.setTelefone(alunoDto.getUserDto().getTelefone());
+        if (user.getEndereco() == null) {
+            user.setEndereco(new Endereco());
+        }
+        user.getEndereco().setCep(alunoDto.getEnderecoDto().getCep());
+        user.getEndereco().setPais(alunoDto.getEnderecoDto().getPais());
+        user.getEndereco().setEstado(alunoDto.getEnderecoDto().getEstado());
+        user.getEndereco().setCidade(alunoDto.getEnderecoDto().getCidade());
+        user.getEndereco().setRua(alunoDto.getEnderecoDto().getRua());
+        user.getEndereco().setNumero(alunoDto.getEnderecoDto().getNumero());
         Aluno aluno = new Aluno();
         aluno.setMatricula(alunoDto.getMatricula());
-        alunoService.cadastrarAluno(user, aluno, alunoDto.getSenha());
+        aluno.setDataMatricula(alunoDto.getDataMatricula());
+        aluno.setStatusMatricula(StatusMatricula.valueOf(alunoDto.getStatusMatricula()));
+        aluno.setNomeResponsavel(alunoDto.getNomeResponsavel());
+        aluno.setTelefoneResponsavel(alunoDto.getTelefoneResponsavel());  
+        
+        alunoService.cadastrarAluno(user, aluno, alunoDto.getUserDto().getSenha());         
         Map<String, String> response = new HashMap<>();
         response.put("mensagem", "Aluno Cadastrado com sucesso");
         return ResponseEntity.ok(response);
@@ -125,4 +147,20 @@ public class AlunoController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", e.getMessage()));
         }
     }
+
+    @GetMapping("/buscar")
+    public ResponseEntity<?> buscarAlunos(
+        @RequestParam(required = false) String nome,
+        @RequestParam(required = false) String matricula,
+        @RequestParam(required = false) String email
+    ) {
+        Optional<List<Aluno>> aluno = alunoService.buscar(nome, matricula, email);
+        
+        if (aluno.isPresent()) {
+            return ResponseEntity.ok(aluno.get());
+        } else {
+            return ResponseEntity.status(404).body("Aluno não encontrado");
+        }
+    }
+
 }
