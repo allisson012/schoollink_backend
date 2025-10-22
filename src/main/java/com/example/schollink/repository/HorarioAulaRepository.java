@@ -17,6 +17,6 @@ public interface HorarioAulaRepository extends JpaRepository<HorarioAula, Long> 
 
     List<HorarioAula> findByDataAndTurma(LocalDate data, Turma turma);
 
-    List<HorarioAula> findByDataAndIdProfessor(LocalDate data, Long idProfessor);
+    List<HorarioAula> findByDataAndProfessorId(LocalDate data, Long professorId);
 
 }

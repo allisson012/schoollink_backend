@@ -10,5 +10,5 @@ import com.example.schollink.model.Turma;
 
 @Repository
 public interface TurmaRepository extends JpaRepository<Turma, Long> {
- List<Aluno> findByIdTurma(Long idTurma);
+   // List<Aluno> findByTurmaId(Long idTurma);
 }

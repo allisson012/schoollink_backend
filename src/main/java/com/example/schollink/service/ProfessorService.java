@@ -5,20 +5,25 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.example.schollink.Dto.AlunoDto;
+import com.example.schollink.Dto.UserDto;
 import com.example.schollink.model.Aluno;
 import com.example.schollink.model.Disciplina;
 import com.example.schollink.model.Funcionario;
 import com.example.schollink.model.HorarioAula;
+import com.example.schollink.model.Presenca;
 import com.example.schollink.model.Professor;
 import com.example.schollink.model.Turma;
 import com.example.schollink.model.User;
 import com.example.schollink.model.UserRole;
 import com.example.schollink.repository.HorarioAulaRepository;
+import com.example.schollink.repository.PresencaRepository;
 import com.example.schollink.repository.ProfessorRepository;
 import com.example.schollink.repository.TurmaRepository;
 import com.example.schollink.repository.UserRepository;
@@ -41,6 +46,8 @@ public class ProfessorService {
     private HorarioAulaRepository horarioAulaRepository;
     @Autowired
     private TurmaRepository turmaRepository;
+    @Autowired
+    private PresencaRepository presencaRepository;
 
     @Transactional
     public void cadastrarProfessor(User user, Professor professor, String senha) {
@@ -115,43 +122,39 @@ public class ProfessorService {
         professorRepository.delete(existente);
     }
 
-    public List<Aluno> receberAlunosParaChamada(Long idProfessor, Long idHorarioAula) {
-        Optional<HorarioAula> aulaOpt = horarioAulaRepository.findById(idHorarioAula);
-        if(aulaOpt.isEmpty()){
-            return null;
-        }
-        HorarioAula aula = aulaOpt.get();
+    public List<AlunoDto> receberAlunosParaChamada(Long idProfessor, Long idHorarioAula) {
         Turma turma = horarioAulaRepository.findById(idHorarioAula).get().getTurma();
         List<Aluno> alunos = turmaRepository.findById(turma.getId()).get().getAlunos();
-        LocalDate dataAtual = LocalDate.now();
-        List<HorarioAula> horariosAula = horarioAulaRepository.findByDataAndIdProfessor(dataAtual, idProfessor);
-        HorarioAula horarioAula;
-        LocalTime horaAtual = LocalTime.now();
-        if(!horariosAula.isEmpty()){
-           for (HorarioAula horarioAula2 : horariosAula) {
-            if(horarioAula2.getHoraInicio() <= horaAtual && horarioAula2.getHoraFim() <= horaAtual )
-           }
+        List<Presenca> presencas = presencaRepository.findByHorarioAulaId(idHorarioAula);
+        Set<Long> idsPresentes = presencas.stream()
+                .filter(Presenca::getPresente)
+                .map(p -> p.getAluno().getIdAluno())
+                .collect(Collectors.toSet());
+
+        List<AlunoDto> alunosDto = alunos.stream().map(aluno -> {
+            AlunoDto dto = new AlunoDto();
+            dto.setMatricula(aluno.getMatricula());
+            UserDto userDto = new UserDto();
+            userDto.setNome(aluno.getUser().getNome());
+            dto.setUserDto(userDto);
+            dto.setPresenca(idsPresentes.contains(aluno.getIdAluno()));
+            return dto;
+        }).collect(Collectors.toList());
+
+        if (alunosDto.isEmpty()) {
+            return null;
         }
-        List<Aluno> alunos = turmaRepository.findByIdTurma(horarioAula.getTurma().getId());
+        return alunosDto;
 
-        return null;
     }
 
-    public List<Aluno> receberAlunosParaChamada02(Long idProfessor, Long idHorarioAula) {
+    public List<HorarioAula> buscarAulasDia(Long idProfessor) {
         LocalDate dataAtual = LocalDate.now();
-        List<HorarioAula> horariosAula = horarioAulaRepository.findByDataAndIdProfessor(dataAtual, idProfessor);
-        HorarioAula horarioAula;
-        LocalTime horaAtual = LocalTime.now();
-        /*
-         * if(!horariosAula.isEmpty()){
-         * for (HorarioAula horarioAula2 : horariosAula) {
-         * if(horarioAula2.getHoraInicio() <= horaAtual && horarioAula2.getHoraFim() <=
-         * horaAtual )
-         * }
-         * }
-         * List<Aluno> alunos =
-         * turmaRepository.findByIdTurma(horarioAula.getTurma().getId());
-         */
-        return null;
+        List<HorarioAula> horarioAulas = horarioAulaRepository.findByDataAndProfessorId(dataAtual, idProfessor);
+        if (horarioAulas.isEmpty()) {
+            return null;
+        }
+        return horarioAulas;
     }
+
 }
