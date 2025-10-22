@@ -11,6 +11,7 @@ public class AlunoDto {
     private String nomeResponsavel;
     private String telefoneResponsavel;
     private EnderecoDto enderecoDto;
+    private boolean presenca;
 
 
     public UserDto getUserDto() {
@@ -69,5 +70,14 @@ public class AlunoDto {
         this.enderecoDto = enderecoDto;
     }
 
+    public boolean isPresenca() {
+        return presenca;
+    }
+
+    public void setPresenca(boolean presenca) {
+        this.presenca = presenca;
+    }
+
+    
 
 }
