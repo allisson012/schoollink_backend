@@ -71,4 +71,11 @@ public class Turma {
         this.anoEscolar = anoEscolar;
     }
 
+    public List<Disciplina> getDisciplinas() {
+        return disciplinas;
+    }
+
+    public void setDisciplinas(List<Disciplina> disciplinas) {
+        this.disciplinas = disciplinas;
+    }
 }
