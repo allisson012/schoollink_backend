@@ -4,7 +4,10 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -24,8 +27,13 @@ public class Funcionario {
     private String cpf;
     private String telefone;
     private LocalDate dataNascimento;
-    private String genero;
-    @OneToOne
+    private String genero;    
+    private LocalDate dataContratacao;
+    private double cargaHorariaSem;
+    @Enumerated(EnumType.STRING)
+    private Turno turno;
+    private double salario;
+    @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "idEndereco", referencedColumnName = "id")
     private Endereco endereco;
 
@@ -110,6 +118,39 @@ public class Funcionario {
 
     public void setRfid(String rfid) {
         this.rfid = rfid;
+    }
+
+
+    public LocalDate getDataContratacao() {
+        return this.dataContratacao;
+    }
+
+    public void setDataContratacao(LocalDate dataContratacao) {
+        this.dataContratacao = dataContratacao;
+    }
+
+    public double getCargaHorariaSem() {
+        return this.cargaHorariaSem;
+    }
+
+    public void setCargaHorariaSem(double cargaHorariaSem) {
+        this.cargaHorariaSem = cargaHorariaSem;
+    }
+
+    public Turno getTurno() {
+        return this.turno;
+    }
+
+    public void setTurno(Turno turno) {
+        this.turno = turno;
+    }
+
+    public double getSalario() {
+        return this.salario;
+    }
+
+    public void setSalario(double salario) {
+        this.salario = salario;
     }
 
 }
