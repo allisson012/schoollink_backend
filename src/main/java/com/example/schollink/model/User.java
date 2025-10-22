@@ -2,6 +2,7 @@ package com.example.schollink.model;
 
 import java.time.LocalDate;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -28,7 +29,8 @@ public class User {
     private String telefone;
     private LocalDate dataNascimento;
     private String genero;
-    @OneToOne
+    
+    @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "idEndereco", referencedColumnName = "id")
     private Endereco endereco;
 
