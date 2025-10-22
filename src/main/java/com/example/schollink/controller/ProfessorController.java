@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.apache.catalina.connector.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -19,8 +20,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.schollink.Dto.AlunoDto;
+import com.example.schollink.Dto.BuscarAulasDto;
 import com.example.schollink.Dto.ProfessorDto;
+import com.example.schollink.Dto.ProfessorHorarioDto;
+import com.example.schollink.model.Aluno;
 import com.example.schollink.model.Disciplina;
+import com.example.schollink.model.HorarioAula;
 import com.example.schollink.model.Professor;
 import com.example.schollink.model.Turno;
 import com.example.schollink.model.User;
@@ -54,11 +60,10 @@ public class ProfessorController {
 
         if (dto.getDisciplinaIds() != null) {
             disciplinas = dto.getDisciplinaIds().stream()
-                .map(id -> disciplinaService.buscarDisciplinaPorId(id)
-                    .orElseThrow(() -> new RuntimeException("Disciplina não encontrada: " + id)))
-                .collect(Collectors.toList());
-        }
-        else {
+                    .map(id -> disciplinaService.buscarDisciplinaPorId(id)
+                            .orElseThrow(() -> new RuntimeException("Disciplina não encontrada: " + id)))
+                    .collect(Collectors.toList());
+        } else {
             professor.setDisciplinas(new ArrayList<>());
         }
 
@@ -97,6 +102,34 @@ public class ProfessorController {
             return ResponseEntity.ok(Map.of("message", "Professor excluído com sucesso"));
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", e.getMessage()));
+        }
+    }
+
+    @PostMapping("/buscar/aulas")
+    public ResponseEntity<?> buscarAulasDia(@RequestBody BuscarAulasDto dto) {
+        Long idProfessor = dto.getIdProfessor();
+        List<HorarioAula> horarioAulas = professorService.buscarAulasDia(idProfessor);
+        if (!horarioAulas.isEmpty()) {
+            return ResponseEntity.ok(horarioAulas);
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Map.of("message", "Erro ao buscar aulas ou lista vazia"));
+        }
+    }
+
+    // buscar aulas do dia
+
+    @PostMapping("/buscar/chamada")
+    public ResponseEntity<?> buscarAlunosChamada(@RequestBody ProfessorHorarioDto dto) {
+        Long idProfessor = dto.getIdProfessor();
+        Long idHorarioAula = dto.getIdHorarioAula();
+        List<AlunoDto> alunosDtos = new ArrayList<AlunoDto>();
+        alunosDtos = professorService.receberAlunosParaChamada(idProfessor, idHorarioAula);
+        if (alunosDtos != null && !alunosDtos.isEmpty()) {
+            return ResponseEntity.ok(alunosDtos);
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Map.of("message", "Erro ao buscar alunos ou lista vazia"));
         }
     }
 }
