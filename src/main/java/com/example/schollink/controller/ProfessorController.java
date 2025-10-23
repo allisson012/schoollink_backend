@@ -26,6 +26,7 @@ import com.example.schollink.Dto.ProfessorDto;
 import com.example.schollink.Dto.ProfessorHorarioDto;
 import com.example.schollink.model.Aluno;
 import com.example.schollink.model.Disciplina;
+import com.example.schollink.model.Endereco;
 import com.example.schollink.model.HorarioAula;
 import com.example.schollink.model.Professor;
 import com.example.schollink.model.Turno;
@@ -47,31 +48,45 @@ public class ProfessorController {
     @PostMapping("/cadastrar")
     public ResponseEntity<Map<String, String>> cadastrarProfessor(@RequestBody ProfessorDto dto) {
         User user = new User();
-        user.setNome(dto.getNome());
-        user.setEmail(dto.getEmail());
+        user.setNome(dto.getUserDto().getNome());
+        user.setEmail(dto.getUserDto().getEmail());
+        user.setCpf(dto.getUserDto().getCpf());
+        user.setTelefone(dto.getUserDto().getTelefone());
+        user.setDataNascimento(dto.getUserDto().getDataNascimento());
+        user.setGenero(dto.getUserDto().getGenero());
 
         Professor professor = new Professor();
         professor.setFormacaoAcademica(dto.getFormacaoAcademica());
         professor.setRegistroProfissional(dto.getRegistroProfissional());
+        professor.setDataContratacao(dto.getDataContratacao());
         professor.setCargaHorariaSem(dto.getCargaHorariaSem());
         professor.setSalario(dto.getSalario());
-        // professor.setTurno(Turno.valueOf(dto.getTurno().toUpperCase()));
-        List<Disciplina> disciplinas = new ArrayList<>();
+        professor.setTurno(Turno.valueOf(dto.getTurno().toUpperCase()));
 
-        if (dto.getDisciplinaIds() != null) {
-            disciplinas = dto.getDisciplinaIds().stream()
-                    .map(id -> disciplinaService.buscarDisciplinaPorId(id)
-                            .orElseThrow(() -> new RuntimeException("Disciplina não encontrada: " + id)))
-                    .collect(Collectors.toList());
+        Endereco endereco = new Endereco();
+        endereco.setCep(dto.getEnderecoDto().getCep());
+        endereco.setPais(dto.getEnderecoDto().getPais());
+        endereco.setEstado(dto.getEnderecoDto().getEstado());
+        endereco.setCidade(dto.getEnderecoDto().getCidade());
+        endereco.setRua(dto.getEnderecoDto().getRua());
+        endereco.setNumero(dto.getEnderecoDto().getNumero());
+        professor.setEndereco(endereco);
+
+        if (dto.getDisciplinaIds() != null && !dto.getDisciplinaIds().isEmpty()) {
+            List<Disciplina> disciplinas = dto.getDisciplinaIds().stream()
+                .map(id -> disciplinaService.buscarDisciplinaPorId(id)
+                    .orElseThrow(() -> new RuntimeException("Disciplina não encontrada: " + id)))
+                .collect(Collectors.toList());
+            professor.setDisciplinas(disciplinas);
         } else {
             professor.setDisciplinas(new ArrayList<>());
         }
 
-        professor.setDisciplinas(disciplinas);
+        professorService.cadastrarProfessor(user, professor, dto.getUserDto().getSenha());
 
-        professorService.cadastrarProfessor(user, professor, dto.getSenha());
-
-        return ResponseEntity.ok(Map.of("mensagem", "Professor cadastrado com sucesso"));
+        Map<String, String> response = new HashMap<>();
+        response.put("mensagem", "Professor cadastrado com sucesso");
+        return ResponseEntity.ok(response);
     }
 
     @PutMapping("/editar")
