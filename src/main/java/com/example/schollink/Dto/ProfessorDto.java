@@ -1,44 +1,46 @@
 package com.example.schollink.Dto;
 
+import java.time.LocalDate;
 import java.util.List;
 
 public class ProfessorDto{
-    private String nome;
-    private String email;
-    private String senha;
+    private UserDto userDto;    
+    private List<Long> disciplinaIds;
+    private LocalDate dataContratacao; 
     private String formacaoAcademica;
     private String registroProfissional;
-    private double cargaHorariaSem;
+    private double cargaHorariaSem; 
     private String turno;
     private double salario;
-    private List<Long> disciplinaIds;
+    private EnderecoDto enderecoDto;
 
-    public void setNome(String nome){
-        this.nome = nome;
+
+    public UserDto getUserDto() {
+        return this.userDto;
     }
 
-    public String getNome() {
-        return nome;
+    public void setUserDto(UserDto userDto) {
+        this.userDto = userDto;
     }
 
-    public String getEmail() {
-        return email;
+    public List<Long> getDisciplinaIds() {
+        return this.disciplinaIds;
     }
 
-    public void setEmail(String email) {
-        this.email = email;
+    public void setDisciplinaIds(List<Long> disciplinaIds) {
+        this.disciplinaIds = disciplinaIds;
     }
 
-    public String getSenha() {
-        return senha;
+    public LocalDate getDataContratacao() {
+        return this.dataContratacao;
     }
 
-    public void setSenha(String senha) {
-        this.senha = senha;
+    public void setDataContratacao(LocalDate dataContratacao) {
+        this.dataContratacao = dataContratacao;
     }
 
     public String getFormacaoAcademica() {
-        return formacaoAcademica;
+        return this.formacaoAcademica;
     }
 
     public void setFormacaoAcademica(String formacaoAcademica) {
@@ -46,7 +48,7 @@ public class ProfessorDto{
     }
 
     public String getRegistroProfissional() {
-        return registroProfissional;
+        return this.registroProfissional;
     }
 
     public void setRegistroProfissional(String registroProfissional) {
@@ -54,7 +56,7 @@ public class ProfessorDto{
     }
 
     public double getCargaHorariaSem() {
-        return cargaHorariaSem;
+        return this.cargaHorariaSem;
     }
 
     public void setCargaHorariaSem(double cargaHorariaSem) {
@@ -62,7 +64,7 @@ public class ProfessorDto{
     }
 
     public String getTurno() {
-        return turno;
+        return this.turno;
     }
 
     public void setTurno(String turno) {
@@ -70,18 +72,19 @@ public class ProfessorDto{
     }
 
     public double getSalario() {
-        return salario;
+        return this.salario;
     }
 
     public void setSalario(double salario) {
         this.salario = salario;
     }
 
-    public List<Long> getDisciplinaIds() {
-        return disciplinaIds;
+    public EnderecoDto getEnderecoDto() {
+        return this.enderecoDto;
     }
 
-    public void setDisciplinaIds(List<Long> disciplinaIds) {
-        this.disciplinaIds = disciplinaIds;
+    public void setEnderecoDto(EnderecoDto enderecoDto) {
+        this.enderecoDto = enderecoDto;
     }
+    
 }

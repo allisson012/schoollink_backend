@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -49,6 +50,10 @@ public class Professor {
     @Enumerated(EnumType.STRING)
     private Turno turno;
     private double salario;
+    
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "idEndereco", referencedColumnName = "id")
+    private Endereco endereco;
 
     // historico de aulas os dois teria que ter classe separadas para guardar essas
     // informações
@@ -134,5 +139,14 @@ public class Professor {
         this.funcionario = funcionario;
     }
 
+
+    public Endereco getEndereco() {
+        return this.endereco;
+    }
+
+    public void setEndereco(Endereco endereco) {
+        this.endereco = endereco;
+    }
+    
     
 }
