@@ -2,7 +2,8 @@ package com.example.schollink.Dto;
 
 import java.time.LocalDate;
 
-public class UserDto {    
+public class UserDto {
+    private Long userId;    
     private String nome;
     private String email;
     private String senha;
@@ -65,6 +66,14 @@ public class UserDto {
 
     public void setGenero(String genero) {
         this.genero = genero;
+    }
+
+    public Long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
     }
 
 

@@ -12,6 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.example.schollink.Dto.AlunoDto;
+import com.example.schollink.Dto.AulaRetornoDto;
+import com.example.schollink.Dto.ChamadaRequestDto;
 import com.example.schollink.Dto.UserDto;
 import com.example.schollink.model.Aluno;
 import com.example.schollink.model.Disciplina;
@@ -22,6 +24,7 @@ import com.example.schollink.model.Professor;
 import com.example.schollink.model.Turma;
 import com.example.schollink.model.User;
 import com.example.schollink.model.UserRole;
+import com.example.schollink.repository.AlunoRepository;
 import com.example.schollink.repository.HorarioAulaRepository;
 import com.example.schollink.repository.PresencaRepository;
 import com.example.schollink.repository.ProfessorRepository;
@@ -48,6 +51,8 @@ public class ProfessorService {
     private TurmaRepository turmaRepository;
     @Autowired
     private PresencaRepository presencaRepository;
+    @Autowired
+    private AlunoRepository alunoRepository;
 
     @Transactional
     public void cadastrarProfessor(User user, Professor professor, String senha) {
@@ -135,6 +140,7 @@ public class ProfessorService {
             AlunoDto dto = new AlunoDto();
             dto.setMatricula(aluno.getMatricula());
             UserDto userDto = new UserDto();
+            userDto.setUserId(aluno.getUser().getId());
             userDto.setNome(aluno.getUser().getNome());
             dto.setUserDto(userDto);
             dto.setPresenca(idsPresentes.contains(aluno.getIdAluno()));
@@ -148,13 +154,54 @@ public class ProfessorService {
 
     }
 
-    public List<HorarioAula> buscarAulasDia(Long idProfessor) {
+    public List<AulaRetornoDto> buscarAulasDia(Long idProfessor) {
         LocalDate dataAtual = LocalDate.now();
         List<HorarioAula> horarioAulas = horarioAulaRepository.findByDataAndProfessorId(dataAtual, idProfessor);
         if (horarioAulas.isEmpty()) {
             return null;
         }
-        return horarioAulas;
+        List<AulaRetornoDto> aulasRetornoDtos = new ArrayList<>();
+        for (HorarioAula horarioAula : horarioAulas) {
+            AulaRetornoDto aulaRetorno = new AulaRetornoDto();
+            aulaRetorno.setIdDisciplina(horarioAula.getDisciplina().getId());
+            aulaRetorno.setNomeDisciplina(horarioAula.getDisciplina().getNome());
+            aulaRetorno.setIdHorarioAula(horarioAula.getId());
+            aulaRetorno.setIdProfessor(horarioAula.getProfessor().getId());
+            aulaRetorno.setHorarioInicio(horarioAula.getHoraInicio());
+            aulaRetorno.setHorarioTermino(horarioAula.getHoraFim());
+            aulasRetornoDtos.add(aulaRetorno);
+        }
+        return aulasRetornoDtos;
+    }
+
+    public boolean realizarChamada(List<AlunoDto> alunos, Long idHorarioAula) {
+        Optional<HorarioAula> horarioAulaOpt = horarioAulaRepository.findById(idHorarioAula);
+        if (horarioAulaOpt.isEmpty()) {
+            return false;
+        }
+        HorarioAula horarioAula = horarioAulaOpt.get();
+        boolean peloMenosUmSalvo = false;
+        for (AlunoDto alunoDto : alunos) {
+            Aluno aluno = new Aluno();
+            Optional<Aluno> alunoOpt = alunoRepository.findByUserId(alunoDto.getUserDto().getUserId());
+            if (alunoOpt.isPresent()) {
+                aluno = alunoOpt.get();
+                Optional<Presenca> presencaOpt = presencaRepository.findByAlunoAndHorarioAula(aluno, horarioAula);
+
+                Presenca presenca;
+                if (presencaOpt.isPresent()) {
+                    presenca = presencaOpt.get();
+                } else {
+                    presenca = new Presenca();
+                    presenca.setAluno(aluno);
+                    presenca.setHorarioAula(horarioAula);
+                }
+                presenca.setPresente(alunoDto.isPresenca());
+                presencaRepository.save(presenca);
+                peloMenosUmSalvo = true;
+            }
+        }
+        return peloMenosUmSalvo;
     }
 
 }

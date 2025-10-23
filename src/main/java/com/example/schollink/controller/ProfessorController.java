@@ -21,7 +21,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.schollink.Dto.AlunoDto;
+import com.example.schollink.Dto.AulaRetornoDto;
 import com.example.schollink.Dto.BuscarAulasDto;
+import com.example.schollink.Dto.ChamadaRequestDto;
 import com.example.schollink.Dto.ProfessorDto;
 import com.example.schollink.Dto.ProfessorHorarioDto;
 import com.example.schollink.model.Aluno;
@@ -120,12 +122,13 @@ public class ProfessorController {
         }
     }
 
+    // tenho que mudar retorno para não retornar tudo de uma vez
     @PostMapping("/buscar/aulas")
     public ResponseEntity<?> buscarAulasDia(@RequestBody BuscarAulasDto dto) {
         Long idProfessor = dto.getIdProfessor();
-        List<HorarioAula> horarioAulas = professorService.buscarAulasDia(idProfessor);
-        if (!horarioAulas.isEmpty()) {
-            return ResponseEntity.ok(horarioAulas);
+        List<AulaRetornoDto> aulaRetornoDtos = professorService.buscarAulasDia(idProfessor);
+        if (!aulaRetornoDtos.isEmpty()) {
+            return ResponseEntity.ok(aulaRetornoDtos);
         } else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(Map.of("message", "Erro ao buscar aulas ou lista vazia"));
@@ -145,6 +148,18 @@ public class ProfessorController {
         } else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(Map.of("message", "Erro ao buscar alunos ou lista vazia"));
+        }
+    }
+
+    @PostMapping("/realizar/chamada")
+    public ResponseEntity<?> realizarChamada(@RequestBody ChamadaRequestDto dto) {
+        Long idHorarioAula = dto.getIdHorarioAula();
+        List<AlunoDto> alunos = dto.getAlunos();
+        boolean chamada = professorService.realizarChamada(alunos, idHorarioAula);
+        if (chamada) {
+            return ResponseEntity.ok(Map.of("message", "Chamada realizada com sucesso"));
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", "Erro ao realizar chamada"));
         }
     }
 }
