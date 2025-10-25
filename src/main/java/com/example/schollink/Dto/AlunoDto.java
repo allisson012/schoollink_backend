@@ -4,6 +4,7 @@ import java.time.LocalDate;
 
 
 public class AlunoDto {
+    private Long idAluno;
     private UserDto userDto;
     private String matricula;
     private LocalDate dataMatricula;
@@ -13,6 +14,18 @@ public class AlunoDto {
     private EnderecoDto enderecoDto;
     private boolean presenca;
 
+
+    public Long getIdAluno() {
+        return this.idAluno;
+    }
+
+    public void setIdAluno(Long idAluno) {
+        this.idAluno = idAluno;
+    }
+
+    public boolean getPresenca() {
+        return this.presenca;
+    }
 
     public UserDto getUserDto() {
         return this.userDto;
