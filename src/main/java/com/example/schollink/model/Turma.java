@@ -9,9 +9,6 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinTable;
-import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
 
 @Entity
@@ -27,9 +24,9 @@ public class Turma {
     private int anoLetivo;
     @Enumerated(EnumType.STRING)
     private Anos anoEscolar;
-    @ManyToMany
-    @JoinTable(name = "turma_disciplina", joinColumns = @JoinColumn(name = "turma_id"), inverseJoinColumns = @JoinColumn(name = "disciplina_id"))
-    private List<Disciplina> disciplinas = new ArrayList<>();
+    // uma turma tem varias disciplinas
+    @OneToMany(mappedBy = "turma")
+    private List<Disciplina> disciplinas;
 
     public Long getId() {
         return id;
@@ -71,6 +68,14 @@ public class Turma {
         this.anoEscolar = anoEscolar;
     }
 
+    public List<Prova> getProvas() {
+        return provas;
+    }
+
+    public void setProvas(List<Prova> provas) {
+        this.provas = provas;
+    }
+
     public List<Disciplina> getDisciplinas() {
         return disciplinas;
     }
@@ -78,4 +83,5 @@ public class Turma {
     public void setDisciplinas(List<Disciplina> disciplinas) {
         this.disciplinas = disciplinas;
     }
+
 }

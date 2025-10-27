@@ -126,7 +126,7 @@ public class ProfessorController {
     @PostMapping("/buscar/aulas")
     public ResponseEntity<?> buscarAulasDia(@RequestBody BuscarAulasDto dto) {
         Long idProfessor = dto.getIdProfessor();
-        List<AulaRetornoDto> aulaRetornoDtos = professorService.buscarAulasDia(idProfessor);
+        List<AulaRetornoDto> aulaRetornoDtos = professorService.buscarAulasSemana(idProfessor);
         if (!aulaRetornoDtos.isEmpty()) {
             return ResponseEntity.ok(aulaRetornoDtos);
         } else {

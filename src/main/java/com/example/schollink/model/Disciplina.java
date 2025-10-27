@@ -19,8 +19,15 @@ public class Disciplina {
     private Long id;
     private String nome;
 
-    @ManyToMany(mappedBy = "disciplinas")
-    private List<Professor> professores = new ArrayList<>();
+    // uma disciplina so pode ter apenas um professor
+    @ManyToOne
+    @JoinColumn(name = "idProfessor")
+    private Professor professor;
+
+    // cada disciplina tem apenas uma turma
+    @ManyToOne
+    @JoinColumn(name = "idTurma")
+    private Turma turma;
 
     @OneToMany(mappedBy = "disciplina")
     private List<Prova> provas = new ArrayList<>();
@@ -41,15 +48,6 @@ public class Disciplina {
         this.nome = nome;
     }
 
-
-    public List<Professor> getProfessores() {
-        return this.professores;
-    }
-
-    public void setProfessores(List<Professor> professores) {
-        this.professores = professores;
-    }
-
     public List<Prova> getProvas() {
         return this.provas;
     }
@@ -57,6 +55,13 @@ public class Disciplina {
     public void setProvas(List<Prova> provas) {
         this.provas = provas;
     }
-    
+
+    public Professor getProfessor() {
+        return professor;
+    }
+
+    public void setProfessor(Professor professor) {
+        this.professor = professor;
+    }
 
 }

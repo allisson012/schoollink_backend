@@ -26,38 +26,23 @@ public class Professor {
     @OneToOne
     @JoinColumn(name = "idUser", referencedColumnName = "id")
     private User user;
-
+   
     @OneToOne
     @JoinColumn(name = "idFuncionario", referencedColumnName = "idFuncionario")
     private Funcionario funcionario;
-
     private LocalDate dataContratacao;
     private String formacaoAcademica;
-
-    @ManyToMany
-    @JoinTable(
-        name = "professor_disciplina",
-        joinColumns = @JoinColumn(name = "professor_id"),
-        inverseJoinColumns = @JoinColumn(name = "disciplina_id")
-    )
+    // um professor pode lecionar varias disciplinas
+    @OneToMany(mappedBy = "professor")
     private List<Disciplina> disciplinas = new ArrayList<>();
-
-    // disciplinas que leciona
-    // turmas estou pensando em colocar todas turmas que o professor ministra para o
-    // acesso a elas ficar mais simples
     private String registroProfissional;
     private double cargaHorariaSem;
     @Enumerated(EnumType.STRING)
     private Turno turno;
     private double salario;
-    
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "idEndereco", referencedColumnName = "id")
     private Endereco endereco;
-
-    // historico de aulas os dois teria que ter classe separadas para guardar essas
-    // informações
-    // horario das aulas
 
     public Long getId() {
         return this.id;
@@ -139,7 +124,6 @@ public class Professor {
         this.funcionario = funcionario;
     }
 
-
     public Endereco getEndereco() {
         return this.endereco;
     }
@@ -147,6 +131,5 @@ public class Professor {
     public void setEndereco(Endereco endereco) {
         this.endereco = endereco;
     }
-    
-    
+
 }

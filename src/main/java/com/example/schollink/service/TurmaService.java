@@ -32,7 +32,7 @@ public class TurmaService {
         if(idDisciplinas != null && !idDisciplinas.isEmpty()) {
             List<Long> idDisciplinasLong = idDisciplinas.stream().map(Integer::longValue).toList();
             List<Disciplina> disciplinas = disciplinaRepository.findAllById(idDisciplinasLong);
-            turma.setDisciplinas(disciplinas);
+            // criar relação na classe TurmaDisciplina turma.setTurmaDisciplinas(null);
         }
         return turmaRepository.save(turma);
     }
@@ -76,13 +76,13 @@ public class TurmaService {
     public Turma adicionarDisciplina(Long turmaId, Long disciplinaId) {
         Turma turma = turmaRepository.findById(turmaId).orElseThrow();
         Disciplina disciplina = disciplinaRepository.findById(disciplinaId).orElseThrow(() -> new RuntimeException("Disciplina não encontrada"));
-        turma.getDisciplinas().add(disciplina);
+       // turma.getDisciplinas().add(disciplina);
         return turmaRepository.save(turma); 
     }
 
     public Turma removerDisciplina(Long turmaId, Long disciplinaId) {
         Turma turma = buscarTurma(turmaId);
-        turma.getDisciplinas().removeIf(disciplina -> disciplina.getId().equals(disciplinaId));
+         //turma.getDisciplinas().removeIf(disciplina -> disciplina.getId().equals(disciplinaId));
         return turmaRepository.save(turma);
     }
 }

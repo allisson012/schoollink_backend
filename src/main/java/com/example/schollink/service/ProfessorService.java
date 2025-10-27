@@ -1,5 +1,6 @@
 package com.example.schollink.service;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
@@ -154,11 +155,20 @@ public class ProfessorService {
 
     }
 
-    public List<AulaRetornoDto> buscarAulasDia(Long idProfessor) {
-        LocalDate dataAtual = LocalDate.now();
-        List<HorarioAula> horarioAulas = horarioAulaRepository.findByDataAndProfessorId(dataAtual, idProfessor);
-        if (horarioAulas.isEmpty()) {
-            return null;
+    public List<AulaRetornoDto> buscarAulasSemana(Long idProfessor) {
+        LocalDate hoje = LocalDate.now();
+        LocalDate inicioSemana = hoje.with(DayOfWeek.MONDAY);
+        LocalDate fimSemana = hoje.with(DayOfWeek.SUNDAY);
+
+        List<HorarioAula> horarioAulas = horarioAulaRepository.findByDataBetweenAndProfessorId(
+                inicioSemana, fimSemana, idProfessor);
+        /*
+         * LocalDate dataAtual = LocalDate.now();
+         * List<HorarioAula> horarioAulas =
+         * horarioAulaRepository.findByDataAndProfessorId(dataAtual, idProfessor);
+         */
+        if (horarioAulas == null || horarioAulas.isEmpty()) {
+            return new ArrayList<>();
         }
         List<AulaRetornoDto> aulasRetornoDtos = new ArrayList<>();
         for (HorarioAula horarioAula : horarioAulas) {
