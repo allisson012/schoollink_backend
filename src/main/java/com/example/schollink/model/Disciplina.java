@@ -19,11 +19,11 @@ public class Disciplina {
     private Long id;
     private String nome;
 
-    @ManyToMany(mappedBy = "disciplinas")
-    private List<Professor> professores = new ArrayList<>();
-
     @OneToMany(mappedBy = "disciplina")
-    private List<Prova> provas = new ArrayList<>();
+    private List<TurmaDisciplina> turmaDisciplinas;
+
+    // @OneToMany(mappedBy = "disciplina")
+    // private List<Prova> provas = new ArrayList<>();
 
     public Long getId() {
         return id;
@@ -41,22 +41,12 @@ public class Disciplina {
         this.nome = nome;
     }
 
-
-    public List<Professor> getProfessores() {
-        return this.professores;
+    public List<TurmaDisciplina> getTurmaDisciplinas() {
+        return turmaDisciplinas;
     }
 
-    public void setProfessores(List<Professor> professores) {
-        this.professores = professores;
+    public void setTurmaDisciplinas(List<TurmaDisciplina> turmaDisciplinas) {
+        this.turmaDisciplinas = turmaDisciplinas;
     }
-
-    public List<Prova> getProvas() {
-        return this.provas;
-    }
-
-    public void setProvas(List<Prova> provas) {
-        this.provas = provas;
-    }
-    
 
 }

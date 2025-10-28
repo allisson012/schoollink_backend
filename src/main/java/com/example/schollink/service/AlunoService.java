@@ -3,13 +3,18 @@ package com.example.schollink.service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+
+import com.example.schollink.Dto.AlunoParaTurmaDto;
+
 import com.example.schollink.Dto.AlunoDto;
 import com.example.schollink.Dto.EnderecoDto;
 import com.example.schollink.Dto.UserDto;
+
 import com.example.schollink.model.Aluno;
 import com.example.schollink.model.Endereco;
 import com.example.schollink.model.StatusMatricula;
@@ -124,21 +129,27 @@ public class AlunoService {
     public void excluirAluno(Long id) {
         Aluno aluno = alunoRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Aluno não encontrado"));
-        
-        if(aluno.getStatusMatricula().equals(StatusMatricula.ATIVA)){
+
+        if (aluno.getStatusMatricula().equals(StatusMatricula.ATIVA)) {
             aluno.setStatusMatricula(StatusMatricula.INATIVA);
             alunoRepository.save(aluno);
         }
     }
 
-    public Aluno verAluno(Long id){        
+    public Aluno verAluno(Long id) {
         Aluno aluno = alunoRepository.findByUserId(id)
                 .orElseThrow(() -> new RuntimeException("Aluno não encontrado"));
 
         return aluno;
     }
 
-     public Optional<List<Aluno>> buscar(String nome, String matricula, String email) {
+    public List<AlunoParaTurmaDto> buscarTodos() {
+        List<Aluno> alunos = alunoRepository.findAll();
+        return alunos.stream()
+                .map(a -> new AlunoParaTurmaDto(a.getIdAluno(), a.getUser().getNome()))
+                .collect(Collectors.toList());
+    }
+    public Optional<List<Aluno>> buscar(String nome, String matricula, String email) {
         List<Aluno> alunos = new ArrayList<>();
 
         if (email != null && !email.isEmpty()) {

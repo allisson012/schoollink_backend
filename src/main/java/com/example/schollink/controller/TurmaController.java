@@ -32,7 +32,7 @@ public class TurmaController {
         turma.setAnoLetivo(turmaDto.getAnoLetivo());
         turma.setAnoEscolar(turmaDto.getAnoEscolar());
 
-        turmaService.cadastrarTurma(turma, turmaDto.getIdAlunos(), turmaDto.getIdDisciplinas());
+        turmaService.cadastrarTurma(turma, turmaDto.getIdAlunos(), turmaDto.getDisciplinas());
         
         Map<String, String> response = new HashMap<>();
         response.put("mensagem", "Turma Cadastrado com sucesso");

@@ -6,4 +6,5 @@ import com.example.schollink.model.Professor;
 
 @Repository
 public interface ProfessorRepository extends JpaRepository<Professor, Long> {
+    Professor findByUser_Id(Long idUser);
 }

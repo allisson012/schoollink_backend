@@ -1,4 +1,5 @@
 package com.example.schollink.model;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -7,7 +8,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-
 
 @Entity
 public class Prova {
@@ -19,11 +19,8 @@ public class Prova {
     @Enumerated(EnumType.STRING)
     private TipoProva tipo;
     @ManyToOne
-    @JoinColumn(name = "idTurma", referencedColumnName = "id")
-    private Turma turma;
-    @ManyToOne
-    @JoinColumn(name = "idDisciplina", referencedColumnName = "id")
-    private Disciplina disciplina;
+    @JoinColumn(name = "id_turma_disciplina")
+    private TurmaDisciplina turmaDisciplina;
     @Enumerated(EnumType.STRING)
     private Periodo periodo;
 
@@ -31,23 +28,8 @@ public class Prova {
     @JoinColumn(name = "idAluno", referencedColumnName = "idAluno")
     private Aluno aluno;
 
-    public Prova(Long idProva, float nota, TipoProva tipo, Turma turma, Periodo periodo) {
-        this.idProva = idProva;
-        this.nota = nota;
-        this.tipo = tipo;
-        this.turma = turma;
-        this.periodo = periodo;
-    }
 
     public Prova() {
-    }
-
-    public Disciplina getDisciplina() {
-        return this.disciplina;
-    }
-
-    public void setDisciplina(Disciplina disciplina) {
-        this.disciplina = disciplina;
     }
 
     public Aluno getAluno() {
@@ -82,20 +64,20 @@ public class Prova {
         this.tipo = tipo;
     }
 
-    public Turma getTurma() {
-        return this.turma;
-    }
-
-    public void setTurma(Turma turma) {
-        this.turma = turma;
-    }
-
     public Periodo getPeriodo() {
         return this.periodo;
     }
 
     public void setPeriodo(Periodo periodo) {
         this.periodo = periodo;
+    }
+
+    public TurmaDisciplina getTurmaDisciplina() {
+        return turmaDisciplina;
+    }
+
+    public void setTurmaDisciplina(TurmaDisciplina turmaDisciplina) {
+        this.turmaDisciplina = turmaDisciplina;
     }
 
 }

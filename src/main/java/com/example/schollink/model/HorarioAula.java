@@ -22,18 +22,9 @@ public class HorarioAula {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
     @ManyToOne
-    @JoinColumn(name = "professor_id")
-    private Professor professor;
-
-    @ManyToOne
-    @JoinColumn(name = "turma_id")
-    private Turma turma;
-
-    @ManyToOne
-    @JoinColumn(name = "disciplina_id")
-    private Disciplina disciplina;
+    @JoinColumn(name = "id_turma_disciplina")
+    private TurmaDisciplina turmaDisciplina;
 
     @Enumerated(EnumType.STRING)
     private DayOfWeek diaSemana;
@@ -51,24 +42,7 @@ public class HorarioAula {
     public void setId(Long id) {
         this.id = id;
     }
-    public Professor getProfessor() {
-        return professor;
-    }
-    public void setProfessor(Professor professor) {
-        this.professor = professor;
-    }
-    public Turma getTurma() {
-        return turma;
-    }
-    public void setTurma(Turma turma) {
-        this.turma = turma;
-    }
-    public Disciplina getDisciplina() {
-        return disciplina;
-    }
-    public void setDisciplina(Disciplina disciplina) {
-        this.disciplina = disciplina;
-    }
+
     public DayOfWeek getDiaSemana() {
         return diaSemana;
     }
@@ -98,6 +72,12 @@ public class HorarioAula {
     }
     public void setPresencas(List<Presenca> presencas) {
         this.presencas = presencas;
+    }
+    public TurmaDisciplina getTurmaDisciplina() {
+        return turmaDisciplina;
+    }
+    public void setTurmaDisciplina(TurmaDisciplina turmaDisciplina) {
+        this.turmaDisciplina = turmaDisciplina;
     }
     
     
