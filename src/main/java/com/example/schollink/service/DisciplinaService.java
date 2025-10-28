@@ -11,9 +11,10 @@ import com.example.schollink.model.Disciplina;
 import com.example.schollink.model.Professor;
 import com.example.schollink.repository.DisciplinaRepository;
 import com.example.schollink.repository.ProfessorRepository;
+
+import jakarta.transaction.Transactional;
+
 import com.example.schollink.Dto.DisciplinaDto;
-
-
 
 @Service
 public class DisciplinaService {
@@ -22,24 +23,26 @@ public class DisciplinaService {
     @Autowired
     private ProfessorRepository professorRepository;
 
-    public boolean cadastrarDisciplina(Disciplina disciplina){
-        if(disciplina != null){
-            disciplinaRepository.save(disciplina);
-            return true;
-        }else{
-            return false;
-        }
+    @Transactional
+    public void cadastrarDisciplina(Disciplina disciplina) {
+        disciplinaRepository.save(disciplina);
     }
 
-    public List<DisciplinaDto> buscarTodasDisciplinas(){
+    public List<DisciplinaDto> buscarTodasDisciplinas() {
         return disciplinaRepository.findAll()
-            .stream()
-            .map(d -> new DisciplinaDto(d.getId(), d.getNome()))
-            .collect(Collectors.toList());
+                .stream()
+                .map(d -> new DisciplinaDto(d.getId(), d.getNome()))
+                .collect(Collectors.toList());
     }
 
-
-    public Optional<Disciplina> buscarDisciplinaPorId(Long id){
+    public Optional<Disciplina> buscarDisciplinaPorId(Long id) {
         return disciplinaRepository.findById(id);
+    }
+
+    public List<DisciplinaDto> buscarTodas() {
+        List<Disciplina> disciplinas = disciplinaRepository.findAll();
+        return disciplinas.stream()
+                .map(d -> new DisciplinaDto(d.getId(), d.getNome()))
+                .collect(Collectors.toList());
     }
 }

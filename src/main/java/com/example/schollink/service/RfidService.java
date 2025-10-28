@@ -14,11 +14,13 @@ import com.example.schollink.model.Funcionario;
 import com.example.schollink.model.HorarioAula;
 import com.example.schollink.model.Ponto;
 import com.example.schollink.model.Presenca;
+import com.example.schollink.model.TurmaDisciplina;
 import com.example.schollink.repository.AlunoRepository;
 import com.example.schollink.repository.FuncionarioRepository;
 import com.example.schollink.repository.HorarioAulaRepository;
 import com.example.schollink.repository.PontoRepository;
 import com.example.schollink.repository.PresencaRepository;
+import com.example.schollink.repository.TurmaDisciplinaRepository;
 
 @Service
 public class RfidService {
@@ -32,6 +34,8 @@ public class RfidService {
     private FuncionarioRepository funcionarioRepository;
     @Autowired
     private PontoRepository pontoRepository;
+    @Autowired
+    private TurmaDisciplinaRepository turmaDisciplinaRepository;
 
     public boolean registrarPonto(String rfid) {
         Optional<Aluno> alunoOpt = alunoRepository.findByRfid(rfid);
@@ -41,7 +45,14 @@ public class RfidService {
 
         Aluno aluno = alunoOpt.get();
         LocalDate dataAtual = LocalDate.now();
-        List<HorarioAula> aulasDoDia = horarioAulaRepository.findByDataAndTurma(dataAtual, aluno.getTurma());
+
+        // Buscar todas as TurmaDisciplina da turma do aluno
+        List<TurmaDisciplina> turmasDisciplinas = turmaDisciplinaRepository.findByTurma(aluno.getTurma());
+
+        List<HorarioAula> aulasDoDia = new ArrayList<>();
+        for (TurmaDisciplina td : turmasDisciplinas) {
+            aulasDoDia.addAll(horarioAulaRepository.findByDataAndTurmaDisciplina(dataAtual, td));
+        }
 
         if (aulasDoDia.isEmpty()) {
             return false;
@@ -57,6 +68,7 @@ public class RfidService {
                 presencaRepository.save(presenca);
             }
         }
+
         return true;
     }
 

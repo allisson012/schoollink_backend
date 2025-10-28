@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.schollink.Dto.AlunoDto;
+import com.example.schollink.Dto.AlunoParaTurmaDto;
 import com.example.schollink.model.Aluno;
 import com.example.schollink.model.Endereco;
 import com.example.schollink.model.StatusMatricula;
@@ -42,7 +43,7 @@ public class AlunoController {
         user.setEmail(alunoDto.getUserDto().getEmail());
         user.setCpf(alunoDto.getUserDto().getCpf());
         user.setDataNascimento(alunoDto.getUserDto().getDataNascimento());
-        user.setGenero(alunoDto.getUserDto().getGenero());     
+        user.setGenero(alunoDto.getUserDto().getGenero());
         user.setTelefone(alunoDto.getUserDto().getTelefone());
         if (user.getEndereco() == null) {
             user.setEndereco(new Endereco());
@@ -58,35 +59,45 @@ public class AlunoController {
         aluno.setDataMatricula(alunoDto.getDataMatricula());
         aluno.setStatusMatricula(StatusMatricula.valueOf(alunoDto.getStatusMatricula()));
         aluno.setNomeResponsavel(alunoDto.getNomeResponsavel());
-        aluno.setTelefoneResponsavel(alunoDto.getTelefoneResponsavel());  
-        
-        alunoService.cadastrarAluno(user, aluno, alunoDto.getUserDto().getSenha());         
+        aluno.setTelefoneResponsavel(alunoDto.getTelefoneResponsavel());
+
+        alunoService.cadastrarAluno(user, aluno, alunoDto.getUserDto().getSenha());
         Map<String, String> response = new HashMap<>();
         response.put("mensagem", "Aluno Cadastrado com sucesso");
         return ResponseEntity.ok(response);
     }
 
-    // cadastrar usando userRole precisa de alguns ajustes no front para funcionar
-    @PostMapping("/cadastrar/verificar")
-    public ResponseEntity<Map<String, String>> CadastrarAlunoComVerificacao(@RequestBody AlunoDto alunoDto,
-            HttpSession session) {
-        User user = new User();
-        user.setNome(alunoDto.getUserDto().getNome());
-        user.setEmail(alunoDto.getUserDto().getEmail());
-        Aluno aluno = new Aluno();
-        UserRole userRole = (UserRole) session.getAttribute("UserRole");
-        if (userRole != null && userRole.equals(UserRole.ADMIN)) {
-            aluno.setMatricula(alunoDto.getMatricula());
-            alunoService.cadastrarAluno(user, aluno, alunoDto.getUserDto().getSenha());
-            Map<String, String> response = new HashMap<>();
-            response.put("mensagem", "Aluno Cadastrado com sucesso");
-            return ResponseEntity.ok(response);
-        } else {
-            Map<String, String> response = new HashMap<>();
-            response.put("mensagem", "Somente usuários do tipo ADMIN podem realizar essa ação");
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
-        }
+    @GetMapping("/buscar-todos")
+    public List<AlunoParaTurmaDto> buscarTodos() {
+        return alunoService.buscarTodos();
     }
+
+    /*
+     * / cadastrar usando userRole precisa de alguns ajustes no front para funcionar
+     * 
+     * @PostMapping("/cadastrar/verificar")
+     * public ResponseEntity<Map<String, String>>
+     * CadastrarAlunoComVerificacao(@RequestBody AlunoDto alunoDto,
+     * HttpSession session) {
+     * User user = new User();
+     * user.setNome(alunoDto.getUserDto().getNome());
+     * user.setEmail(alunoDto.getUserDto().getEmail());
+     * Aluno aluno = new Aluno();
+     * UserRole userRole = (UserRole) session.getAttribute("UserRole");
+     * if (userRole != null && userRole.equals(UserRole.ADMIN)) {
+     * aluno.setMatricula(alunoDto.getMatricula());
+     * alunoService.cadastrarAluno(user, aluno, alunoDto.getUserDto().getSenha());
+     * Map<String, String> response = new HashMap<>();
+     * response.put("mensagem", "Aluno Cadastrado com sucesso");
+     * return ResponseEntity.ok(response);
+     * } else {
+     * Map<String, String> response = new HashMap<>();
+     * response.put("mensagem",
+     * "Somente usuários do tipo ADMIN podem realizar essa ação");
+     * return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+     * }
+     * }
+     */
 
     @PutMapping("/editar")
     public ResponseEntity<?> editarAluno(@RequestBody Aluno alunoNovo, HttpSession session) {
@@ -150,12 +161,11 @@ public class AlunoController {
 
     @GetMapping("/buscar")
     public ResponseEntity<?> buscarAlunos(
-        @RequestParam(required = false) String nome,
-        @RequestParam(required = false) String matricula,
-        @RequestParam(required = false) String email
-    ) {
+            @RequestParam(required = false) String nome,
+            @RequestParam(required = false) String matricula,
+            @RequestParam(required = false) String email) {
         Optional<List<Aluno>> aluno = alunoService.buscar(nome, matricula, email);
-        
+
         if (aluno.isPresent()) {
             return ResponseEntity.ok(aluno.get());
         } else {

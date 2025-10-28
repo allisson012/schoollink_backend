@@ -19,18 +19,11 @@ public class Disciplina {
     private Long id;
     private String nome;
 
-    // uma disciplina so pode ter apenas um professor
-    @ManyToOne
-    @JoinColumn(name = "idProfessor")
-    private Professor professor;
-
-    // cada disciplina tem apenas uma turma
-    @ManyToOne
-    @JoinColumn(name = "idTurma")
-    private Turma turma;
-
     @OneToMany(mappedBy = "disciplina")
-    private List<Prova> provas = new ArrayList<>();
+    private List<TurmaDisciplina> turmaDisciplinas;
+
+    // @OneToMany(mappedBy = "disciplina")
+    // private List<Prova> provas = new ArrayList<>();
 
     public Long getId() {
         return id;
@@ -48,20 +41,12 @@ public class Disciplina {
         this.nome = nome;
     }
 
-    public List<Prova> getProvas() {
-        return this.provas;
+    public List<TurmaDisciplina> getTurmaDisciplinas() {
+        return turmaDisciplinas;
     }
 
-    public void setProvas(List<Prova> provas) {
-        this.provas = provas;
-    }
-
-    public Professor getProfessor() {
-        return professor;
-    }
-
-    public void setProfessor(Professor professor) {
-        this.professor = professor;
+    public void setTurmaDisciplinas(List<TurmaDisciplina> turmaDisciplinas) {
+        this.turmaDisciplinas = turmaDisciplinas;
     }
 
 }

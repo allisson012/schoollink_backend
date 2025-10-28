@@ -16,17 +16,8 @@ public class HistoricoAula {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "idProfessor")
-    private Professor professor;
-
-    @ManyToOne
-    @JoinColumn(name = "idTurma")
-    private Turma turma;
-
-    @ManyToOne
-    @JoinColumn(name = "idDisciplina")
-    private Disciplina disciplina;
-
+    @JoinColumn(name = "id_turma_disciplina")
+    private TurmaDisciplina turmaDisciplina;
     private LocalDate dataAula;
     private String conteudoMinistrado;
 
@@ -39,30 +30,6 @@ public class HistoricoAula {
 
     public void setId(Long id) {
         this.id = id;
-    }
-
-    public Professor getProfessor() {
-        return professor;
-    }
-
-    public void setProfessor(Professor professor) {
-        this.professor = professor;
-    }
-
-    public Turma getTurma() {
-        return turma;
-    }
-
-    public void setTurma(Turma turma) {
-        this.turma = turma;
-    }
-
-    public Disciplina getDisciplina() {
-        return disciplina;
-    }
-
-    public void setDisciplina(Disciplina disciplina) {
-        this.disciplina = disciplina;
     }
 
     public LocalDate getDataAula() {
@@ -80,7 +47,6 @@ public class HistoricoAula {
     public void setConteudoMinistrado(String conteudoMinistrado) {
         this.conteudoMinistrado = conteudoMinistrado;
     }
-
 
     public Boolean isTarefa() {
         return this.tarefa;
@@ -100,6 +66,14 @@ public class HistoricoAula {
 
     public void setDescricaoTarefa(String descricaoTarefa) {
         this.descricaoTarefa = descricaoTarefa;
+    }
+
+    public TurmaDisciplina getTurmaDisciplina() {
+        return turmaDisciplina;
+    }
+
+    public void setTurmaDisciplina(TurmaDisciplina turmaDisciplina) {
+        this.turmaDisciplina = turmaDisciplina;
     }
 
 }

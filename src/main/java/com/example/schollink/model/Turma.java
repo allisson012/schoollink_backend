@@ -3,6 +3,7 @@ package com.example.schollink.model;
 import java.util.ArrayList;
 import java.util.List;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -17,16 +18,15 @@ public class Turma {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String nome;
-    @OneToMany(mappedBy = "turma")
+    @OneToMany(mappedBy = "turma", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Aluno> alunos;
-    @OneToMany(mappedBy = "turma")
-    private List<Prova> provas;
+    // @OneToMany(mappedBy = "turma")
+    // private List<Prova> provas;
     private int anoLetivo;
     @Enumerated(EnumType.STRING)
     private Anos anoEscolar;
-    // uma turma tem varias disciplinas
-    @OneToMany(mappedBy = "turma")
-    private List<Disciplina> disciplinas;
+    @OneToMany(mappedBy = "turma", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<TurmaDisciplina> turmaDisciplinas = new ArrayList<>();
 
     public Long getId() {
         return id;
@@ -68,20 +68,12 @@ public class Turma {
         this.anoEscolar = anoEscolar;
     }
 
-    public List<Prova> getProvas() {
-        return provas;
+    public List<TurmaDisciplina> getTurmaDisciplinas() {
+        return turmaDisciplinas;
     }
 
-    public void setProvas(List<Prova> provas) {
-        this.provas = provas;
-    }
-
-    public List<Disciplina> getDisciplinas() {
-        return disciplinas;
-    }
-
-    public void setDisciplinas(List<Disciplina> disciplinas) {
-        this.disciplinas = disciplinas;
+    public void setTurmaDisciplinas(List<TurmaDisciplina> turmaDisciplinas) {
+        this.turmaDisciplinas = turmaDisciplinas;
     }
 
 }

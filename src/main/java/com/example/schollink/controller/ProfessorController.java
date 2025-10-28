@@ -13,6 +13,7 @@ import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -26,6 +27,7 @@ import com.example.schollink.Dto.BuscarAulasDto;
 import com.example.schollink.Dto.ChamadaRequestDto;
 import com.example.schollink.Dto.ProfessorDto;
 import com.example.schollink.Dto.ProfessorHorarioDto;
+import com.example.schollink.Dto.ProfessorParaTurmaDto;
 import com.example.schollink.model.Aluno;
 import com.example.schollink.model.Disciplina;
 import com.example.schollink.model.Endereco;
@@ -74,16 +76,6 @@ public class ProfessorController {
         endereco.setNumero(dto.getEnderecoDto().getNumero());
         professor.setEndereco(endereco);
 
-        if (dto.getDisciplinaIds() != null && !dto.getDisciplinaIds().isEmpty()) {
-            List<Disciplina> disciplinas = dto.getDisciplinaIds().stream()
-                .map(id -> disciplinaService.buscarDisciplinaPorId(id)
-                    .orElseThrow(() -> new RuntimeException("Disciplina não encontrada: " + id)))
-                .collect(Collectors.toList());
-            professor.setDisciplinas(disciplinas);
-        } else {
-            professor.setDisciplinas(new ArrayList<>());
-        }
-
         professorService.cadastrarProfessor(user, professor, dto.getUserDto().getSenha());
 
         Map<String, String> response = new HashMap<>();
@@ -123,10 +115,26 @@ public class ProfessorController {
     }
 
     // tenho que mudar retorno para não retornar tudo de uma vez
-    @PostMapping("/buscar/aulas")
-    public ResponseEntity<?> buscarAulasDia(@RequestBody BuscarAulasDto dto) {
+    @PostMapping("/buscar/aulas/peloId")
+    public ResponseEntity<?> buscarAulasSemanaPeloId(@RequestBody BuscarAulasDto dto) {
         Long idProfessor = dto.getIdProfessor();
-        List<AulaRetornoDto> aulaRetornoDtos = professorService.buscarAulasSemana(idProfessor);
+        List<AulaRetornoDto> aulaRetornoDtos = professorService.buscarAulasSemanaPeloId(idProfessor);
+        if (!aulaRetornoDtos.isEmpty()) {
+            return ResponseEntity.ok(aulaRetornoDtos);
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Map.of("message", "Erro ao buscar aulas ou lista vazia"));
+        }
+    }
+
+    @GetMapping("/buscar/aulas")
+    public ResponseEntity<?> buscarAulasSemana(HttpSession session) {
+        Long idUser = (Long) session.getAttribute("userId");
+        if (idUser == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("message", "Usuário não autenticado"));
+        }
+        List<AulaRetornoDto> aulaRetornoDtos = professorService.buscarAulasSemana(idUser);
         if (!aulaRetornoDtos.isEmpty()) {
             return ResponseEntity.ok(aulaRetornoDtos);
         } else {
@@ -141,8 +149,14 @@ public class ProfessorController {
     public ResponseEntity<?> buscarAlunosChamada(@RequestBody ProfessorHorarioDto dto) {
         Long idProfessor = dto.getIdProfessor();
         Long idHorarioAula = dto.getIdHorarioAula();
+        System.out.println("id do professor = " + idProfessor);
+        System.out.println("id do horario aula = " + idHorarioAula);
         List<AlunoDto> alunosDtos = new ArrayList<AlunoDto>();
         alunosDtos = professorService.receberAlunosParaChamada(idProfessor, idHorarioAula);
+        for (AlunoDto alunoDto : alunosDtos) {
+            System.out.println(alunoDto.getUserDto().getNome());
+            System.out.println(alunoDto.getMatricula());
+        }
         if (alunosDtos != null && !alunosDtos.isEmpty()) {
             return ResponseEntity.ok(alunosDtos);
         } else {
@@ -162,4 +176,10 @@ public class ProfessorController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", "Erro ao realizar chamada"));
         }
     }
+
+    @GetMapping("/buscar-todos")
+    public List<ProfessorParaTurmaDto> buscarTodos() {
+        return professorService.buscarTodos();
+    }
+
 }

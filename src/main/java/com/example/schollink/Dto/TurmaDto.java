@@ -9,7 +9,7 @@ public class TurmaDto {
     private Anos anoEscolar;
     private int anoLetivo;
     private List<Integer> idAlunos;
-    private List<Integer> idDisciplinas;
+    private List<DisciplinaProfessorDto> disciplinas;
 
     public String getNome() {
         return nome;
@@ -43,11 +43,11 @@ public class TurmaDto {
         this.idAlunos = idAlunos;
     }
 
-    public List<Integer> getIdDisciplinas() {
-        return idDisciplinas;
+    public List<DisciplinaProfessorDto> getDisciplinas() {
+        return disciplinas;
     }
 
-    public void setIdDisciplinas(List<Integer> idDisciplinas) {
-        this.idDisciplinas = idDisciplinas;
+    public void setDisciplinas(List<DisciplinaProfessorDto> disciplinas) {
+        this.disciplinas = disciplinas;
     }
 }

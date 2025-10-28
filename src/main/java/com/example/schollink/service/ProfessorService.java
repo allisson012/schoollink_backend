@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import com.example.schollink.Dto.AlunoDto;
 import com.example.schollink.Dto.AulaRetornoDto;
 import com.example.schollink.Dto.ChamadaRequestDto;
+import com.example.schollink.Dto.ProfessorParaTurmaDto;
 import com.example.schollink.Dto.UserDto;
 import com.example.schollink.model.Aluno;
 import com.example.schollink.model.Disciplina;
@@ -23,6 +24,7 @@ import com.example.schollink.model.HorarioAula;
 import com.example.schollink.model.Presenca;
 import com.example.schollink.model.Professor;
 import com.example.schollink.model.Turma;
+import com.example.schollink.model.TurmaDisciplina;
 import com.example.schollink.model.User;
 import com.example.schollink.model.UserRole;
 import com.example.schollink.repository.AlunoRepository;
@@ -129,8 +131,16 @@ public class ProfessorService {
     }
 
     public List<AlunoDto> receberAlunosParaChamada(Long idProfessor, Long idHorarioAula) {
-        Turma turma = horarioAulaRepository.findById(idHorarioAula).get().getTurma();
-        List<Aluno> alunos = turmaRepository.findById(turma.getId()).get().getAlunos();
+        HorarioAula horarioAula = horarioAulaRepository.findById(idHorarioAula)
+                .orElseThrow(() -> new RuntimeException("Aula não encontrada"));
+
+        // Pegando a turma através do TurmaDisciplina
+        Turma turma = horarioAula.getTurmaDisciplina().getTurma();
+
+        List<Aluno> alunos = turmaRepository.findById(turma.getId())
+                .orElseThrow(() -> new RuntimeException("Turma não encontrada"))
+                .getAlunos();
+
         List<Presenca> presencas = presencaRepository.findByHorarioAulaId(idHorarioAula);
         Set<Long> idsPresentes = presencas.stream()
                 .filter(Presenca::getPresente)
@@ -148,39 +158,66 @@ public class ProfessorService {
             return dto;
         }).collect(Collectors.toList());
 
-        if (alunosDto.isEmpty()) {
-            return null;
-        }
-        return alunosDto;
-
+        return alunosDto.isEmpty() ? null : alunosDto;
     }
 
-    public List<AulaRetornoDto> buscarAulasSemana(Long idProfessor) {
+    public List<AulaRetornoDto> buscarAulasSemanaPeloId(Long idProfessor) {
         LocalDate hoje = LocalDate.now();
         LocalDate inicioSemana = hoje.with(DayOfWeek.MONDAY);
         LocalDate fimSemana = hoje.with(DayOfWeek.SUNDAY);
 
+        // Agora buscamos pelas aulas do professor via TurmaDisciplina
         List<HorarioAula> horarioAulas = horarioAulaRepository.findByDataBetweenAndProfessorId(
                 inicioSemana, fimSemana, idProfessor);
-        /*
-         * LocalDate dataAtual = LocalDate.now();
-         * List<HorarioAula> horarioAulas =
-         * horarioAulaRepository.findByDataAndProfessorId(dataAtual, idProfessor);
-         */
+
         if (horarioAulas == null || horarioAulas.isEmpty()) {
             return new ArrayList<>();
         }
-        List<AulaRetornoDto> aulasRetornoDtos = new ArrayList<>();
-        for (HorarioAula horarioAula : horarioAulas) {
+
+        List<AulaRetornoDto> aulasRetornoDtos = horarioAulas.stream().map(horarioAula -> {
             AulaRetornoDto aulaRetorno = new AulaRetornoDto();
-            aulaRetorno.setIdDisciplina(horarioAula.getDisciplina().getId());
-            aulaRetorno.setNomeDisciplina(horarioAula.getDisciplina().getNome());
+            TurmaDisciplina td = horarioAula.getTurmaDisciplina();
+            aulaRetorno.setIdDisciplina(td.getDisciplina().getId());
+            aulaRetorno.setNomeDisciplina(td.getDisciplina().getNome());
             aulaRetorno.setIdHorarioAula(horarioAula.getId());
-            aulaRetorno.setIdProfessor(horarioAula.getProfessor().getId());
+            aulaRetorno.setIdProfessor(td.getProfessor().getId());
             aulaRetorno.setHorarioInicio(horarioAula.getHoraInicio());
             aulaRetorno.setHorarioTermino(horarioAula.getHoraFim());
-            aulasRetornoDtos.add(aulaRetorno);
+            return aulaRetorno;
+        }).collect(Collectors.toList());
+
+        return aulasRetornoDtos;
+    }
+
+    public List<AulaRetornoDto> buscarAulasSemana(Long idUser) {
+        Professor professor = professorRepository.findByUser_Id(idUser);
+        if (professor == null) {
+            return new ArrayList<>();
         }
+        LocalDate hoje = LocalDate.now();
+        LocalDate inicioSemana = hoje.with(DayOfWeek.MONDAY);
+        LocalDate fimSemana = hoje.with(DayOfWeek.SUNDAY);
+
+        // Agora buscamos pelas aulas do professor via TurmaDisciplina
+        List<HorarioAula> horarioAulas = horarioAulaRepository.findByDataBetweenAndProfessorId(
+                inicioSemana, fimSemana, professor.getId());
+
+        if (horarioAulas == null || horarioAulas.isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        List<AulaRetornoDto> aulasRetornoDtos = horarioAulas.stream().map(horarioAula -> {
+            AulaRetornoDto aulaRetorno = new AulaRetornoDto();
+            TurmaDisciplina td = horarioAula.getTurmaDisciplina();
+            aulaRetorno.setIdDisciplina(td.getDisciplina().getId());
+            aulaRetorno.setNomeDisciplina(td.getDisciplina().getNome());
+            aulaRetorno.setIdHorarioAula(horarioAula.getId());
+            aulaRetorno.setIdProfessor(td.getProfessor().getId());
+            aulaRetorno.setHorarioInicio(horarioAula.getHoraInicio());
+            aulaRetorno.setHorarioTermino(horarioAula.getHoraFim());
+            return aulaRetorno;
+        }).collect(Collectors.toList());
+
         return aulasRetornoDtos;
     }
 
@@ -212,6 +249,13 @@ public class ProfessorService {
             }
         }
         return peloMenosUmSalvo;
+    }
+
+    public List<ProfessorParaTurmaDto> buscarTodos() {
+        List<Professor> professores = professorRepository.findAll();
+        return professores.stream()
+                .map(p -> new ProfessorParaTurmaDto(p.getId(), p.getUser().getNome()))
+                .collect(Collectors.toList());
     }
 
 }

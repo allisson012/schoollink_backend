@@ -34,7 +34,7 @@ public class Professor {
     private String formacaoAcademica;
     // um professor pode lecionar varias disciplinas
     @OneToMany(mappedBy = "professor")
-    private List<Disciplina> disciplinas = new ArrayList<>();
+    private List<TurmaDisciplina> turmaDisciplinas;
     private String registroProfissional;
     private double cargaHorariaSem;
     @Enumerated(EnumType.STRING)
@@ -108,13 +108,6 @@ public class Professor {
         this.salario = salario;
     }
 
-    public List<Disciplina> getDisciplinas() {
-        return disciplinas;
-    }
-
-    public void setDisciplinas(List<Disciplina> disciplinas) {
-        this.disciplinas = disciplinas;
-    }
 
     public Funcionario getFuncionario() {
         return funcionario;
@@ -130,6 +123,14 @@ public class Professor {
 
     public void setEndereco(Endereco endereco) {
         this.endereco = endereco;
+    }
+
+    public List<TurmaDisciplina> getTurmaDisciplinas() {
+        return turmaDisciplinas;
+    }
+
+    public void setTurmaDisciplinas(List<TurmaDisciplina> turmaDisciplinas) {
+        this.turmaDisciplinas = turmaDisciplinas;
     }
 
 }

@@ -1,16 +1,23 @@
 package com.example.schollink.service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.example.schollink.Dto.DisciplinaProfessorDto;
 import com.example.schollink.model.Aluno;
 import com.example.schollink.model.Disciplina;
+import com.example.schollink.model.Professor;
 import com.example.schollink.model.Turma;
+import com.example.schollink.model.TurmaDisciplina;
 import com.example.schollink.repository.AlunoRepository;
 import com.example.schollink.repository.DisciplinaRepository;
+import com.example.schollink.repository.ProfessorRepository;
 import com.example.schollink.repository.TurmaRepository;
+
+import jakarta.transaction.Transactional;
 
 @Service
 public class TurmaService {
@@ -23,18 +30,49 @@ public class TurmaService {
     @Autowired
     private DisciplinaRepository disciplinaRepository;
 
-    public Turma cadastrarTurma(Turma turma, List<Integer> idAlunos, List<Integer> idDisciplinas) {
-        if(idAlunos != null && !idAlunos.isEmpty()) {
-            List<Long> idAlunosLong = idAlunos.stream().map(Integer::longValue).toList();
-            List<Aluno> alunos = alunoRepository.findAllById(idAlunosLong);
+    @Autowired
+    private ProfessorRepository professorRepository;
+
+    @Transactional
+    public Turma cadastrarTurma(Turma turma, List<Integer> idAlunos, List<DisciplinaProfessorDto> disciplinas) {
+        List<Aluno> alunos = new ArrayList<Aluno>();
+        // Adiciona os alunos, se existirem
+        if (idAlunos != null && !idAlunos.isEmpty()) {
+            List<Long> idAlunosLong = idAlunos.stream()
+                    .map(Integer::longValue)
+                    .toList();
+            alunos = alunoRepository.findAllById(idAlunosLong);
             turma.setAlunos(alunos);
         }
-        if(idDisciplinas != null && !idDisciplinas.isEmpty()) {
-            List<Long> idDisciplinasLong = idDisciplinas.stream().map(Integer::longValue).toList();
-            List<Disciplina> disciplinas = disciplinaRepository.findAllById(idDisciplinasLong);
-            // criar relação na classe TurmaDisciplina turma.setTurmaDisciplinas(null);
+
+        // Cria a lista de TurmaDisciplina
+        List<TurmaDisciplina> turmaDisciplinas = new ArrayList<>();
+        if (disciplinas != null && !disciplinas.isEmpty()) {
+            for (DisciplinaProfessorDto dp : disciplinas) {
+                Disciplina disciplina = disciplinaRepository.findById(dp.getIdDisciplina())
+                        .orElseThrow(() -> new RuntimeException("Disciplina não encontrada"));
+
+                Professor professor = professorRepository.findById(dp.getIdProfessor())
+                        .orElseThrow(() -> new RuntimeException("Professor não encontrado"));
+
+                TurmaDisciplina td = new TurmaDisciplina();
+                td.setTurma(turma);
+                td.setDisciplina(disciplina);
+                td.setProfessor(professor);
+
+                turmaDisciplinas.add(td);
+            }
         }
-        return turmaRepository.save(turma);
+
+        turma.setTurmaDisciplinas(turmaDisciplinas);
+
+        // Salva a turma (e por cascade, salva TurmaDisciplina)
+        Turma turmaSalva = turmaRepository.save(turma);
+        for (Aluno alunosSalvos : alunos) {
+            alunosSalvos.setTurma(turmaSalva);
+            alunoRepository.save(alunosSalvos);
+        }
+        return turmaSalva;
     }
 
     public List<Turma> listarTurmas() {
@@ -64,7 +102,7 @@ public class TurmaService {
         Aluno aluno = alunoRepository.findById(alunoId).orElseThrow(() -> new RuntimeException("Aluno não encontrado"));
 
         turma.getAlunos().add(aluno);
-        return turmaRepository.save(turma); 
+        return turmaRepository.save(turma);
     }
 
     public Turma removerAluno(Long turmaId, Long alunoId) {
@@ -75,14 +113,16 @@ public class TurmaService {
 
     public Turma adicionarDisciplina(Long turmaId, Long disciplinaId) {
         Turma turma = turmaRepository.findById(turmaId).orElseThrow();
-        Disciplina disciplina = disciplinaRepository.findById(disciplinaId).orElseThrow(() -> new RuntimeException("Disciplina não encontrada"));
-       // turma.getDisciplinas().add(disciplina);
-        return turmaRepository.save(turma); 
+        Disciplina disciplina = disciplinaRepository.findById(disciplinaId)
+                .orElseThrow(() -> new RuntimeException("Disciplina não encontrada"));
+        // turma.getDisciplinas().add(disciplina);
+        return turmaRepository.save(turma);
     }
 
     public Turma removerDisciplina(Long turmaId, Long disciplinaId) {
         Turma turma = buscarTurma(turmaId);
-         //turma.getDisciplinas().removeIf(disciplina -> disciplina.getId().equals(disciplinaId));
+        // turma.getDisciplinas().removeIf(disciplina ->
+        // disciplina.getId().equals(disciplinaId));
         return turmaRepository.save(turma);
     }
 }

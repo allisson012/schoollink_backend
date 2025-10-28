@@ -17,7 +17,6 @@ import com.example.schollink.service.DisciplinaService;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 
-
 @RestController()
 @RequestMapping("/disciplina")
 public class DisciplinaController {
@@ -26,27 +25,28 @@ public class DisciplinaController {
 
     @PostMapping("/cadastrar")
     public ResponseEntity<Map<String, String>> cadastrarDisciplina(@RequestBody DisciplinaDto disciplinaDto) {
-        if (disciplinaDto.getNome() == null ) {
-            return ResponseEntity.badRequest().body(Map.of("mensagem", "Nome da disciplina é obrigatório"));
+        if (disciplinaDto.getNome() == null && disciplinaDto.getNome().isEmpty()) {
+            return ResponseEntity.badRequest()
+                    .body(Map.of("mensagem", "Nome da disciplina é obrigatório"));
         }
         Disciplina disciplina = new Disciplina();
         disciplina.setNome(disciplinaDto.getNome());
-        boolean sucesso = disciplinaService.cadastrarDisciplina(disciplina);
-        if (sucesso) {
-            return ResponseEntity.ok(Map.of("mensagem", "Disciplina cadastrada com sucesso"));
-        } else {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(Map.of("mensagem", "Professor não encontrado, não foi possível cadastrar a disciplina"));
-        }
+        disciplinaService.cadastrarDisciplina(disciplina);
+        return ResponseEntity.ok(Map.of("mensagem", "Disciplina cadastrada com sucesso"));
     }
 
     @GetMapping("/buscar-todas")
-    public ResponseEntity<List<DisciplinaDto>> buscarTodasDisciplinas() {
-        List<DisciplinaDto> disciplinas = disciplinaService.buscarTodasDisciplinas();
-        if(disciplinas.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
-        }
-        return ResponseEntity.ok(disciplinas);
+    public List<DisciplinaDto> buscarTodas() {
+        return disciplinaService.buscarTodas();
     }
-    
+
+    // @GetMapping("/buscar-todas")
+    // public ResponseEntity<List<DisciplinaDto>> buscarTodasDisciplinas() {
+    // List<DisciplinaDto> disciplinas = disciplinaService.buscarTodasDisciplinas();
+    // if (disciplinas.isEmpty()) {
+    // return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    // }
+    // return ResponseEntity.ok(disciplinas);
+    // }
+
 }
