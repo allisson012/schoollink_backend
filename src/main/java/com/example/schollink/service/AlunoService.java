@@ -8,8 +8,15 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+
 import com.example.schollink.Dto.AlunoParaTurmaDto;
+
+import com.example.schollink.Dto.AlunoDto;
+import com.example.schollink.Dto.EnderecoDto;
+import com.example.schollink.Dto.UserDto;
+
 import com.example.schollink.model.Aluno;
+import com.example.schollink.model.Endereco;
 import com.example.schollink.model.StatusMatricula;
 import com.example.schollink.model.User;
 import com.example.schollink.model.UserRole;
@@ -36,45 +43,86 @@ public class AlunoService {
         alunoRepository.save(aluno);
     }
 
-    public Aluno editarAluno(Aluno alunoNovo, Long id) {
+    public Aluno editarAluno(AlunoDto alunoDto, Long id) {
         Optional<Aluno> alunoOpt = alunoRepository.findById(id);
         if (alunoOpt.isEmpty()) {
             throw new RuntimeException("Aluno não encontrado");
         }
 
         Aluno alunoExistente = alunoOpt.get();
+        User userExistente = alunoExistente.getUser();
 
-        if (alunoNovo.getMatricula() != null && !alunoNovo.getMatricula().isBlank()) {
-            alunoExistente.setMatricula(alunoNovo.getMatricula());
+        if (alunoDto.getMatricula() != null && !alunoDto.getMatricula().isBlank()) {
+            alunoExistente.setMatricula(alunoDto.getMatricula());
         }
-        if (alunoNovo.getTelefoneResponsavel() != null && !alunoNovo.getTelefoneResponsavel().isBlank()) {
-            alunoExistente.setTelefoneResponsavel(alunoNovo.getTelefoneResponsavel());
+        if (alunoDto.getDataMatricula() != null) {
+            alunoExistente.setDataMatricula(alunoDto.getDataMatricula());
         }
-        if (alunoNovo.getStatusMatricula() != null) {
-            alunoExistente.setStatusMatricula(alunoNovo.getStatusMatricula());
+        if (alunoDto.getStatusMatricula() != null && !alunoDto.getStatusMatricula().isBlank()) {
+            alunoExistente.setStatusMatricula(
+                StatusMatricula.valueOf(alunoDto.getStatusMatricula().trim().toUpperCase())
+            );
+        }
+        if (alunoDto.getNomeResponsavel() != null && !alunoDto.getNomeResponsavel().isBlank()) {
+            alunoExistente.setNomeResponsavel(alunoDto.getNomeResponsavel());
+        }
+        if (alunoDto.getTelefoneResponsavel() != null && !alunoDto.getTelefoneResponsavel().isBlank()) {
+            alunoExistente.setTelefoneResponsavel(alunoDto.getTelefoneResponsavel());
         }
 
-        if (alunoNovo.getUser() != null) {
-            User userNovo = alunoNovo.getUser();
-            User userExistente = alunoExistente.getUser();
+        if (alunoDto.getUserDto() != null) {
+            UserDto userDto = alunoDto.getUserDto();
 
-            if (userNovo.getNome() != null && !userNovo.getNome().isBlank()) {
-                userExistente.setNome(userNovo.getNome());
+            if (userDto.getNome() != null && !userDto.getNome().isBlank()) {
+                userExistente.setNome(userDto.getNome());
             }
-            if (userNovo.getEmail() != null && !userNovo.getEmail().isBlank()) {
-                userExistente.setEmail(userNovo.getEmail());
+            if (userDto.getEmail() != null && !userDto.getEmail().isBlank()) {
+                userExistente.setEmail(userDto.getEmail());
             }
-            if (userNovo.getCpf() != null && !userNovo.getCpf().isBlank()) {
-                userExistente.setCpf(userNovo.getCpf());
+            if (userDto.getCpf() != null && !userDto.getCpf().isBlank()) {
+                userExistente.setCpf(userDto.getCpf());
             }
-            if (userNovo.getTelefone() != null && !userNovo.getTelefone().isBlank()) {
-                userExistente.setTelefone(userNovo.getTelefone());
+            if (userDto.getDataNascimento() != null) {
+                userExistente.setDataNascimento(userDto.getDataNascimento());
             }
-            if (userNovo.getGenero() != null && !userNovo.getGenero().isBlank()) {
-                userExistente.setGenero(userNovo.getGenero());
+            if (userDto.getGenero() != null && !userDto.getGenero().isBlank()) {
+                userExistente.setGenero(userDto.getGenero());
             }
+            if (userDto.getTelefone() != null && !userDto.getTelefone().isBlank()) {
+                userExistente.setTelefone(userDto.getTelefone());
+            }
+
+            // Atualiza o endereço (caso tenha vindo no DTO)
+            if (alunoDto.getEnderecoDto() != null) {
+                EnderecoDto enderecoDto = alunoDto.getEnderecoDto();
+                if (userExistente.getEndereco() == null) {
+                    userExistente.setEndereco(new Endereco());
+                }
+                Endereco endereco = userExistente.getEndereco();
+
+                if (enderecoDto.getCep() != null && !enderecoDto.getCep().isBlank()) {
+                    endereco.setCep(enderecoDto.getCep());
+                }
+                if (enderecoDto.getPais() != null && !enderecoDto.getPais().isBlank()) {
+                    endereco.setPais(enderecoDto.getPais());
+                }
+                if (enderecoDto.getEstado() != null && !enderecoDto.getEstado().isBlank()) {
+                    endereco.setEstado(enderecoDto.getEstado());
+                }
+                if (enderecoDto.getCidade() != null && !enderecoDto.getCidade().isBlank()) {
+                    endereco.setCidade(enderecoDto.getCidade());
+                }
+                if (enderecoDto.getRua() != null && !enderecoDto.getRua().isBlank()) {
+                    endereco.setRua(enderecoDto.getRua());
+                }
+                if (enderecoDto.getNumero() != null && !enderecoDto.getNumero().isBlank()) {
+                    endereco.setNumero(enderecoDto.getNumero());
+                }
+            }
+
             userRepository.save(userExistente);
         }
+
         return alunoRepository.save(alunoExistente);
     }
 

@@ -100,13 +100,34 @@ public class AlunoController {
      */
 
     @PutMapping("/editar")
-    public ResponseEntity<?> editarAluno(@RequestBody Aluno alunoNovo, HttpSession session) {
+    public ResponseEntity<?> editarAluno(@RequestBody AlunoDto alunoNovo, HttpSession session) {
         Long id = (Long) session.getAttribute("userId");
+
         if (id == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "Usuario não logado"));
         }
         try {
             Aluno atualizado = alunoService.editarAluno(alunoNovo, id);
+            return ResponseEntity.ok(Map.of("message", "Aluno atualizado com sucesso",
+                    "id", String.valueOf(
+                            atualizado.getIdAluno())));
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", e.getMessage()));
+        }
+    }
+
+    @PutMapping("/editar/verificar")
+    public ResponseEntity<?> editarAlunoComVerificacao(@RequestBody AlunoDto alunoNovo, HttpSession session) {
+        Long userId = (Long) session.getAttribute("userId");
+        UserRole userRole = (UserRole) session.getAttribute("UserRole");
+
+        if (userId == null || userRole == null || !userRole.equals(UserRole.ADMIN)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(Map.of("message", "Usuário não logado ou sem permissão"));
+        }
+
+        try {
+            Aluno atualizado = alunoService.editarAluno(alunoNovo, alunoNovo.getIdAluno());
             return ResponseEntity.ok(Map.of("message", "Aluno atualizado com sucesso",
                     "id", String.valueOf(
                             atualizado.getIdAluno())));
