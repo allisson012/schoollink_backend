@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.example.schollink.Dto.DisciplinaProfessorDto;
+import com.example.schollink.Dto.TurmaDto;
 import com.example.schollink.model.Aluno;
 import com.example.schollink.model.Disciplina;
 import com.example.schollink.model.Professor;
@@ -124,5 +125,56 @@ public class TurmaService {
         // turma.getDisciplinas().removeIf(disciplina ->
         // disciplina.getId().equals(disciplinaId));
         return turmaRepository.save(turma);
+    }
+
+    @Transactional
+    public void editarTurma(Long id, TurmaDto turmaDto) {
+        Turma turma = turmaRepository.findById(id).orElseThrow(() -> new RuntimeException("Turma não encontrada"));
+
+        turma.setNome(turmaDto.getNome());
+        turma.setAnoLetivo(turmaDto.getAnoLetivo());
+        turma.setAnoEscolar(turmaDto.getAnoEscolar());
+        List<Aluno> alunosAntigos = turma.getAlunos();
+        for (Aluno antigo : alunosAntigos) {
+            antigo.setTurma(null);
+            alunoRepository.save(antigo);
+        }
+
+        List<Aluno> novosAlunos = new ArrayList<Aluno>();
+        if (turmaDto.getIdAlunos() != null && !turmaDto.getIdAlunos().isEmpty()) {
+            List<Long> idAlunosLong = turmaDto.getIdAlunos().stream()
+                    .map(Integer::longValue)
+                    .toList();
+            novosAlunos = alunoRepository.findAllById(idAlunosLong);
+            turma.setAlunos(novosAlunos);
+        }else{
+            turma.setAlunos(new ArrayList<>());
+        }
+
+        turma.getTurmaDisciplinas().clear();
+
+        if(turmaDto.getDisciplinas() != null && !turmaDto.getDisciplinas().isEmpty()){
+            for (DisciplinaProfessorDto dp : turmaDto.getDisciplinas()) {
+                Disciplina disciplina = disciplinaRepository.findById(dp.getIdDisciplina())
+                        .orElseThrow(() -> new RuntimeException("Disciplina não encontrada"));
+    
+                Professor professor = professorRepository.findById(dp.getIdProfessor())
+                        .orElseThrow(() -> new RuntimeException("Professor não encontrado"));
+    
+                TurmaDisciplina td = new TurmaDisciplina();
+                td.setTurma(turma);
+                td.setDisciplina(disciplina);
+                td.setProfessor(professor);
+    
+                turma.getTurmaDisciplinas().add(td);
+            }
+        }
+
+        turmaRepository.save(turma);
+
+        for (Aluno novo : novosAlunos) {
+            novo.setTurma(turma);
+            alunoRepository.save(novo);
+        }
     }
 }

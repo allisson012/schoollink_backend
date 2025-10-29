@@ -1,6 +1,7 @@
 package com.example.schollink.controller;
 
 import java.util.List;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -15,8 +16,12 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.DeleteMapping;
 
+import com.example.schollink.Dto.DisciplinaProfessorDto;
 import com.example.schollink.Dto.TurmaDto;
+import com.example.schollink.model.Aluno;
 import com.example.schollink.model.Turma;
+import com.example.schollink.model.TurmaDisciplina;
+import com.example.schollink.repository.TurmaRepository;
 import com.example.schollink.service.TurmaService;
 
 @RestController()
@@ -24,6 +29,8 @@ import com.example.schollink.service.TurmaService;
 public class TurmaController {
     @Autowired
     private TurmaService turmaService;
+    @Autowired
+    private TurmaRepository turmaRepository;
 
     @PostMapping("/cadastrar")
     public ResponseEntity<Map<String, String>> cadastrarTurma(@RequestBody TurmaDto turmaDto) {
@@ -33,9 +40,17 @@ public class TurmaController {
         turma.setAnoEscolar(turmaDto.getAnoEscolar());
 
         turmaService.cadastrarTurma(turma, turmaDto.getIdAlunos(), turmaDto.getDisciplinas());
-        
+
         Map<String, String> response = new HashMap<>();
         response.put("mensagem", "Turma Cadastrado com sucesso");
+        return ResponseEntity.ok(response);
+    }
+
+    @PutMapping("/editar{id}")
+    public ResponseEntity<?> editarTurma(@PathVariable Long id, @RequestBody TurmaDto turmaDto) {
+        turmaService.editarTurma(id, turmaDto);
+        Map<String, String> response = new HashMap<>();
+        response.put("mensagem", "Turma editada com sucesso!");
         return ResponseEntity.ok(response);
     }
 
@@ -80,7 +95,8 @@ public class TurmaController {
     }
 
     @PostMapping("/{turmaId}/adicionar-disciplina/{disciplinaId}")
-    public ResponseEntity<Map<String, String>> adicionarDisciplina(@PathVariable Long turmaId, @PathVariable Long disciplinaId) {
+    public ResponseEntity<Map<String, String>> adicionarDisciplina(@PathVariable Long turmaId,
+            @PathVariable Long disciplinaId) {
         turmaService.adicionarDisciplina(turmaId, disciplinaId);
         Map<String, String> response = new HashMap<>();
         response.put("mensagem", "Disciplina adicionada com sucesso");
@@ -88,10 +104,47 @@ public class TurmaController {
     }
 
     @DeleteMapping("/{turmaId}/remover-disciplina/{disciplinaId}")
-    public ResponseEntity<Map<String, String>> removerDisciplina(@PathVariable Long turmaId, @PathVariable Long disciplinaId) {
+    public ResponseEntity<Map<String, String>> removerDisciplina(@PathVariable Long turmaId,
+            @PathVariable Long disciplinaId) {
         turmaService.removerDisciplina(turmaId, disciplinaId);
         Map<String, String> response = new HashMap<>();
         response.put("mensagem", "Disciplina removida com sucesso");
         return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/todas")
+    public ResponseEntity<List<TurmaDto>> listarTodas() {
+        List<Turma> turmas = turmaRepository.findAll();
+
+        List<TurmaDto> turmasDto = turmas.stream().map(t -> {
+            TurmaDto dto = new TurmaDto();
+            dto.setId(t.getId());
+            dto.setNome(t.getNome());
+            dto.setAnoEscolar(t.getAnoEscolar());
+            dto.setAnoLetivo(t.getAnoLetivo());
+            List<Integer> idAlunos = new ArrayList<Integer>();
+            for (Aluno aluno : t.getAlunos()) {
+                if (aluno.getIdAluno() != null) {
+                    idAlunos.add(aluno.getIdAluno().intValue());
+                }
+            }
+            if (idAlunos != null && !idAlunos.isEmpty()) {
+                dto.setIdAlunos(idAlunos);
+            }
+            List<DisciplinaProfessorDto> disciplinaProfessorDtos = new ArrayList<DisciplinaProfessorDto>();
+            for (TurmaDisciplina turmaDisciplina : t.getTurmaDisciplinas()) {
+                DisciplinaProfessorDto dpd = new DisciplinaProfessorDto();
+                dpd.setIdDisciplina(turmaDisciplina.getDisciplina().getId());
+                dpd.setIdProfessor(turmaDisciplina.getProfessor().getId());
+                disciplinaProfessorDtos.add(dpd);
+            }
+            if (disciplinaProfessorDtos != null && !disciplinaProfessorDtos.isEmpty()) {
+                dto.setDisciplinas(disciplinaProfessorDtos);
+            }
+
+            return dto;
+        }).toList();
+
+        return ResponseEntity.ok(turmasDto);
     }
 }
