@@ -177,4 +177,43 @@ public class TurmaService {
             alunoRepository.save(novo);
         }
     }
+
+    public List<TurmaDto> buscarTodas(){
+        List<Turma> turmas = turmaRepository.findAll();
+
+        List<TurmaDto> turmasDto = turmas.stream().map(t -> {
+            TurmaDto dto = new TurmaDto();
+            dto.setId(t.getId());
+            dto.setNome(t.getNome());
+            dto.setAnoEscolar(t.getAnoEscolar());
+            dto.setAnoLetivo(t.getAnoLetivo());
+            List<Integer> idAlunos = new ArrayList<Integer>();
+            for (Aluno aluno : t.getAlunos()) {
+                if (aluno.getIdAluno() != null) {
+                    idAlunos.add(aluno.getIdAluno().intValue());
+                }
+            }
+            if (idAlunos != null && !idAlunos.isEmpty()) {
+                dto.setIdAlunos(idAlunos);
+            }
+            List<DisciplinaProfessorDto> disciplinaProfessorDtos = new ArrayList<DisciplinaProfessorDto>();
+            for (TurmaDisciplina turmaDisciplina : t.getTurmaDisciplinas()) {
+                DisciplinaProfessorDto dpd = new DisciplinaProfessorDto();
+                dpd.setIdDisciplina(turmaDisciplina.getDisciplina().getId());
+                dpd.setIdProfessor(turmaDisciplina.getProfessor().getId());
+                disciplinaProfessorDtos.add(dpd);
+            }
+            if (disciplinaProfessorDtos != null && !disciplinaProfessorDtos.isEmpty()) {
+                dto.setDisciplinas(disciplinaProfessorDtos);
+            }
+
+            return dto;
+        }).toList();
+
+        if(turmasDto != null && !turmasDto.isEmpty()){
+            return turmasDto;
+        }else{
+            return new ArrayList<>();
+        }
+    }
 }
