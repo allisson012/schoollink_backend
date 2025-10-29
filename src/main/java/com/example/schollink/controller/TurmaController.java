@@ -1,7 +1,6 @@
 package com.example.schollink.controller;
 
 import java.util.List;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -15,13 +14,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.DeleteMapping;
-
-import com.example.schollink.Dto.DisciplinaProfessorDto;
 import com.example.schollink.Dto.TurmaDto;
-import com.example.schollink.model.Aluno;
 import com.example.schollink.model.Turma;
-import com.example.schollink.model.TurmaDisciplina;
-import com.example.schollink.repository.TurmaRepository;
 import com.example.schollink.service.TurmaService;
 
 @RestController()
@@ -60,12 +54,6 @@ public class TurmaController {
     @GetMapping("/{id}")
     public ResponseEntity<Turma> buscarTurma(@PathVariable Long id) {
         return ResponseEntity.ok(turmaService.buscarTurma(id));
-    }
-
-    @PutMapping("/{id}/editar")
-    public ResponseEntity<Turma> editarTurma(@PathVariable Long id, @RequestBody Turma turmaAtualizada) {
-        Turma turmaEditada = turmaService.editarTurma(id, turmaAtualizada);
-        return ResponseEntity.ok(turmaEditada);
     }
 
     @DeleteMapping("/{id}/deletar")

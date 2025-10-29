@@ -37,7 +37,6 @@ public class TurmaService {
     @Transactional
     public Turma cadastrarTurma(Turma turma, List<Integer> idAlunos, List<DisciplinaProfessorDto> disciplinas) {
         List<Aluno> alunos = new ArrayList<Aluno>();
-        // Adiciona os alunos, se existirem
         if (idAlunos != null && !idAlunos.isEmpty()) {
             List<Long> idAlunosLong = idAlunos.stream()
                     .map(Integer::longValue)
@@ -46,7 +45,6 @@ public class TurmaService {
             turma.setAlunos(alunos);
         }
 
-        // Cria a lista de TurmaDisciplina
         List<TurmaDisciplina> turmaDisciplinas = new ArrayList<>();
         if (disciplinas != null && !disciplinas.isEmpty()) {
             for (DisciplinaProfessorDto dp : disciplinas) {
@@ -66,8 +64,6 @@ public class TurmaService {
         }
 
         turma.setTurmaDisciplinas(turmaDisciplinas);
-
-        // Salva a turma (e por cascade, salva TurmaDisciplina)
         Turma turmaSalva = turmaRepository.save(turma);
         for (Aluno alunosSalvos : alunos) {
             alunosSalvos.setTurma(turmaSalva);
@@ -82,16 +78,6 @@ public class TurmaService {
 
     public Turma buscarTurma(Long id) {
         return turmaRepository.findById(id).orElseThrow(() -> new RuntimeException("Turma não encontrada"));
-    }
-
-    public Turma editarTurma(Long id, Turma turmaAtualizada) {
-        Turma turmaExistente = buscarTurma(id);
-
-        turmaExistente.setNome(turmaAtualizada.getNome());
-        turmaExistente.setAnoLetivo(turmaAtualizada.getAnoLetivo());
-        turmaExistente.setAnoEscolar(turmaAtualizada.getAnoEscolar());
-
-        return turmaRepository.save(turmaExistente);
     }
 
     public void deletarTurma(Long id) {
@@ -147,25 +133,25 @@ public class TurmaService {
                     .toList();
             novosAlunos = alunoRepository.findAllById(idAlunosLong);
             turma.setAlunos(novosAlunos);
-        }else{
+        } else {
             turma.setAlunos(new ArrayList<>());
         }
 
         turma.getTurmaDisciplinas().clear();
 
-        if(turmaDto.getDisciplinas() != null && !turmaDto.getDisciplinas().isEmpty()){
+        if (turmaDto.getDisciplinas() != null && !turmaDto.getDisciplinas().isEmpty()) {
             for (DisciplinaProfessorDto dp : turmaDto.getDisciplinas()) {
                 Disciplina disciplina = disciplinaRepository.findById(dp.getIdDisciplina())
                         .orElseThrow(() -> new RuntimeException("Disciplina não encontrada"));
-    
+
                 Professor professor = professorRepository.findById(dp.getIdProfessor())
                         .orElseThrow(() -> new RuntimeException("Professor não encontrado"));
-    
+
                 TurmaDisciplina td = new TurmaDisciplina();
                 td.setTurma(turma);
                 td.setDisciplina(disciplina);
                 td.setProfessor(professor);
-    
+
                 turma.getTurmaDisciplinas().add(td);
             }
         }
@@ -178,7 +164,7 @@ public class TurmaService {
         }
     }
 
-    public List<TurmaDto> buscarTodas(){
+    public List<TurmaDto> buscarTodas() {
         List<Turma> turmas = turmaRepository.findAll();
 
         List<TurmaDto> turmasDto = turmas.stream().map(t -> {
@@ -210,9 +196,9 @@ public class TurmaService {
             return dto;
         }).toList();
 
-        if(turmasDto != null && !turmasDto.isEmpty()){
+        if (turmasDto != null && !turmasDto.isEmpty()) {
             return turmasDto;
-        }else{
+        } else {
             return new ArrayList<>();
         }
     }
