@@ -47,7 +47,7 @@ public class TurmaController {
     }
 
     @GetMapping("/listar")
-    public ResponseEntity<List<Turma>> listarTurmas() {
+    public ResponseEntity<List<TurmaDto>> listarTurmas() {
         return ResponseEntity.ok(turmaService.listarTurmas());
     }
 

@@ -72,8 +72,22 @@ public class TurmaService {
         return turmaSalva;
     }
 
-    public List<Turma> listarTurmas() {
-        return turmaRepository.findAll();
+    public List<TurmaDto> listarTurmas() {
+        List<Turma> turmas = turmaRepository.findAll();
+        List<TurmaDto> dtos = new ArrayList<>();
+        for (Turma turma : turmas) {
+            TurmaDto dto = new TurmaDto();
+            dto.setId(turma.getId());
+            dto.setNome(turma.getNome());
+            dto.setAnoLetivo(turma.getAnoLetivo());
+            dtos.add(dto);
+        }
+
+        if (!dtos.isEmpty()) {
+            return dtos;
+        } else {
+            return new ArrayList<>();
+        }
     }
 
     public Turma buscarTurma(Long id) {
