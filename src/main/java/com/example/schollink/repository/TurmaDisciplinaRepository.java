@@ -10,8 +10,10 @@ import com.example.schollink.model.Professor;
 import com.example.schollink.model.Turma;
 import com.example.schollink.model.TurmaDisciplina;
 
-public interface TurmaDisciplinaRepository extends JpaRepository<TurmaDisciplina,Long>{
-    Optional<TurmaDisciplina> findByTurmaAndDisciplinaAndProfessor(Turma turma, Disciplina disciplina, Professor professor);
+public interface TurmaDisciplinaRepository extends JpaRepository<TurmaDisciplina, Long> {
+    Optional<TurmaDisciplina> findByTurmaAndDisciplinaAndProfessor(Turma turma, Disciplina disciplina,
+            Professor professor);
+
     List<TurmaDisciplina> findByTurma(Turma turma);
 
 }
