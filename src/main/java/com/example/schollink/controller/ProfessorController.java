@@ -31,6 +31,7 @@ import com.example.schollink.Dto.ProfessorParaTurmaDto;
 import com.example.schollink.model.Aluno;
 import com.example.schollink.model.Disciplina;
 import com.example.schollink.model.Endereco;
+import com.example.schollink.model.HistoricoAula;
 import com.example.schollink.model.HorarioAula;
 import com.example.schollink.model.Professor;
 import com.example.schollink.model.Turno;
@@ -169,7 +170,14 @@ public class ProfessorController {
     public ResponseEntity<?> realizarChamada(@RequestBody ChamadaRequestDto dto) {
         Long idHorarioAula = dto.getIdHorarioAula();
         List<AlunoDto> alunos = dto.getAlunos();
-        boolean chamada = professorService.realizarChamada(alunos, idHorarioAula);
+        HistoricoAula historicoAula = new HistoricoAula();
+        if(dto.isTarefa()){
+        historicoAula.setConteudoMinistrado(dto.getConteudoMinistrado());
+        historicoAula.setDescricaoTarefa(dto.getDescricao());
+        historicoAula.setTarefa(dto.isTarefa());
+        }
+        boolean chamada = professorService.realizarChamada(alunos, idHorarioAula,historicoAula);
+  
         if (chamada) {
             return ResponseEntity.ok(Map.of("message", "Chamada realizada com sucesso"));
         } else {

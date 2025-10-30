@@ -20,6 +20,7 @@ import com.example.schollink.Dto.UserDto;
 import com.example.schollink.model.Aluno;
 import com.example.schollink.model.Disciplina;
 import com.example.schollink.model.Funcionario;
+import com.example.schollink.model.HistoricoAula;
 import com.example.schollink.model.HorarioAula;
 import com.example.schollink.model.Presenca;
 import com.example.schollink.model.Professor;
@@ -28,6 +29,7 @@ import com.example.schollink.model.TurmaDisciplina;
 import com.example.schollink.model.User;
 import com.example.schollink.model.UserRole;
 import com.example.schollink.repository.AlunoRepository;
+import com.example.schollink.repository.HistoricoAulaRepository;
 import com.example.schollink.repository.HorarioAulaRepository;
 import com.example.schollink.repository.PresencaRepository;
 import com.example.schollink.repository.ProfessorRepository;
@@ -47,7 +49,7 @@ public class ProfessorService {
     @Autowired
     private FuncionarioService funcionarioService;
     @Autowired
-    private DisciplinaService disciplinaService;
+    private HistoricoAulaRepository historicoAulaRepository;
     @Autowired
     private HorarioAulaRepository horarioAulaRepository;
     @Autowired
@@ -134,7 +136,6 @@ public class ProfessorService {
         HorarioAula horarioAula = horarioAulaRepository.findById(idHorarioAula)
                 .orElseThrow(() -> new RuntimeException("Aula não encontrada"));
 
-        // Pegando a turma através do TurmaDisciplina
         Turma turma = horarioAula.getTurmaDisciplina().getTurma();
 
         List<Aluno> alunos = turmaRepository.findById(turma.getId())
@@ -166,7 +167,6 @@ public class ProfessorService {
         LocalDate inicioSemana = hoje.with(DayOfWeek.MONDAY);
         LocalDate fimSemana = hoje.with(DayOfWeek.SUNDAY);
 
-        // Agora buscamos pelas aulas do professor via TurmaDisciplina
         List<HorarioAula> horarioAulas = horarioAulaRepository.findByDataBetweenAndProfessorId(
                 inicioSemana, fimSemana, idProfessor);
 
@@ -198,7 +198,6 @@ public class ProfessorService {
         LocalDate inicioSemana = hoje.with(DayOfWeek.MONDAY);
         LocalDate fimSemana = hoje.with(DayOfWeek.SUNDAY);
 
-        // Agora buscamos pelas aulas do professor via TurmaDisciplina
         List<HorarioAula> horarioAulas = horarioAulaRepository.findByDataBetweenAndProfessorId(
                 inicioSemana, fimSemana, professor.getId());
 
@@ -221,7 +220,8 @@ public class ProfessorService {
         return aulasRetornoDtos;
     }
 
-    public boolean realizarChamada(List<AlunoDto> alunos, Long idHorarioAula) {
+    public boolean realizarChamada(List<AlunoDto> alunos, Long idHorarioAula, HistoricoAula historicoAula) {
+
         Optional<HorarioAula> horarioAulaOpt = horarioAulaRepository.findById(idHorarioAula);
         if (horarioAulaOpt.isEmpty()) {
             return false;
@@ -247,6 +247,11 @@ public class ProfessorService {
                 presencaRepository.save(presenca);
                 peloMenosUmSalvo = true;
             }
+        }
+        if (historicoAula != null && historicoAula.isTarefa() && horarioAula != null) {
+            historicoAula.setDataAula(horarioAula.getData());
+            historicoAula.setTurmaDisciplina(horarioAula.getTurmaDisciplina());
+            historicoAulaRepository.save(historicoAula);
         }
         return peloMenosUmSalvo;
     }
