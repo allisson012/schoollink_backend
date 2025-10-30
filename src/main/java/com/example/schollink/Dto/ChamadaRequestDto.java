@@ -49,5 +49,5 @@ public class ChamadaRequestDto {
     public void setTarefa(boolean tarefa) {
         this.tarefa = tarefa;
     }
-  
+
 }

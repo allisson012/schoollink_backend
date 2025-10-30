@@ -171,13 +171,13 @@ public class ProfessorController {
         Long idHorarioAula = dto.getIdHorarioAula();
         List<AlunoDto> alunos = dto.getAlunos();
         HistoricoAula historicoAula = new HistoricoAula();
-        if(dto.isTarefa()){
-        historicoAula.setConteudoMinistrado(dto.getConteudoMinistrado());
-        historicoAula.setDescricaoTarefa(dto.getDescricao());
-        historicoAula.setTarefa(dto.isTarefa());
+        if (dto.isTarefa()) {
+            historicoAula.setConteudoMinistrado(dto.getConteudoMinistrado());
+            historicoAula.setDescricaoTarefa(dto.getDescricao());
+            historicoAula.setTarefa(dto.isTarefa());
         }
-        boolean chamada = professorService.realizarChamada(alunos, idHorarioAula,historicoAula);
-  
+        boolean chamada = professorService.realizarChamada(alunos, idHorarioAula, historicoAula);
+
         if (chamada) {
             return ResponseEntity.ok(Map.of("message", "Chamada realizada com sucesso"));
         } else {
