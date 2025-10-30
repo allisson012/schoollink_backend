@@ -9,9 +9,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.schollink.Dto.DisciplinaDto;
+import com.example.schollink.Dto.DisciplinaProfessorDto;
 import com.example.schollink.model.Disciplina;
 import com.example.schollink.service.DisciplinaService;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -38,6 +40,11 @@ public class DisciplinaController {
     @GetMapping("/buscar-todas")
     public List<DisciplinaDto> buscarTodas() {
         return disciplinaService.buscarTodas();
+    }
+
+    @GetMapping("/buscarDisciplinas")
+    public ResponseEntity<List<DisciplinaProfessorDto>> buscarDisciplinasProfessores(@RequestParam Long id) {
+        return ResponseEntity.ok(disciplinaService.buscarDisciplinasProfessores(id));
     }
 
     // @GetMapping("/buscar-todas")
