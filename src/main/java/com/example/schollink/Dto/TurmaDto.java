@@ -5,11 +5,20 @@ import java.util.List;
 import com.example.schollink.model.Anos;
 
 public class TurmaDto {
+    private Long id;
     private String nome;
     private Anos anoEscolar;
     private int anoLetivo;
     private List<Integer> idAlunos;
     private List<DisciplinaProfessorDto> disciplinas;
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
 
     public String getNome() {
         return nome;

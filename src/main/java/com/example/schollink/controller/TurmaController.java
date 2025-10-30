@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.DeleteMapping;
-
 import com.example.schollink.Dto.TurmaDto;
 import com.example.schollink.model.Turma;
 import com.example.schollink.service.TurmaService;
@@ -33,26 +32,28 @@ public class TurmaController {
         turma.setAnoEscolar(turmaDto.getAnoEscolar());
 
         turmaService.cadastrarTurma(turma, turmaDto.getIdAlunos(), turmaDto.getDisciplinas());
-        
+
         Map<String, String> response = new HashMap<>();
         response.put("mensagem", "Turma Cadastrado com sucesso");
         return ResponseEntity.ok(response);
     }
 
+    @PutMapping("/editar{id}")
+    public ResponseEntity<?> editarTurma(@PathVariable Long id, @RequestBody TurmaDto turmaDto) {
+        turmaService.editarTurma(id, turmaDto);
+        Map<String, String> response = new HashMap<>();
+        response.put("mensagem", "Turma editada com sucesso!");
+        return ResponseEntity.ok(response);
+    }
+
     @GetMapping("/listar")
-    public ResponseEntity<List<Turma>> listarTurmas() {
+    public ResponseEntity<List<TurmaDto>> listarTurmas() {
         return ResponseEntity.ok(turmaService.listarTurmas());
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<Turma> buscarTurma(@PathVariable Long id) {
         return ResponseEntity.ok(turmaService.buscarTurma(id));
-    }
-
-    @PutMapping("/{id}/editar")
-    public ResponseEntity<Turma> editarTurma(@PathVariable Long id, @RequestBody Turma turmaAtualizada) {
-        Turma turmaEditada = turmaService.editarTurma(id, turmaAtualizada);
-        return ResponseEntity.ok(turmaEditada);
     }
 
     @DeleteMapping("/{id}/deletar")
@@ -80,7 +81,8 @@ public class TurmaController {
     }
 
     @PostMapping("/{turmaId}/adicionar-disciplina/{disciplinaId}")
-    public ResponseEntity<Map<String, String>> adicionarDisciplina(@PathVariable Long turmaId, @PathVariable Long disciplinaId) {
+    public ResponseEntity<Map<String, String>> adicionarDisciplina(@PathVariable Long turmaId,
+            @PathVariable Long disciplinaId) {
         turmaService.adicionarDisciplina(turmaId, disciplinaId);
         Map<String, String> response = new HashMap<>();
         response.put("mensagem", "Disciplina adicionada com sucesso");
@@ -88,10 +90,17 @@ public class TurmaController {
     }
 
     @DeleteMapping("/{turmaId}/remover-disciplina/{disciplinaId}")
-    public ResponseEntity<Map<String, String>> removerDisciplina(@PathVariable Long turmaId, @PathVariable Long disciplinaId) {
+    public ResponseEntity<Map<String, String>> removerDisciplina(@PathVariable Long turmaId,
+            @PathVariable Long disciplinaId) {
         turmaService.removerDisciplina(turmaId, disciplinaId);
         Map<String, String> response = new HashMap<>();
         response.put("mensagem", "Disciplina removida com sucesso");
         return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/todas")
+    public ResponseEntity<List<TurmaDto>> listarTodas() {
+        List<TurmaDto> turmasDto = turmaService.buscarTodas();
+        return ResponseEntity.ok(turmasDto);
     }
 }

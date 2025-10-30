@@ -17,7 +17,6 @@ public class FuncionarioDto {
     private String turno;
     private double salario;
     private EnderecoDto enderecoDto;
-    
 
     public String getRfid() {
         return this.rfid;
@@ -113,6 +112,6 @@ public class FuncionarioDto {
 
     public void setEnderecoDto(EnderecoDto enderecoDto) {
         this.enderecoDto = enderecoDto;
-    }   
-    
+    }
+
 }

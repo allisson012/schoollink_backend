@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.example.schollink.Dto.DisciplinaProfessorDto;
+import com.example.schollink.Dto.TurmaDto;
 import com.example.schollink.model.Aluno;
 import com.example.schollink.model.Disciplina;
 import com.example.schollink.model.Professor;
@@ -36,7 +37,6 @@ public class TurmaService {
     @Transactional
     public Turma cadastrarTurma(Turma turma, List<Integer> idAlunos, List<DisciplinaProfessorDto> disciplinas) {
         List<Aluno> alunos = new ArrayList<Aluno>();
-        // Adiciona os alunos, se existirem
         if (idAlunos != null && !idAlunos.isEmpty()) {
             List<Long> idAlunosLong = idAlunos.stream()
                     .map(Integer::longValue)
@@ -45,7 +45,6 @@ public class TurmaService {
             turma.setAlunos(alunos);
         }
 
-        // Cria a lista de TurmaDisciplina
         List<TurmaDisciplina> turmaDisciplinas = new ArrayList<>();
         if (disciplinas != null && !disciplinas.isEmpty()) {
             for (DisciplinaProfessorDto dp : disciplinas) {
@@ -65,8 +64,6 @@ public class TurmaService {
         }
 
         turma.setTurmaDisciplinas(turmaDisciplinas);
-
-        // Salva a turma (e por cascade, salva TurmaDisciplina)
         Turma turmaSalva = turmaRepository.save(turma);
         for (Aluno alunosSalvos : alunos) {
             alunosSalvos.setTurma(turmaSalva);
@@ -75,22 +72,26 @@ public class TurmaService {
         return turmaSalva;
     }
 
-    public List<Turma> listarTurmas() {
-        return turmaRepository.findAll();
+    public List<TurmaDto> listarTurmas() {
+        List<Turma> turmas = turmaRepository.findAll();
+        List<TurmaDto> dtos = new ArrayList<>();
+        for (Turma turma : turmas) {
+            TurmaDto dto = new TurmaDto();
+            dto.setId(turma.getId());
+            dto.setNome(turma.getNome());
+            dto.setAnoLetivo(turma.getAnoLetivo());
+            dtos.add(dto);
+        }
+
+        if (!dtos.isEmpty()) {
+            return dtos;
+        } else {
+            return new ArrayList<>();
+        }
     }
 
     public Turma buscarTurma(Long id) {
         return turmaRepository.findById(id).orElseThrow(() -> new RuntimeException("Turma não encontrada"));
-    }
-
-    public Turma editarTurma(Long id, Turma turmaAtualizada) {
-        Turma turmaExistente = buscarTurma(id);
-
-        turmaExistente.setNome(turmaAtualizada.getNome());
-        turmaExistente.setAnoLetivo(turmaAtualizada.getAnoLetivo());
-        turmaExistente.setAnoEscolar(turmaAtualizada.getAnoEscolar());
-
-        return turmaRepository.save(turmaExistente);
     }
 
     public void deletarTurma(Long id) {
@@ -124,5 +125,95 @@ public class TurmaService {
         // turma.getDisciplinas().removeIf(disciplina ->
         // disciplina.getId().equals(disciplinaId));
         return turmaRepository.save(turma);
+    }
+
+    @Transactional
+    public void editarTurma(Long id, TurmaDto turmaDto) {
+        Turma turma = turmaRepository.findById(id).orElseThrow(() -> new RuntimeException("Turma não encontrada"));
+
+        turma.setNome(turmaDto.getNome());
+        turma.setAnoLetivo(turmaDto.getAnoLetivo());
+        turma.setAnoEscolar(turmaDto.getAnoEscolar());
+        List<Aluno> alunosAntigos = turma.getAlunos();
+        for (Aluno antigo : alunosAntigos) {
+            antigo.setTurma(null);
+            alunoRepository.save(antigo);
+        }
+
+        List<Aluno> novosAlunos = new ArrayList<Aluno>();
+        if (turmaDto.getIdAlunos() != null && !turmaDto.getIdAlunos().isEmpty()) {
+            List<Long> idAlunosLong = turmaDto.getIdAlunos().stream()
+                    .map(Integer::longValue)
+                    .toList();
+            novosAlunos = alunoRepository.findAllById(idAlunosLong);
+            turma.setAlunos(novosAlunos);
+        } else {
+            turma.setAlunos(new ArrayList<>());
+        }
+
+        turma.getTurmaDisciplinas().clear();
+
+        if (turmaDto.getDisciplinas() != null && !turmaDto.getDisciplinas().isEmpty()) {
+            for (DisciplinaProfessorDto dp : turmaDto.getDisciplinas()) {
+                Disciplina disciplina = disciplinaRepository.findById(dp.getIdDisciplina())
+                        .orElseThrow(() -> new RuntimeException("Disciplina não encontrada"));
+
+                Professor professor = professorRepository.findById(dp.getIdProfessor())
+                        .orElseThrow(() -> new RuntimeException("Professor não encontrado"));
+
+                TurmaDisciplina td = new TurmaDisciplina();
+                td.setTurma(turma);
+                td.setDisciplina(disciplina);
+                td.setProfessor(professor);
+
+                turma.getTurmaDisciplinas().add(td);
+            }
+        }
+
+        turmaRepository.save(turma);
+
+        for (Aluno novo : novosAlunos) {
+            novo.setTurma(turma);
+            alunoRepository.save(novo);
+        }
+    }
+
+    public List<TurmaDto> buscarTodas() {
+        List<Turma> turmas = turmaRepository.findAll();
+
+        List<TurmaDto> turmasDto = turmas.stream().map(t -> {
+            TurmaDto dto = new TurmaDto();
+            dto.setId(t.getId());
+            dto.setNome(t.getNome());
+            dto.setAnoEscolar(t.getAnoEscolar());
+            dto.setAnoLetivo(t.getAnoLetivo());
+            List<Integer> idAlunos = new ArrayList<Integer>();
+            for (Aluno aluno : t.getAlunos()) {
+                if (aluno.getIdAluno() != null) {
+                    idAlunos.add(aluno.getIdAluno().intValue());
+                }
+            }
+            if (idAlunos != null && !idAlunos.isEmpty()) {
+                dto.setIdAlunos(idAlunos);
+            }
+            List<DisciplinaProfessorDto> disciplinaProfessorDtos = new ArrayList<DisciplinaProfessorDto>();
+            for (TurmaDisciplina turmaDisciplina : t.getTurmaDisciplinas()) {
+                DisciplinaProfessorDto dpd = new DisciplinaProfessorDto();
+                dpd.setIdDisciplina(turmaDisciplina.getDisciplina().getId());
+                dpd.setIdProfessor(turmaDisciplina.getProfessor().getId());
+                disciplinaProfessorDtos.add(dpd);
+            }
+            if (disciplinaProfessorDtos != null && !disciplinaProfessorDtos.isEmpty()) {
+                dto.setDisciplinas(disciplinaProfessorDtos);
+            }
+
+            return dto;
+        }).toList();
+
+        if (turmasDto != null && !turmasDto.isEmpty()) {
+            return turmasDto;
+        } else {
+            return new ArrayList<>();
+        }
     }
 }
