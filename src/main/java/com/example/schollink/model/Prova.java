@@ -15,7 +15,7 @@ public class Prova {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long idProva;
-    private float nota;
+    private Float nota;
     @Enumerated(EnumType.STRING)
     private TipoProva tipo;
     @ManyToOne
@@ -48,11 +48,11 @@ public class Prova {
         this.idProva = idProva;
     }
 
-    public float getNota() {
+    public Float getNota() {
         return this.nota;
     }
 
-    public void setNota(float nota) {
+    public void setNota(Float nota) {
         this.nota = nota;
     }
 
