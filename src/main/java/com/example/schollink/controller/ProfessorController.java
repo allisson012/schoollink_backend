@@ -171,10 +171,13 @@ public class ProfessorController {
         Long idHorarioAula = dto.getIdHorarioAula();
         List<AlunoDto> alunos = dto.getAlunos();
         HistoricoAula historicoAula = new HistoricoAula();
-        if (dto.isTarefa()) {
+
+        boolean temTarefa = Boolean.TRUE.equals(dto.getTarefa());
+        if (temTarefa) {
             historicoAula.setConteudoMinistrado(dto.getConteudoMinistrado());
             historicoAula.setDescricaoTarefa(dto.getDescricao());
-            historicoAula.setTarefa(dto.isTarefa());
+            historicoAula.setTarefa(true);
+            historicoAula.setResumoAula(dto.getResumoAula());
         }
         boolean chamada = professorService.realizarChamada(alunos, idHorarioAula, historicoAula);
 

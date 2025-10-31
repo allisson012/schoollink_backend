@@ -1,14 +1,14 @@
 package com.example.schollink.Dto;
 
 import java.util.List;
-import com.example.schollink.model.HistoricoAula;
 
 public class ChamadaRequestDto {
     private Long idHorarioAula;
     private List<AlunoDto> alunos;
     private String descricao;
     private String conteudoMinistrado;
-    private boolean tarefa;
+    private String resumoAula;
+    private Boolean tarefa;
 
     public Long getIdHorarioAula() {
         return idHorarioAula;
@@ -42,11 +42,21 @@ public class ChamadaRequestDto {
         this.conteudoMinistrado = conteudoMinistrado;
     }
 
-    public boolean isTarefa() {
+
+
+    public String getResumoAula() {
+        return resumoAula;
+    }
+
+    public void setResumoAula(String resumoAula) {
+        this.resumoAula = resumoAula;
+    }
+
+    public Boolean getTarefa() {
         return tarefa;
     }
 
-    public void setTarefa(boolean tarefa) {
+    public void setTarefa(Boolean tarefa) {
         this.tarefa = tarefa;
     }
 

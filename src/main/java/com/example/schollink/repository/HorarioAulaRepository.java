@@ -17,26 +17,25 @@ import java.util.List;
 
 @Repository
 public interface HorarioAulaRepository extends JpaRepository<HorarioAula, Long> {
-    boolean existsByTurmaDisciplina_TurmaAndTurmaDisciplina_DisciplinaAndData(
-            Turma turma, Disciplina disciplina, LocalDate data);
+        boolean existsByTurmaDisciplina_TurmaAndTurmaDisciplina_DisciplinaAndData(
+                        Turma turma, Disciplina disciplina, LocalDate data);
 
-    // Busca horários de uma turma específica em determinada data
-    List<HorarioAula> findByDataAndTurmaDisciplina_Turma(LocalDate data, Turma turma);
+        List<HorarioAula> findByDataAndTurmaDisciplina_Turma(LocalDate data, Turma turma);
 
-    // Busca horários de um professor específico em determinada data
-    List<HorarioAula> findByDataAndTurmaDisciplina_Professor_Id(LocalDate data, Long professorId);
+        List<HorarioAula> findByDataAndTurmaDisciplina_Professor_Id(LocalDate data, Long professorId);
 
-    List<HorarioAula> findByDataAndTurmaDisciplina(LocalDate data, TurmaDisciplina turmaDisciplina);
+        List<HorarioAula> findByTurmaDisciplina(TurmaDisciplina turmaDisciplina);
 
-    // Busca horários de um professor em um intervalo de datas
-    @Query("SELECT h FROM HorarioAula h " +
-            "WHERE h.data BETWEEN :inicio AND :fim " +
-            "AND h.turmaDisciplina.professor.id = :idProfessor")
-    List<HorarioAula> findByDataBetweenAndProfessorId(
-            @Param("inicio") LocalDate inicio,
-            @Param("fim") LocalDate fim,
-            @Param("idProfessor") Long idProfessor);
-    // List<HorarioAula> findByDataBetweenAndTurmaDisciplina_Professor_Id(
-    // LocalDate inicioSemana, LocalDate fimSemana, Long professorId);
+        List<HorarioAula> findByDataAndTurmaDisciplina(LocalDate data, TurmaDisciplina turmaDisciplina);
+
+        @Query("SELECT h FROM HorarioAula h " +
+                        "WHERE h.data BETWEEN :inicio AND :fim " +
+                        "AND h.turmaDisciplina.professor.id = :idProfessor")
+        List<HorarioAula> findByDataBetweenAndProfessorId(
+                        @Param("inicio") LocalDate inicio,
+                        @Param("fim") LocalDate fim,
+                        @Param("idProfessor") Long idProfessor);
+        // List<HorarioAula> findByDataBetweenAndTurmaDisciplina_Professor_Id(
+        // LocalDate inicioSemana, LocalDate fimSemana, Long professorId);
 
 }

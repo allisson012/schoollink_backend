@@ -5,6 +5,7 @@ public class DisciplinaProfessorDto {
     private String nomeDisciplina;
     private Long idProfessor;
     private String nomeProfessor;
+    private Long idTurmaDisciplina;
 
     public Long getIdDisciplina() {
         return idDisciplina;
@@ -37,4 +38,13 @@ public class DisciplinaProfessorDto {
     public void setNomeProfessor(String nomeProfessor) {
         this.nomeProfessor = nomeProfessor;
     }
+
+    public Long getIdTurmaDisciplina() {
+        return idTurmaDisciplina;
+    }
+
+    public void setIdTurmaDisciplina(Long idTurmaDisciplina) {
+        this.idTurmaDisciplina = idTurmaDisciplina;
+    }
+
 }

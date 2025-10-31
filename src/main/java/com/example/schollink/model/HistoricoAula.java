@@ -20,7 +20,7 @@ public class HistoricoAula {
     private TurmaDisciplina turmaDisciplina;
     private LocalDate dataAula;
     private String conteudoMinistrado;
-
+    private String resumoAula;
     private Boolean tarefa;
     private String descricaoTarefa;
 
@@ -38,6 +38,14 @@ public class HistoricoAula {
 
     public void setDataAula(LocalDate dataAula) {
         this.dataAula = dataAula;
+    }
+
+    public String getResumoAula() {
+        return resumoAula;
+    }
+
+    public void setResumoAula(String resumoAula) {
+        this.resumoAula = resumoAula;
     }
 
     public String getConteudoMinistrado() {
