@@ -248,7 +248,7 @@ public class ProfessorService {
                 peloMenosUmSalvo = true;
             }
         }
-        if (historicoAula != null && historicoAula.isTarefa() && horarioAula != null) {
+        if (historicoAula != null && Boolean.TRUE.equals(historicoAula.getTarefa()) && horarioAula != null) {
             historicoAula.setDataAula(horarioAula.getData());
             historicoAula.setTurmaDisciplina(horarioAula.getTurmaDisciplina());
             historicoAulaRepository.save(historicoAula);

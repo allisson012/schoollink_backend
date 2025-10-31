@@ -6,21 +6,30 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-
+import org.springframework.web.server.ResponseStatusException;
 
 import com.example.schollink.Dto.AlunoParaTurmaDto;
-
+import com.example.schollink.Dto.DisciplinaProfessorDto;
 import com.example.schollink.Dto.AlunoDto;
 import com.example.schollink.Dto.EnderecoDto;
+import com.example.schollink.Dto.PresencasAlunoDto;
 import com.example.schollink.Dto.UserDto;
 
 import com.example.schollink.model.Aluno;
 import com.example.schollink.model.Endereco;
+import com.example.schollink.model.HorarioAula;
+import com.example.schollink.model.Presenca;
 import com.example.schollink.model.StatusMatricula;
+import com.example.schollink.model.Turma;
+import com.example.schollink.model.TurmaDisciplina;
 import com.example.schollink.model.User;
 import com.example.schollink.model.UserRole;
 import com.example.schollink.repository.AlunoRepository;
+import com.example.schollink.repository.HorarioAulaRepository;
+import com.example.schollink.repository.PresencaRepository;
+import com.example.schollink.repository.TurmaDisciplinaRepository;
 import com.example.schollink.repository.UserRepository;
 
 @Service
@@ -31,6 +40,12 @@ public class AlunoService {
     private UserRepository userRepository;
     @Autowired
     private AlunoRepository alunoRepository;
+    @Autowired
+    private TurmaDisciplinaRepository turmaDisciplinaRepository;
+    @Autowired
+    private HorarioAulaRepository horarioAulaRepository;
+    @Autowired
+    private PresencaRepository presencaRepository;
 
     public void cadastrarAluno(User user, Aluno aluno, String senha) {
         byte salt[] = passwordService.gerarSalt();
@@ -60,8 +75,7 @@ public class AlunoService {
         }
         if (alunoDto.getStatusMatricula() != null && !alunoDto.getStatusMatricula().isBlank()) {
             alunoExistente.setStatusMatricula(
-                StatusMatricula.valueOf(alunoDto.getStatusMatricula().trim().toUpperCase())
-            );
+                    StatusMatricula.valueOf(alunoDto.getStatusMatricula().trim().toUpperCase()));
         }
         if (alunoDto.getNomeResponsavel() != null && !alunoDto.getNomeResponsavel().isBlank()) {
             alunoExistente.setNomeResponsavel(alunoDto.getNomeResponsavel());
@@ -149,6 +163,7 @@ public class AlunoService {
                 .map(a -> new AlunoParaTurmaDto(a.getIdAluno(), a.getUser().getNome()))
                 .collect(Collectors.toList());
     }
+
     public Optional<List<Aluno>> buscar(String nome, String matricula, String email) {
         List<Aluno> alunos = new ArrayList<>();
 
@@ -161,6 +176,67 @@ public class AlunoService {
         }
 
         return alunos.isEmpty() ? Optional.empty() : Optional.of(alunos);
+    }
+
+    public List<DisciplinaProfessorDto> buscarDisciplinas(Long idUser) {
+        Optional<Aluno> alunoOpt = alunoRepository.findByUserId(idUser);
+        List<TurmaDisciplina> turmasDisciplinas = new ArrayList<>();
+        List<DisciplinaProfessorDto> disciplinasProfessoresDtos = new ArrayList<>();
+        if (alunoOpt.isPresent()) {
+            Aluno aluno = alunoOpt.get();
+            Turma turma = aluno.getTurma();
+            turmasDisciplinas = turmaDisciplinaRepository.findByTurma(turma);
+            if (!turmasDisciplinas.isEmpty()) {
+                for (TurmaDisciplina turmaDisciplina : turmasDisciplinas) {
+                    DisciplinaProfessorDto disciplinaProfessorDto = new DisciplinaProfessorDto();
+                    disciplinaProfessorDto.setIdDisciplina(turmaDisciplina.getDisciplina().getId());
+                    disciplinaProfessorDto.setNomeDisciplina(turmaDisciplina.getDisciplina().getNome());
+                    disciplinaProfessorDto.setIdProfessor(turmaDisciplina.getProfessor().getId());
+                    disciplinaProfessorDto.setNomeProfessor(turmaDisciplina.getProfessor().getUser().getNome());
+                    disciplinaProfessorDto.setIdTurmaDisciplina(turmaDisciplina.getId());
+                    disciplinasProfessoresDtos.add(disciplinaProfessorDto);
+                }
+            }
+        }
+        return disciplinasProfessoresDtos;
+    }
+
+    public PresencasAlunoDto buscarPresencas(Long idUser, Long idTurmaDisciplina) {
+        Optional<Aluno> alunoOpt = alunoRepository.findByUserId(idUser);
+        Optional<TurmaDisciplina> turmaDisciplinaOpt = turmaDisciplinaRepository.findById(idTurmaDisciplina);
+        if (!alunoOpt.isPresent()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND,
+                    "Aluno não encontrado para o usuário ID: " + idUser);
+        }
+        if (!turmaDisciplinaOpt.isPresent()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND,
+                    "TurmaDisciplina não encontrada para o ID: " + idTurmaDisciplina);
+        }
+        Aluno aluno = alunoOpt.get();
+        TurmaDisciplina turmaDisciplina = turmaDisciplinaOpt.get();
+        if(!turmaDisciplina.getTurma().equals(aluno.getTurma())){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND,
+                    "Aluno não participa dessa turma");
+        }
+        List<HorarioAula> horariosAulas = horarioAulaRepository.findByTurmaDisciplina(turmaDisciplina);
+        int totalAulas = horariosAulas.size();
+        ;
+        int aulasPresente = 0;
+        for (HorarioAula horarioAula : horariosAulas) {
+            List<Presenca> presencas = horarioAula.getPresencas();
+            for (Presenca presenca : presencas) {
+                if (presenca.getAluno().equals(aluno) && Boolean.TRUE.equals(presenca.getPresente())) {
+                    aulasPresente += 1;
+                }
+            }
+        }
+        PresencasAlunoDto presencasAlunoDto = new PresencasAlunoDto();
+        presencasAlunoDto.setId(turmaDisciplina.getId());
+        presencasAlunoDto.setNomeDisciplina(turmaDisciplina.getDisciplina().getNome());
+        presencasAlunoDto.setTotalAulas(totalAulas);
+        presencasAlunoDto.setPresencas(aulasPresente);
+
+        return presencasAlunoDto;
     }
 
 }
