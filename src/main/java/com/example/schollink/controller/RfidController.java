@@ -18,6 +18,23 @@ import com.example.schollink.service.RfidService;
 public class RfidController {
     @Autowired
     RfidService rfidService;
+    private int modo = 0;
+
+    @PostMapping("/modo")
+    public void setModo(@RequestBody Map<String, Integer> body) {
+        this.modo = body.get("valor");
+    }
+
+    @PostMapping("/ponto")
+    public ResponseEntity<String> registrar(@RequestBody Map<String, String> body) {
+        String rfid = body.get("codigoRFID");
+        String tipo = rfidService.buscarPonto(rfid);
+        return switch (tipo) {
+            case "aluno" -> ResponseEntity.ok("Presença registrada para aluno");
+            case "funcionario" -> ResponseEntity.ok("Ponto registrado para funcionário");
+            default -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("RFID não encontrado");
+        };
+    }
 
     @PostMapping("/ponto/aluno")
     public ResponseEntity<String> registrarPonto(@RequestBody RfidDto rfidDto) {
@@ -40,9 +57,10 @@ public class RfidController {
     }
 
     @PostMapping("/cadastro")
-    public ResponseEntity<String> cadastrarRfid(@RequestBody RfidDto rfidDto) {
-
-        return ResponseEntity.ok("RFID cadastrado: " + rfidDto.getRfidCodigo());
+    public ResponseEntity<String> cadastrarRfid(@RequestBody Map<String, String> body) {
+        String codigo = body.get("codigoRFID");
+        System.out.println("Rfid para cadastro = " + codigo);
+        return ResponseEntity.ok("RFID cadastrado: " + codigo);
     }
 
 }
