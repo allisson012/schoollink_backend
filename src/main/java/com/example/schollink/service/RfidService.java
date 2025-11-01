@@ -99,4 +99,15 @@ public class RfidService {
         }
     }
 
+    public String buscarPonto(String rfid) {
+        if (alunoRepository.findByRfid(rfid).isPresent()) {
+            registrarPonto(rfid);
+            return "aluno";
+        } else if (funcionarioRepository.findByRfid(rfid).isPresent()) {
+            registrarPontoFuncionario(rfid);
+            return "funcionario";
+        }
+        return "nao_encontrado";
+    }
+
 }
