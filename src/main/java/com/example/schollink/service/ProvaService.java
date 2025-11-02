@@ -1,5 +1,6 @@
 package com.example.schollink.service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -65,13 +66,13 @@ public class ProvaService {
     public boolean salvarNota(Long idAluno, Long idProva, double nota) {
         Optional<Aluno> alunoOpt = alunoRepository.findById(idAluno);
         Optional<Prova> provaOpt = provaRepository.findById(idProva);
-        if(alunoOpt.isEmpty() || provaOpt.isEmpty()){
+        if (alunoOpt.isEmpty() || provaOpt.isEmpty()) {
             return false;
         }
         Aluno aluno = alunoOpt.get();
         Prova prova = provaOpt.get();
         ProvaAluno provaAluno = new ProvaAluno();
-        boolean existe = provaAlunoRepository.existsByAlunoIdAlunoAndProvaIdProva(idAluno,idProva);
+        boolean existe = provaAlunoRepository.existsByAlunoIdAlunoAndProvaIdProva(idAluno, idProva);
         if (existe) {
             throw new IllegalStateException("Este aluno já está vinculado a esta prova.");
         }
@@ -88,20 +89,29 @@ public class ProvaService {
         return provaRepository.findByTurmaDisciplina(turmaDisciplina);
     }
 
-    public Double calcularMedia(Long alunoId, Long turmaDisciplinaId) {
-        // List<Prova> provas =
-        // provaRepository.findByAlunoIdAlunoAndTurmaDisciplinaId(alunoId,
-        // turmaDisciplinaId);
-        // if (provas.isEmpty())
-        // return 0.0;
+    public Double calcularMedia(Long idAluno, Long turmaDisciplinaId) {
+        Optional<TurmaDisciplina> turmaDisciplinaOpt = turmaDisciplinaRepository.findById(turmaDisciplinaId);
+        Optional<Aluno> alunoOpt = alunoRepository.findById(idAluno);
+        if (turmaDisciplinaOpt.isEmpty() || alunoOpt.isEmpty()) {
+            return null;
+        }
+        TurmaDisciplina turmaDisciplina = turmaDisciplinaOpt.get();
+        Aluno aluno = alunoOpt.get();
+        List<Prova> provas = provaRepository.findByTurmaDisciplina(turmaDisciplina);
+        List<ProvaAluno> provasAluno = new ArrayList<>();
+        for (Prova prova : provas) {
+            List<ProvaAluno> pa = provaAlunoRepository.findByProvaAndAluno(prova, aluno);
+            provasAluno.addAll(pa);
+        }
 
-        // double soma = provas.stream()
-        // .filter(p -> p.getNota() != null)
-        // .mapToDouble(Prova::getNota)
-        // .sum();
+        if (provasAluno.isEmpty()) {
+            return 0.0;
+        }
 
-        // return soma / provas.size();
-        return null;
+        double soma = provasAluno.stream()
+                .mapToDouble(ProvaAluno::getNota)
+                .sum();
+        return soma / provas.size();
     }
 
     public List<Object[]> listarMediasPorTurmaDisciplina(Long turmaDisciplinaId) {

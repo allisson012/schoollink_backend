@@ -2,6 +2,9 @@ package com.example.schollink.controller;
 
 import java.util.List;
 import java.util.Map;
+
+import javax.print.attribute.standard.Media;
+
 import java.util.HashMap;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import com.example.schollink.Dto.MediaDto;
 import com.example.schollink.Dto.NotaDto;
 import com.example.schollink.Dto.ProvaDto;
 import com.example.schollink.model.Prova;
@@ -61,16 +65,14 @@ public class ProvaController {
     }
 
     // 🔹 Calcular a média de um aluno específico
-    @GetMapping("/{turmaDisciplinaId}/aluno/{alunoId}/media")
-    public ResponseEntity<Map<String, Object>> calcularMedia(
-            @PathVariable Long turmaDisciplinaId,
-            @PathVariable Long alunoId) {
+    @PostMapping("/calcularMedia")
+    public ResponseEntity<Map<String, Object>> calcularMedia(@RequestBody MediaDto dto) {
 
-        Double media = provaService.calcularMedia(alunoId, turmaDisciplinaId);
+        Double media = provaService.calcularMedia(dto.getIdAluno(), dto.getIdTurmaDisciplina());
 
         Map<String, Object> response = new HashMap<>();
-        response.put("alunoId", alunoId);
-        response.put("turmaDisciplinaId", turmaDisciplinaId);
+        response.put("alunoId", dto.getIdAluno());
+        response.put("turmaDisciplinaId", dto.getIdTurmaDisciplina());
         response.put("mediaFinal", media);
 
         return ResponseEntity.ok(response);
