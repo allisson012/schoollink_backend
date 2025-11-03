@@ -35,18 +35,17 @@ public class Aluno {
     private Turma turma;
     // turma , serie , ano
     private String nomeResponsavel;
-    
+
     private String telefoneResponsavel;
     private LocalDate dataIngresso;
     // foto
     @Enumerated(EnumType.STRING)
     private StatusMatricula statusMatricula;
-
-    @OneToMany(mappedBy = "aluno", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Prova> prova = new ArrayList<>();
-
     @OneToMany(mappedBy = "aluno")
     private List<Presenca> presencas;
+
+    @OneToMany(mappedBy = "aluno")
+    private List<ProvaAluno> provaAlunos = new ArrayList<>();
 
     public List<Presenca> getPresencas() {
         return presencas;
@@ -95,7 +94,7 @@ public class Aluno {
     public void setDataMatricula(LocalDate dataMatricula) {
         this.dataMatricula = dataMatricula;
     }
-    
+
     public String getTelefoneResponsavel() {
         return telefoneResponsavel;
     }
@@ -128,20 +127,20 @@ public class Aluno {
         this.nomeResponsavel = nomeResponsavel;
     }
 
-    public List<Prova> getProva() {
-        return this.prova;
-    }
-
-    public void setProva(List<Prova> prova) {
-        this.prova = prova;
-    }
-
     public String getRfid() {
         return rfid;
     }
 
     public void setRfid(String rfid) {
         this.rfid = rfid;
+    }
+
+    public List<ProvaAluno> getProvaAlunos() {
+        return provaAlunos;
+    }
+
+    public void setProvaAlunos(List<ProvaAluno> provaAlunos) {
+        this.provaAlunos = provaAlunos;
     }
 
 }

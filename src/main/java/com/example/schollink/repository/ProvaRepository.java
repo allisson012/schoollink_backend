@@ -14,17 +14,17 @@ import com.example.schollink.model.TipoProva;
 import com.example.schollink.model.TurmaDisciplina;
 
 @Repository
-public interface ProvasRepository extends JpaRepository<Prova, Long> {
+public interface ProvaRepository extends JpaRepository<Prova, Long> {
 
-    Optional<Prova> findByAlunoAndTurmaDisciplinaAndTipo(
-            Aluno aluno,
-            TurmaDisciplina turmaDisciplina,
-            TipoProva tipo);
+    //Optional<Prova> findByAlunoAndTurmaDisciplinaAndTipo(
+         //   Aluno aluno,
+         //   TurmaDisciplina turmaDisciplina,
+          //  TipoProva tipo);
 
     List<Prova> findByTurmaDisciplina(TurmaDisciplina turmaDisciplina);
 
-    List<Prova> findByAlunoIdAlunoAndTurmaDisciplinaId(Long idAluno, Long idTurmaDisciplina);
+//   List<Prova> findByAlunoIdAlunoAndTurmaDisciplinaId(Long idAluno, Long idTurmaDisciplina);
 
-    @Query("SELECT p.aluno.id, AVG(p.nota) FROM Prova p WHERE p.turmaDisciplina.id = :turmaDisciplinaId GROUP BY p.aluno.id")
-    List<Object[]> findMediasPorTurmaDisciplina(@Param("turmaDisciplinaId") Long turmaDisciplinaId);
+   // @Query("SELECT p.aluno.id, AVG(p.nota) FROM Prova p WHERE p.turmaDisciplina.id = :turmaDisciplinaId GROUP BY p.aluno.id")
+ //   List<Object[]> findMediasPorTurmaDisciplina(@Param("turmaDisciplinaId") Long turmaDisciplinaId);
 }

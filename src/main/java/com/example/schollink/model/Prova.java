@@ -1,5 +1,8 @@
 package com.example.schollink.model;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -8,6 +11,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 
 @Entity
 public class Prova {
@@ -15,7 +19,6 @@ public class Prova {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long idProva;
-    private Float nota;
     @Enumerated(EnumType.STRING)
     private TipoProva tipo;
     @ManyToOne
@@ -24,20 +27,10 @@ public class Prova {
     @Enumerated(EnumType.STRING)
     private Periodo periodo;
 
-    @ManyToOne
-    @JoinColumn(name = "idAluno", referencedColumnName = "idAluno")
-    private Aluno aluno;
-
+    @OneToMany(mappedBy = "prova")
+    private List<ProvaAluno> provaAlunos = new ArrayList<>();
 
     public Prova() {
-    }
-
-    public Aluno getAluno() {
-        return this.aluno;
-    }
-
-    public void setAluno(Aluno aluno) {
-        this.aluno = aluno;
     }
 
     public Long getIdProva() {
@@ -46,14 +39,6 @@ public class Prova {
 
     public void setIdProva(Long idProva) {
         this.idProva = idProva;
-    }
-
-    public Float getNota() {
-        return this.nota;
-    }
-
-    public void setNota(Float nota) {
-        this.nota = nota;
     }
 
     public TipoProva getTipo() {
@@ -78,6 +63,14 @@ public class Prova {
 
     public void setTurmaDisciplina(TurmaDisciplina turmaDisciplina) {
         this.turmaDisciplina = turmaDisciplina;
+    }
+
+    public List<ProvaAluno> getProvaAlunos() {
+        return provaAlunos;
+    }
+
+    public void setProvaAlunos(List<ProvaAluno> provaAlunos) {
+        this.provaAlunos = provaAlunos;
     }
 
 }
