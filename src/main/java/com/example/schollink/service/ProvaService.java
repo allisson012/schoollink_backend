@@ -103,7 +103,6 @@ public class ProvaService {
             List<ProvaAluno> pa = provaAlunoRepository.findByProvaAndAluno(prova, aluno);
             provasAluno.addAll(pa);
         }
-
         if (provasAluno.isEmpty()) {
             return 0.0;
         }
