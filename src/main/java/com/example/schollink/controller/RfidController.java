@@ -21,6 +21,8 @@ public class RfidController {
     RfidService rfidService;
     private int modo = 0;
 
+    private String ultimoRfid = null;
+
     @GetMapping("/modo")
     public Map<String, Integer> getModo() {
         return Map.of("valor", this.modo);
@@ -63,11 +65,20 @@ public class RfidController {
     }
 
     @PostMapping("/cadastro")
-    public ResponseEntity<String> cadastrarRfid(@RequestBody Map<String, String> body) {
+    public ResponseEntity<Map<String, String>> cadastrarRfid(@RequestBody Map<String, String> body) {
         String codigo = body.get("codigoRFID");
         System.out.println("Rfid para cadastro = " + codigo);
         this.modo = 0;
-        return ResponseEntity.ok("RFID cadastrado: " + codigo);
+        this.ultimoRfid = codigo; // salva último RFID lido
+        return ResponseEntity.ok(Map.of("rfid", codigo));
+    }
+
+    @GetMapping("/ultimo")
+    public ResponseEntity<Map<String, String>> getUltimoRfid() {
+        if (ultimoRfid == null) {
+            return ResponseEntity.ok(Map.of());
+        }
+        return ResponseEntity.ok(Map.of("rfid", ultimoRfid));
     }
 
 }
