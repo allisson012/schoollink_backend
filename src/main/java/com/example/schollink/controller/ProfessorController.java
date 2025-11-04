@@ -25,6 +25,7 @@ import com.example.schollink.Dto.AlunoDto;
 import com.example.schollink.Dto.AulaRetornoDto;
 import com.example.schollink.Dto.BuscarAulasDto;
 import com.example.schollink.Dto.ChamadaRequestDto;
+import com.example.schollink.Dto.DataDto;
 import com.example.schollink.Dto.ProfessorDto;
 import com.example.schollink.Dto.ProfessorHorarioDto;
 import com.example.schollink.Dto.ProfessorParaTurmaDto;
@@ -128,6 +129,23 @@ public class ProfessorController {
         }
     }
 
+    @PostMapping("/buscar/aulas/dia")
+    public ResponseEntity<?> buscarAulasSemana(@RequestBody DataDto data, HttpSession session) {
+        Long idUser = (Long) session.getAttribute("userId");
+        if (idUser == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("message", "Usuário não autenticado"));
+        }
+        List<AulaRetornoDto> aulaRetornoDtos = professorService.buscarAulasDia(idUser, data);
+        if (!aulaRetornoDtos.isEmpty()) {
+            return ResponseEntity.ok(aulaRetornoDtos);
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Map.of("message", "Erro ao buscar aulas ou lista vazia"));
+        }
+    }
+
+    // semana
     @GetMapping("/buscar/aulas")
     public ResponseEntity<?> buscarAulasSemana(HttpSession session) {
         Long idUser = (Long) session.getAttribute("userId");

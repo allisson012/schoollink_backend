@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import com.example.schollink.Dto.AlunoDto;
 import com.example.schollink.Dto.AulaRetornoDto;
 import com.example.schollink.Dto.ChamadaRequestDto;
+import com.example.schollink.Dto.DataDto;
 import com.example.schollink.Dto.ProfessorParaTurmaDto;
 import com.example.schollink.Dto.UserDto;
 import com.example.schollink.model.Aluno;
@@ -200,6 +201,38 @@ public class ProfessorService {
 
         List<HorarioAula> horarioAulas = horarioAulaRepository.findByDataBetweenAndProfessorId(
                 inicioSemana, fimSemana, professor.getId());
+
+        if (horarioAulas == null || horarioAulas.isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        List<AulaRetornoDto> aulasRetornoDtos = horarioAulas.stream().map(horarioAula -> {
+            AulaRetornoDto aulaRetorno = new AulaRetornoDto();
+            TurmaDisciplina td = horarioAula.getTurmaDisciplina();
+            aulaRetorno.setIdDisciplina(td.getDisciplina().getId());
+            aulaRetorno.setNomeDisciplina(td.getDisciplina().getNome());
+            aulaRetorno.setIdHorarioAula(horarioAula.getId());
+            aulaRetorno.setIdProfessor(td.getProfessor().getId());
+            aulaRetorno.setHorarioInicio(horarioAula.getHoraInicio());
+            aulaRetorno.setHorarioTermino(horarioAula.getHoraFim());
+            return aulaRetorno;
+        }).collect(Collectors.toList());
+
+        return aulasRetornoDtos;
+    }
+
+    public List<AulaRetornoDto> buscarAulasDia(Long idUser, DataDto dto) {
+        Professor professor = professorRepository.findByUser_Id(idUser);
+        if (professor == null) {
+            return new ArrayList<>();
+        }
+        if (dto.getDia() == null || dto.getDia().isEmpty()) {
+            throw new IllegalArgumentException("O campo 'dia' não pode ser nulo ou vazio");
+        }
+        LocalDate data = LocalDate.parse(dto.getDia());
+
+        List<HorarioAula> horarioAulas = horarioAulaRepository.findByDataAndTurmaDisciplina_Professor_Id(data,
+                professor.getId());
 
         if (horarioAulas == null || horarioAulas.isEmpty()) {
             return new ArrayList<>();
