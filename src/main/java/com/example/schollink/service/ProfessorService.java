@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import com.example.schollink.Dto.AlunoDto;
 import com.example.schollink.Dto.AulaRetornoDto;
+import com.example.schollink.Dto.BuscarDisciplinasDto;
 import com.example.schollink.Dto.ChamadaRequestDto;
 import com.example.schollink.Dto.DataDto;
 import com.example.schollink.Dto.ProfessorParaTurmaDto;
@@ -302,4 +303,29 @@ public class ProfessorService {
         Professor professor = professorRepository.findByUser_Id(userId);
         return professor.getId();
     }
+
+    public List<BuscarDisciplinasDto> buscarTurmasDisciplinas(Long idUser) {
+        Professor professor = professorRepository.findByUser_Id(idUser);
+        if (professor == null) {
+            return new ArrayList<>();
+        }
+        List<TurmaDisciplina> turmasDisciplinas = turmaDisciplinaRepository.findByProfessor(professor);
+        if (turmasDisciplinas.isEmpty()) {
+            return new ArrayList<>();
+        }
+        List<BuscarDisciplinasDto> dtos = new ArrayList<>();
+        for (TurmaDisciplina turmaDisciplina : turmasDisciplinas) {
+            BuscarDisciplinasDto dto = new BuscarDisciplinasDto();
+            dto.setIdDisciplina(turmaDisciplina.getDisciplina().getId());
+            dto.setNomeDisciplina(turmaDisciplina.getDisciplina().getNome());
+            dto.setIdProfessor(turmaDisciplina.getProfessor().getId());
+            dto.setNomeProfessor(turmaDisciplina.getProfessor().getUser().getNome());
+            dto.setIdTurma(turmaDisciplina.getTurma().getId());
+            dto.setNomeTurma(turmaDisciplina.getTurma().getNome());
+            dto.setIdTurmaDisciplina(turmaDisciplina.getId());
+            dtos.add(dto);
+        }
+        return dtos;
+    }
+
 }
