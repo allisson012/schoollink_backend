@@ -6,10 +6,11 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import com.example.schollink.Dto.DisciplinaDto;
+import com.example.schollink.Dto.DisciplinaProfessorDto;
+import com.example.schollink.Dto.TurmaDisciplinaDto;
 import com.example.schollink.model.Disciplina;
 import com.example.schollink.model.Professor;
 import com.example.schollink.model.Turma;
@@ -20,9 +21,6 @@ import com.example.schollink.repository.TurmaDisciplinaRepository;
 import com.example.schollink.repository.TurmaRepository;
 
 import jakarta.transaction.Transactional;
-
-import com.example.schollink.Dto.DisciplinaDto;
-import com.example.schollink.Dto.DisciplinaProfessorDto;
 
 @Service
 public class DisciplinaService {
@@ -81,7 +79,7 @@ public class DisciplinaService {
                 .collect(Collectors.toList());
     }
 
-    public List<DisciplinaDto> buscarDisciplinaPorProfessorETurma(Long idTurma, Long userId) {
+    public List<TurmaDisciplinaDto> buscarDisciplinaPorProfessorETurma(Long idTurma, Long userId) {
         Professor professor = professorRepository.findByUser_Id(userId);
         if (professor == null) {
             return List.of(); 
@@ -90,10 +88,20 @@ public class DisciplinaService {
         List<TurmaDisciplina> lista = turmaDisciplinaRepository.findByTurmaIdAndProfessorId(idTurma, professor.getId());
 
         return lista.stream()
-                .map(td -> new DisciplinaDto(
+            .map(td -> {
+                TurmaDisciplinaDto dto = new TurmaDisciplinaDto();
+                dto.setIdTurmaDisciplina(td.getId());
+                dto.setId_professor(td.getProfessor().getId());
+                dto.setId_turma(td.getTurma().getId());
+
+                DisciplinaDto disciplinaDto = new DisciplinaDto(
                         td.getDisciplina().getId(),
                         td.getDisciplina().getNome()
-                ))
-                .toList();
+                );
+                dto.setDisciplinaDto(disciplinaDto);
+
+                return dto;
+            })
+            .toList();
     }
 }
