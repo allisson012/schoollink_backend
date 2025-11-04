@@ -299,6 +299,11 @@ public class ProfessorService {
                 .collect(Collectors.toList());
     }
 
+    public Long buscarIdProfessorPeloIdUser(Long userId){
+        Professor professor = professorRepository.findByUser_Id(userId);
+        return professor.getId();
+    }
+
     public List<BuscarDisciplinasDto> buscarTurmasDisciplinas(Long idUser) {
         Professor professor = professorRepository.findByUser_Id(idUser);
         if (professor == null) {

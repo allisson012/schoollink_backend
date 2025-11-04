@@ -3,6 +3,7 @@ package com.example.schollink.service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -117,5 +118,22 @@ public class ProvaService {
     public List<Object[]> listarMediasPorTurmaDisciplina(Long turmaDisciplinaId) {
         // return provaRepository.findMediasPorTurmaDisciplina(turmaDisciplinaId);
         return null;
+    }
+
+    public List<ProvaDto> buscarProvasDoProfessor(Long professorId){
+        List<Prova> provas = provaRepository.findByTurmaDisciplinaProfessorId(professorId);
+
+        return provas.stream()
+        .map(prova -> {
+            ProvaDto dto = new ProvaDto();
+            dto.setIdProva(prova.getIdProva());
+            dto.setNome(prova.getNome());
+            dto.setTipoProva(prova.getTipo().name());
+            dto.setBimestre(prova.getPeriodo().name());
+            dto.setNomeDisciplina(prova.getTurmaDisciplina().getDisciplina().getNome());
+            dto.setNomeTurma(prova.getTurmaDisciplina().getTurma().getNome());            
+            return dto;
+        })
+        .collect(Collectors.toList());
     }
 }
