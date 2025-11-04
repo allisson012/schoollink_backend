@@ -4,12 +4,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
-
-import org.apache.catalina.connector.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -24,21 +20,18 @@ import org.springframework.web.bind.annotation.RestController;
 import com.example.schollink.Dto.AlunoDto;
 import com.example.schollink.Dto.AulaRetornoDto;
 import com.example.schollink.Dto.BuscarAulasDto;
+import com.example.schollink.Dto.BuscarDisciplinasDto;
 import com.example.schollink.Dto.ChamadaRequestDto;
 import com.example.schollink.Dto.DataDto;
 import com.example.schollink.Dto.ProfessorDto;
 import com.example.schollink.Dto.ProfessorHorarioDto;
 import com.example.schollink.Dto.ProfessorParaTurmaDto;
-import com.example.schollink.model.Aluno;
-import com.example.schollink.model.Disciplina;
 import com.example.schollink.model.Endereco;
 import com.example.schollink.model.HistoricoAula;
-import com.example.schollink.model.HorarioAula;
 import com.example.schollink.model.Professor;
 import com.example.schollink.model.Turno;
 import com.example.schollink.model.User;
 import com.example.schollink.service.ProfessorService;
-import com.example.schollink.service.DisciplinaService;
 
 import jakarta.servlet.http.HttpSession;
 
@@ -48,8 +41,6 @@ import jakarta.servlet.http.HttpSession;
 public class ProfessorController {
     @Autowired
     private ProfessorService professorService;
-    @Autowired
-    private DisciplinaService disciplinaService;
 
     @PostMapping("/cadastrar")
     public ResponseEntity<Map<String, String>> cadastrarProfessor(@RequestBody ProfessorDto dto) {
@@ -209,6 +200,16 @@ public class ProfessorController {
     @GetMapping("/buscar-todos")
     public List<ProfessorParaTurmaDto> buscarTodos() {
         return professorService.buscarTodos();
+    }
+
+    @GetMapping("buscar/turmasDisciplinas")
+    public ResponseEntity<List<BuscarDisciplinasDto>> buscarTurmasDisciplinas(HttpSession session) {
+        Long idUser = (Long) session.getAttribute("idUser");
+        List<BuscarDisciplinasDto> buscarDisciplinasDto = professorService.buscarTurmasDisciplinas(idUser);
+        if (buscarDisciplinasDto.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ArrayList<>());
+        }
+        return ResponseEntity.ok(buscarDisciplinasDto);
     }
 
 }
