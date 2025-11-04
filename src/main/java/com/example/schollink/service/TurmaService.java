@@ -16,6 +16,7 @@ import com.example.schollink.model.TurmaDisciplina;
 import com.example.schollink.repository.AlunoRepository;
 import com.example.schollink.repository.DisciplinaRepository;
 import com.example.schollink.repository.ProfessorRepository;
+import com.example.schollink.repository.TurmaDisciplinaRepository;
 import com.example.schollink.repository.TurmaRepository;
 
 import jakarta.transaction.Transactional;
@@ -24,6 +25,9 @@ import jakarta.transaction.Transactional;
 public class TurmaService {
     @Autowired
     private TurmaRepository turmaRepository;
+    
+    @Autowired
+    private TurmaDisciplinaRepository turmaDisciplinaRepository;
 
     @Autowired
     private AlunoRepository alunoRepository;
@@ -212,6 +216,24 @@ public class TurmaService {
 
         if (turmasDto != null && !turmasDto.isEmpty()) {
             return turmasDto;
+        } else {
+            return new ArrayList<>();
+        }
+    }
+
+    public List<TurmaDto> listarTurmasDoProfessor(Long id) {
+        List<TurmaDisciplina> turmas = turmaDisciplinaRepository.findByProfessorUserId(id);
+        List<TurmaDto> dtos = new ArrayList<>();
+        for (TurmaDisciplina turma : turmas) {
+            TurmaDto dto = new TurmaDto();
+            dto.setId(turma.getTurma().getId());
+            dto.setNome(turma.getTurma().getNome());
+            dto.setAnoLetivo(turma.getTurma().getAnoLetivo());
+            dtos.add(dto);
+        }
+
+        if (!dtos.isEmpty()) {
+            return dtos;
         } else {
             return new ArrayList<>();
         }
