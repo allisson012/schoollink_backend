@@ -1,18 +1,18 @@
 package com.example.schollink.Dto;
 
 public class TurmaDisciplinaDto {
-    private Long id;
+    private Long id_turma_disciplina;
     private Long id_professor;
-    private Long id_disciplina;
+    private DisciplinaDto disciplinaDto;
     private Long id_turma;
 
 
-    public Long getId() {
-        return this.id;
+    public Long getIdTurmaDisciplina() {
+        return this.id_turma_disciplina;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setIdTurmaDisciplina(Long id_turma_disciplina) {
+        this.id_turma_disciplina = id_turma_disciplina;
     }
 
     public Long getId_professor() {
@@ -23,13 +23,15 @@ public class TurmaDisciplinaDto {
         this.id_professor = id_professor;
     }
 
-    public Long getId_disciplina() {
-        return this.id_disciplina;
+
+    public DisciplinaDto getDisciplinaDto() {
+        return this.disciplinaDto;
     }
 
-    public void setId_disciplina(Long id_disciplina) {
-        this.id_disciplina = id_disciplina;
+    public void setDisciplinaDto(DisciplinaDto disciplinaDto) {
+        this.disciplinaDto = disciplinaDto;
     }
+
 
     public Long getId_turma() {
         return this.id_turma;

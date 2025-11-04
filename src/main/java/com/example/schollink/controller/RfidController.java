@@ -5,6 +5,7 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,6 +20,11 @@ public class RfidController {
     @Autowired
     RfidService rfidService;
     private int modo = 0;
+
+    @GetMapping("/modo")
+    public Map<String, Integer> getModo() {
+        return Map.of("valor", this.modo);
+    }
 
     @PostMapping("/modo")
     public void setModo(@RequestBody Map<String, Integer> body) {
@@ -60,6 +66,7 @@ public class RfidController {
     public ResponseEntity<String> cadastrarRfid(@RequestBody Map<String, String> body) {
         String codigo = body.get("codigoRFID");
         System.out.println("Rfid para cadastro = " + codigo);
+        this.modo = 0;
         return ResponseEntity.ok("RFID cadastrado: " + codigo);
     }
 
