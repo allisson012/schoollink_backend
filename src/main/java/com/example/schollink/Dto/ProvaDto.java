@@ -2,12 +2,40 @@ package com.example.schollink.Dto;
 
 public class ProvaDto {
     private Long alunoId;
+    private Long idProva;
     private Long idTurmaDisciplina;
     private double nota;
     private String nome;
     private String bimestre;
     private String tipoProva;
+    private String nomeDisciplina;
+    private String nomeTurma;
+
+
+    public String getNomeDisciplina() {
+        return this.nomeDisciplina;
+    }
+
+    public void setNomeDisciplina(String nomeDisciplina) {
+        this.nomeDisciplina = nomeDisciplina;
+    }
+
+    public String getNomeTurma() {
+        return this.nomeTurma;
+    }
+
+    public void setNomeTurma(String nomeTurma) {
+        this.nomeTurma = nomeTurma;
+    }
     
+
+    public Long getIdProva() {
+        return this.idProva;
+    }
+
+    public void setIdProva(Long idProva) {
+        this.idProva = idProva;
+    }
 
     public Long getAlunoId() {
         return alunoId;

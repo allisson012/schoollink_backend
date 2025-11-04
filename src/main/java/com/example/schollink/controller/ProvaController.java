@@ -16,7 +16,11 @@ import com.example.schollink.Dto.MediaDto;
 import com.example.schollink.Dto.NotaDto;
 import com.example.schollink.Dto.ProvaDto;
 import com.example.schollink.model.Prova;
+import com.example.schollink.service.ProfessorService;
 import com.example.schollink.service.ProvaService;
+
+import jakarta.servlet.http.HttpSession;
+
 
 @RestController
 @RequestMapping("/prova")
@@ -24,6 +28,8 @@ public class ProvaController {
 
     @Autowired
     private ProvaService provaService;
+    @Autowired
+    private ProfessorService professorService;
 
     // 🔹 Lançar ou atualizar notas para todos os alunos
     @PostMapping("/{turmaDisciplinaId}/lancar-notas")
@@ -83,4 +89,16 @@ public class ProvaController {
     public ResponseEntity<List<Object[]>> listarMedias(@PathVariable Long turmaDisciplinaId) {
         return ResponseEntity.ok(provaService.listarMediasPorTurmaDisciplina(turmaDisciplinaId));
     }
+
+    @GetMapping("/buscar/professor")
+    public ResponseEntity<?> buscarProvasDoProfessor(HttpSession session) {
+        Long idUser = (Long) session.getAttribute("userId");
+        Long idProfessor = professorService.buscarIdProfessorPeloIdUser(idUser);
+
+        if(idProfessor == null){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Usuário não está logado");
+        }
+        return ResponseEntity.ok(provaService.buscarProvasDoProfessor(idProfessor));
+    }
+    
 }
