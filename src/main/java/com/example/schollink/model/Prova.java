@@ -19,6 +19,9 @@ public class Prova {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long idProva;
+
+    private String nome;
+
     @Enumerated(EnumType.STRING)
     private TipoProva tipo;
     @ManyToOne
@@ -39,6 +42,14 @@ public class Prova {
 
     public void setIdProva(Long idProva) {
         this.idProva = idProva;
+    }
+
+    public String getNome() {
+        return this.nome;
+    }
+
+    public void setNome(String nome) {
+        this.nome = nome;
     }
 
     public TipoProva getTipo() {

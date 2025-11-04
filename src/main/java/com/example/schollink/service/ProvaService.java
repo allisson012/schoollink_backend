@@ -42,6 +42,7 @@ public class ProvaService {
         TurmaDisciplina turmaDisciplina = turmaDisciplinaOpt.get();
         Prova prova = new Prova();
         prova.setTurmaDisciplina(turmaDisciplina);
+        prova.setNome(dto.getNome());
         prova.setPeriodo(Periodo.valueOf(dto.getBimestre()));
         prova.setTipo(TipoProva.valueOf(dto.getTipoProva()));
         provaRepository.save(prova);
