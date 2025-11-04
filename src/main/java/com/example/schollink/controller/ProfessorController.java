@@ -67,7 +67,7 @@ public class ProfessorController {
         professor.setCargaHorariaSem(dto.getCargaHorariaSem());
         professor.setSalario(dto.getSalario());
         professor.setTurno(Turno.valueOf(dto.getTurno().toUpperCase()));
-
+        
         Endereco endereco = new Endereco();
         endereco.setCep(dto.getEnderecoDto().getCep());
         endereco.setPais(dto.getEnderecoDto().getPais());
@@ -77,7 +77,7 @@ public class ProfessorController {
         endereco.setNumero(dto.getEnderecoDto().getNumero());
         professor.setEndereco(endereco);
 
-        professorService.cadastrarProfessor(user, professor, dto.getUserDto().getSenha());
+        professorService.cadastrarProfessor(user, professor, dto.getUserDto().getSenha(), dto.getRfid());
 
         Map<String, String> response = new HashMap<>();
         response.put("mensagem", "Professor cadastrado com sucesso");

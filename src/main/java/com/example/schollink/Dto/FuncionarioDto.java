@@ -2,8 +2,6 @@ package com.example.schollink.Dto;
 
 import java.time.LocalDate;
 
-import com.example.schollink.model.Turno;
-
 public class FuncionarioDto {
     private String rfid;
     private String nome;

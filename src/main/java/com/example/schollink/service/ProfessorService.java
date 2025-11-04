@@ -60,7 +60,7 @@ public class ProfessorService {
     private AlunoRepository alunoRepository;
 
     @Transactional
-    public void cadastrarProfessor(User user, Professor professor, String senha) {
+    public void cadastrarProfessor(User user, Professor professor, String senha, String rfid) {
         byte[] salt = passwordService.gerarSalt();
         byte[] hash = passwordService.gerarHash(senha, salt);
         user.setSalt(salt);
@@ -73,6 +73,7 @@ public class ProfessorService {
         funcionario.setGenero(user.getGenero());
         funcionario.setCpf(user.getCpf());
         funcionario.setTelefone(user.getTelefone());
+        funcionario.setRfid(rfid);
         Funcionario funcionarioSalvo = funcionarioService.cadastrarFuncionario(funcionario);
 
         professor.setUser(savedUser);

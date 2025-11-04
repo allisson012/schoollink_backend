@@ -13,6 +13,15 @@ public class ProfessorDto{
     private String turno;
     private double salario;
     private EnderecoDto enderecoDto;
+    private String rfid;
+
+    public String getRfid() {
+        return this.rfid;
+    }
+
+    public void setRfid(String rfid) {
+        this.rfid = rfid;
+    }
 
 
     public UserDto getUserDto() {
