@@ -13,7 +13,15 @@ public class AlunoDto {
     private String telefoneResponsavel;
     private EnderecoDto enderecoDto;
     private boolean presenca;
+    private String rfid;
 
+    public String getRfid() {
+        return this.rfid;
+    }
+
+    public void setRfid(String rfid) {
+        this.rfid = rfid;
+    }
 
     public Long getIdAluno() {
         return this.idAluno;

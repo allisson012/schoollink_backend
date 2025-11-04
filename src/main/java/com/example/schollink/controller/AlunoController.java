@@ -62,6 +62,7 @@ public class AlunoController {
         aluno.setStatusMatricula(StatusMatricula.valueOf(alunoDto.getStatusMatricula()));
         aluno.setNomeResponsavel(alunoDto.getNomeResponsavel());
         aluno.setTelefoneResponsavel(alunoDto.getTelefoneResponsavel());
+        aluno.setRfid(alunoDto.getRfid());
 
         alunoService.cadastrarAluno(user, aluno, alunoDto.getUserDto().getSenha());
         Map<String, String> response = new HashMap<>();

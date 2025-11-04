@@ -78,7 +78,10 @@ public class RfidController {
         if (ultimoRfid == null) {
             return ResponseEntity.ok(Map.of());
         }
-        return ResponseEntity.ok(Map.of("rfid", ultimoRfid));
+        
+        String rfid = ultimoRfid; 
+        ultimoRfid = null;        
+        return ResponseEntity.ok(Map.of("rfid", rfid));
     }
 
 }
