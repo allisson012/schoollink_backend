@@ -34,6 +34,7 @@ import com.example.schollink.repository.HistoricoAulaRepository;
 import com.example.schollink.repository.HorarioAulaRepository;
 import com.example.schollink.repository.PresencaRepository;
 import com.example.schollink.repository.ProfessorRepository;
+import com.example.schollink.repository.TurmaDisciplinaRepository;
 import com.example.schollink.repository.TurmaRepository;
 import com.example.schollink.repository.UserRepository;
 
@@ -59,6 +60,8 @@ public class ProfessorService {
     private PresencaRepository presencaRepository;
     @Autowired
     private AlunoRepository alunoRepository;
+    @Autowired
+    private TurmaDisciplinaRepository turmaDisciplinaRepository;
 
     @Transactional
     public void cadastrarProfessor(User user, Professor professor, String senha) {
@@ -221,18 +224,16 @@ public class ProfessorService {
         return aulasRetornoDtos;
     }
 
-    public List<AulaRetornoDto> buscarAulasDia(Long idUser, DataDto dto) {
-        Professor professor = professorRepository.findByUser_Id(idUser);
-        if (professor == null) {
-            return new ArrayList<>();
-        }
-        if (dto.getDia() == null || dto.getDia().isEmpty()) {
+    public List<AulaRetornoDto> buscarAulasDia(DataDto dto) {
+
+        Optional<TurmaDisciplina> turmaDisciplinaOpt = turmaDisciplinaRepository.findById(dto.getIdTurmaDisciplina());
+        if (dto.getDia() == null || dto.getDia().isEmpty() || turmaDisciplinaOpt.isEmpty()) {
             throw new IllegalArgumentException("O campo 'dia' não pode ser nulo ou vazio");
         }
         LocalDate data = LocalDate.parse(dto.getDia());
+        TurmaDisciplina turmaDisciplina = turmaDisciplinaOpt.get();
 
-        List<HorarioAula> horarioAulas = horarioAulaRepository.findByDataAndTurmaDisciplina_Professor_Id(data,
-                professor.getId());
+        List<HorarioAula> horarioAulas = horarioAulaRepository.findByDataAndTurmaDisciplina(data, turmaDisciplina);
 
         if (horarioAulas == null || horarioAulas.isEmpty()) {
             return new ArrayList<>();

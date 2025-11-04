@@ -130,13 +130,13 @@ public class ProfessorController {
     }
 
     @PostMapping("/buscar/aulas/dia")
-    public ResponseEntity<?> buscarAulasSemana(@RequestBody DataDto data, HttpSession session) {
+    public ResponseEntity<?> buscarAulasPeloDia(@RequestBody DataDto data, HttpSession session) {
         Long idUser = (Long) session.getAttribute("userId");
         if (idUser == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(Map.of("message", "Usuário não autenticado"));
         }
-        List<AulaRetornoDto> aulaRetornoDtos = professorService.buscarAulasDia(idUser, data);
+        List<AulaRetornoDto> aulaRetornoDtos = professorService.buscarAulasDia(data);
         if (!aulaRetornoDtos.isEmpty()) {
             return ResponseEntity.ok(aulaRetornoDtos);
         } else {
