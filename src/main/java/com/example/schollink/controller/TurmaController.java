@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -17,6 +18,8 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import com.example.schollink.Dto.TurmaDto;
 import com.example.schollink.model.Turma;
 import com.example.schollink.service.TurmaService;
+
+import jakarta.servlet.http.HttpSession;
 
 @RestController()
 @RequestMapping("/turma")
@@ -102,5 +105,14 @@ public class TurmaController {
     public ResponseEntity<List<TurmaDto>> listarTodas() {
         List<TurmaDto> turmasDto = turmaService.buscarTodas();
         return ResponseEntity.ok(turmasDto);
+    }
+
+    @GetMapping("/listar/professor/")
+    public ResponseEntity<?> listarTurmasDoProfessor(HttpSession session) {
+        Long id = (Long) session.getAttribute("userId");
+        if (id == null) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Usuário não está logado");
+        }
+        return ResponseEntity.ok(turmaService.listarTurmasDoProfessor(id));
     }
 }

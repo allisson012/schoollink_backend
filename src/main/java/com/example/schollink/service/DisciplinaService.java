@@ -6,6 +6,8 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.example.schollink.model.Disciplina;
@@ -77,5 +79,21 @@ public class DisciplinaService {
         return disciplinas.stream()
                 .map(d -> new DisciplinaDto(d.getId(), d.getNome()))
                 .collect(Collectors.toList());
+    }
+
+    public List<DisciplinaDto> buscarDisciplinaPorProfessorETurma(Long idTurma, Long userId) {
+        Professor professor = professorRepository.findByUser_Id(userId);
+        if (professor == null) {
+            return List.of(); 
+        }
+
+        List<TurmaDisciplina> lista = turmaDisciplinaRepository.findByTurmaIdAndProfessorId(idTurma, professor.getId());
+
+        return lista.stream()
+                .map(td -> new DisciplinaDto(
+                        td.getDisciplina().getId(),
+                        td.getDisciplina().getNome()
+                ))
+                .toList();
     }
 }
