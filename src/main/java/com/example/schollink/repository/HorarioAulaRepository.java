@@ -1,6 +1,7 @@
 package com.example.schollink.repository;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -27,6 +28,9 @@ public interface HorarioAulaRepository extends JpaRepository<HorarioAula, Long> 
         List<HorarioAula> findByTurmaDisciplina(TurmaDisciplina turmaDisciplina);
 
         List<HorarioAula> findByDataAndTurmaDisciplina(LocalDate data, TurmaDisciplina turmaDisciplina);
+
+        boolean existsByTurmaDisciplina_TurmaAndTurmaDisciplina_DisciplinaAndDataAndHoraInicio(
+                        Turma turma, Disciplina disciplina, LocalDate data, LocalTime horaInicio);
 
         @Query("SELECT h FROM HorarioAula h " +
                         "WHERE h.data BETWEEN :inicio AND :fim " +

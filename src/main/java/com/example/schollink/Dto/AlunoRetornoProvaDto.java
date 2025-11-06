@@ -5,6 +5,7 @@ public class AlunoRetornoProvaDto {
     private String nome;
     private String matricula;
     private double nota;
+    private String nomeProva;
 
     public Long getIdAluno() {
         return idAluno;
@@ -37,5 +38,14 @@ public class AlunoRetornoProvaDto {
     public void setNota(double nota) {
         this.nota = nota;
     }
+
+    public String getNomeProva() {
+        return nomeProva;
+    }
+
+    public void setNomeProva(String nomeProva) {
+        this.nomeProva = nomeProva;
+    }
+
 
 }

@@ -7,6 +7,8 @@ import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import com.example.schollink.Dto.AlunoRetornoNotaDto;
 import com.example.schollink.Dto.AlunoRetornoProvaDto;
 import com.example.schollink.Dto.NotaDto;
 import com.example.schollink.Dto.ProvaDto;
@@ -126,8 +128,11 @@ public class ProvaService {
         List<Prova> provas = provaRepository.findByTurmaDisciplina(turmaDisciplina);
         List<ProvaAluno> provasAluno = new ArrayList<>();
         for (Prova prova : provas) {
-            List<ProvaAluno> pa = provaAlunoRepository.findByProvaAndAluno(prova, aluno);
-            provasAluno.addAll(pa);
+            Optional<ProvaAluno> paOpt = provaAlunoRepository.findByProvaAndAluno(prova, aluno);
+            if (paOpt.isPresent()) {
+                ProvaAluno pa = paOpt.get();
+                provasAluno.add(pa);
+            }
         }
         if (provasAluno.isEmpty()) {
             return 0.0;
@@ -178,5 +183,35 @@ public class ProvaService {
             dtosRetorno.add(alunoRetornoProvaDto);
         }
         return dtosRetorno;
+    }
+
+    public List<AlunoRetornoNotaDto> buscarNotasAluno(Long idUser, Long idDisciplina) {
+        Optional<Aluno> alunoOpt = alunoRepository.findByUserId(idUser);
+        if (alunoOpt.isEmpty()) {
+            return new ArrayList<>();
+        }
+        Aluno aluno = alunoOpt.get();
+        Optional<TurmaDisciplina> turmaDisciplinaOpt = turmaDisciplinaRepository.findById(idDisciplina);
+        if (turmaDisciplinaOpt.isEmpty()) {
+            return new ArrayList<>();
+        }
+        TurmaDisciplina turmaDisciplina = turmaDisciplinaOpt.get();
+        List<AlunoRetornoNotaDto> dtos = new ArrayList<>();
+        List<Prova> provas = provaRepository.findByTurmaDisciplina(turmaDisciplina);
+        for (Prova prova : provas) {
+            Optional<ProvaAluno> provaAlunoOpt = provaAlunoRepository.findByProvaAndAluno(prova, aluno);
+            AlunoRetornoNotaDto dto = new AlunoRetornoNotaDto();
+            if(provaAlunoOpt.isEmpty()){
+                dto.setNota(0);
+            }
+            ProvaAluno provaAluno = provaAlunoOpt.get();
+            dto.setNota(provaAluno.getNota());
+            dto.setBimestre(prova.getPeriodo().toString());
+            dto.setTipo(prova.getTipo().toString());
+            dto.setIdProva(prova.getIdProva());
+            // ta sem o nome da prova pois não esta reconhecendo o metodo get
+            dtos.add(dto);
+        }
+        return dtos;
     }
 }
