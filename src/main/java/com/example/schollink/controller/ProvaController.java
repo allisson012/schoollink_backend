@@ -25,7 +25,6 @@ public class ProvaController {
     @Autowired
     private ProvaService provaService;
 
-    // 🔹 Lançar ou atualizar notas para todos os alunos
     @PostMapping("/{turmaDisciplinaId}/lancar-notas")
     public ResponseEntity<Map<String, String>> lancarNotas(
             @PathVariable Long turmaDisciplinaId,
@@ -57,14 +56,11 @@ public class ProvaController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Erro ao salvar nota");
         }
     }
-
-    // 🔹 Listar todas as provas lançadas de uma turma/disciplina
     @GetMapping("/{turmaDisciplinaId}/notas")
     public ResponseEntity<List<Prova>> listarNotas(@PathVariable Long turmaDisciplinaId) {
         return ResponseEntity.ok(provaService.listarNotasPorTurmaDisciplina(turmaDisciplinaId));
     }
 
-    // 🔹 Calcular a média de um aluno específico
     @PostMapping("/calcularMedia")
     public ResponseEntity<Map<String, Object>> calcularMedia(@RequestBody MediaDto dto) {
 
@@ -78,7 +74,6 @@ public class ProvaController {
         return ResponseEntity.ok(response);
     }
 
-    // 🔹 Calcular a média de todos os alunos da turma/disciplina
     @GetMapping("/{turmaDisciplinaId}/medias")
     public ResponseEntity<List<Object[]>> listarMedias(@PathVariable Long turmaDisciplinaId) {
         return ResponseEntity.ok(provaService.listarMediasPorTurmaDisciplina(turmaDisciplinaId));
