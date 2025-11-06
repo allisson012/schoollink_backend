@@ -12,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import com.example.schollink.Dto.AlunoRetornoNotaDto;
 import com.example.schollink.Dto.AlunoRetornoProvaDto;
 import com.example.schollink.Dto.MediaDto;
 import com.example.schollink.Dto.NotaDto;
@@ -103,6 +104,16 @@ public class ProvaController {
     @GetMapping("/buscar/AlunoProva/{idProva}")
     public ResponseEntity<?> buscarAlunosProva(@PathVariable Long idProva) {
         List<AlunoRetornoProvaDto> dtosRetornos = provaService.buscarAlunosProva(idProva);
+        if (dtosRetornos.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Erro ao buscar alunos");
+        }
+        return ResponseEntity.ok(dtosRetornos);
+    }
+
+    @GetMapping("/buscar/notasAluno/{idTurmaDisciplina}")
+    public ResponseEntity<?> buscarNotasAluno(@PathVariable Long idTurmaDisciplina, HttpSession session) {
+        Long idUser = (Long) session.getAttribute("userId");
+        List<AlunoRetornoNotaDto> dtosRetornos = provaService.buscarNotasAluno(idUser, idTurmaDisciplina);
         if (dtosRetornos.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Erro ao buscar alunos");
         }

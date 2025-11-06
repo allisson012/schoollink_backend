@@ -32,34 +32,35 @@ public class GeradorDeAulasService {
     public void gerarAulasDaSemana() {
         LocalDate hoje = LocalDate.now();
         LocalDate proximaSegunda = hoje.with(TemporalAdjusters.next(DayOfWeek.MONDAY));
-    
+
         List<HorarioFixo> horariosFixos = horarioFixoRepository.findAll();
-    
+
         for (HorarioFixo hf : horariosFixos) {
             LocalDate dataAula = proximaSegunda.with(TemporalAdjusters.nextOrSame(hf.getDiaSemana()));
-    
+
             // Verifica se já existe uma aula para essa TurmaDisciplina e data
-            boolean jaExiste = horarioAulaRepository.existsByTurmaDisciplina_TurmaAndTurmaDisciplina_DisciplinaAndData(
-                    hf.getTurma(), hf.getDisciplina(), dataAula);
-    
+            boolean jaExiste = horarioAulaRepository
+                    .existsByTurmaDisciplina_TurmaAndTurmaDisciplina_DisciplinaAndDataAndHoraInicio(
+                            hf.getTurma(), hf.getDisciplina(), dataAula, hf.getHoraInicio());
+
             if (!jaExiste) {
                 HorarioAula aula = new HorarioAula();
-    
+
                 // Aqui você precisa buscar o TurmaDisciplina correspondente
                 TurmaDisciplina td = turmaDisciplinaRepository
                         .findByTurmaAndDisciplinaAndProfessor(hf.getTurma(), hf.getDisciplina(), hf.getProfessor())
                         .orElseThrow(() -> new RuntimeException("TurmaDisciplina não encontrada!"));
-    
+
                 aula.setTurmaDisciplina(td);
                 aula.setDiaSemana(hf.getDiaSemana());
                 aula.setHoraInicio(hf.getHoraInicio());
                 aula.setHoraFim(hf.getHoraFim());
                 aula.setData(dataAula);
-    
+
                 horarioAulaRepository.save(aula);
             }
         }
-    
+
         System.out.println("✅ Aulas da semana geradas com sucesso!");
     }
 }
