@@ -7,7 +7,8 @@ import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
+import com.example.schollink.Dto.AlunoRetornoProvaDto;
+import com.example.schollink.Dto.NotaDto;
 import com.example.schollink.Dto.ProvaDto;
 import com.example.schollink.model.Aluno;
 import com.example.schollink.model.Periodo;
@@ -19,6 +20,8 @@ import com.example.schollink.repository.AlunoRepository;
 import com.example.schollink.repository.ProvaAlunoRepository;
 import com.example.schollink.repository.ProvaRepository;
 import com.example.schollink.repository.TurmaDisciplinaRepository;
+
+import jakarta.transaction.Transactional;
 
 @Service
 public class ProvaService {
@@ -41,46 +44,67 @@ public class ProvaService {
             return false;
         }
         TurmaDisciplina turmaDisciplina = turmaDisciplinaOpt.get();
+        List<Aluno> alunos = turmaDisciplina.getTurma().getAlunos();
         Prova prova = new Prova();
         prova.setTurmaDisciplina(turmaDisciplina);
         prova.setNome(dto.getNome());
         prova.setPeriodo(Periodo.valueOf(dto.getBimestre()));
         prova.setTipo(TipoProva.valueOf(dto.getTipoProva()));
         provaRepository.save(prova);
+        if (!alunos.isEmpty()) {
+            for (Aluno aluno : alunos) {
+                ProvaAluno provaAluno = new ProvaAluno();
+                provaAluno.setAluno(aluno);
+                provaAluno.setProva(prova);
+                provaAluno.setNota(0);
+                provaAlunoRepository.save(provaAluno);
+            }
+        }
         return true;
     }
 
-    public void lancarNotas(Long turmaDisciplinaId, List<ProvaDto> notasDtos) {
-        TurmaDisciplina turmaDisciplina = turmaDisciplinaRepository.findById(turmaDisciplinaId)
-                .orElseThrow(() -> new RuntimeException("TurmaDisciplina não encontrada"));
+    @Transactional
+    public boolean lancarNotas(List<NotaDto> notaDtos) {
+        boolean sucesso = true;
 
-        for (ProvaDto dto : notasDtos) {
-            Aluno aluno = alunoRepository.findById(dto.getAlunoId())
-                    .orElseThrow(() -> new RuntimeException("Aluno não encontrado"));
+        for (NotaDto nota : notaDtos) {
+            Long idAluno = nota.getIdAluno();
+            Long idProva = nota.getIdProva();
+            double notaAluno = nota.getNota();
 
-            // salvarNota(aluno, turmaDisciplina, TipoProva.P1, dto.getP1());
-            // salvarNota(aluno, turmaDisciplina, TipoProva.P2, dto.getP2());
-            // salvarNota(aluno, turmaDisciplina, TipoProva.AC, dto.getAc());
-            // salvarNota(aluno, turmaDisciplina, TipoProva.AF, dto.getAf());
+            boolean resultado = salvarNota(idAluno, idProva, notaAluno);
+            if (!resultado) {
+                sucesso = false;
+            }
         }
+
+        return sucesso;
     }
 
     public boolean salvarNota(Long idAluno, Long idProva, double nota) {
         Optional<Aluno> alunoOpt = alunoRepository.findById(idAluno);
         Optional<Prova> provaOpt = provaRepository.findById(idProva);
+
         if (alunoOpt.isEmpty() || provaOpt.isEmpty()) {
             return false;
         }
+
         Aluno aluno = alunoOpt.get();
         Prova prova = provaOpt.get();
-        ProvaAluno provaAluno = new ProvaAluno();
-        boolean existe = provaAlunoRepository.existsByAlunoIdAlunoAndProvaIdProva(idAluno, idProva);
-        if (existe) {
-            throw new IllegalStateException("Este aluno já está vinculado a esta prova.");
+
+        Optional<ProvaAluno> provaAlunoOpt = provaAlunoRepository.findByAlunoIdAlunoAndProvaIdProva(idAluno, idProva);
+
+        ProvaAluno provaAluno;
+        if (provaAlunoOpt.isPresent()) {
+            provaAluno = provaAlunoOpt.get();
+            provaAluno.setNota(nota);
+        } else {
+            provaAluno = new ProvaAluno();
+            provaAluno.setAluno(aluno);
+            provaAluno.setProva(prova);
+            provaAluno.setNota(nota);
         }
-        provaAluno.setAluno(aluno);
-        provaAluno.setProva(prova);
-        provaAluno.setNota(nota);
+
         provaAlunoRepository.save(provaAluno);
         return true;
     }
@@ -120,20 +144,39 @@ public class ProvaService {
         return null;
     }
 
-    public List<ProvaDto> buscarProvasDoProfessor(Long professorId){
+    public List<ProvaDto> buscarProvasDoProfessor(Long professorId) {
         List<Prova> provas = provaRepository.findByTurmaDisciplinaProfessorId(professorId);
 
         return provas.stream()
-        .map(prova -> {
-            ProvaDto dto = new ProvaDto();
-            dto.setIdProva(prova.getIdProva());
-            dto.setNome(prova.getNome());
-            dto.setTipoProva(prova.getTipo().name());
-            dto.setBimestre(prova.getPeriodo().name());
-            dto.setNomeDisciplina(prova.getTurmaDisciplina().getDisciplina().getNome());
-            dto.setNomeTurma(prova.getTurmaDisciplina().getTurma().getNome());            
-            return dto;
-        })
-        .collect(Collectors.toList());
+                .map(prova -> {
+                    ProvaDto dto = new ProvaDto();
+                    dto.setIdProva(prova.getIdProva());
+                    dto.setNome(prova.getNome());
+                    dto.setTipoProva(prova.getTipo().name());
+                    dto.setBimestre(prova.getPeriodo().name());
+                    dto.setNomeDisciplina(prova.getTurmaDisciplina().getDisciplina().getNome());
+                    dto.setNomeTurma(prova.getTurmaDisciplina().getTurma().getNome());
+                    return dto;
+                })
+                .collect(Collectors.toList());
+    }
+
+    public List<AlunoRetornoProvaDto> buscarAlunosProva(Long idProva) {
+        Optional<Prova> provaOpt = provaRepository.findById(idProva);
+        if (provaOpt.isEmpty()) {
+            return new ArrayList<>();
+        }
+        Prova prova = provaOpt.get();
+        List<ProvaAluno> provaAlunos = provaAlunoRepository.findByProva(prova);
+        List<AlunoRetornoProvaDto> dtosRetorno = new ArrayList<>();
+        for (ProvaAluno provaAluno : provaAlunos) {
+            AlunoRetornoProvaDto alunoRetornoProvaDto = new AlunoRetornoProvaDto();
+            alunoRetornoProvaDto.setIdAluno(provaAluno.getAluno().getIdAluno());
+            alunoRetornoProvaDto.setNome(provaAluno.getAluno().getUser().getNome());
+            alunoRetornoProvaDto.setMatricula(provaAluno.getAluno().getMatricula());
+            alunoRetornoProvaDto.setNota(provaAluno.getNota());
+            dtosRetorno.add(alunoRetornoProvaDto);
+        }
+        return dtosRetorno;
     }
 }
