@@ -12,11 +12,14 @@ import com.example.schollink.model.ProvaAluno;
 
 @Repository
 public interface ProvaAlunoRepository extends JpaRepository<ProvaAluno, Long> {
+
     boolean existsByAlunoIdAlunoAndProvaIdProva(Long idAluno, Long idProva);
 
     Optional<ProvaAluno> findByProvaAndAluno(Prova prova, Aluno aluno);
  
     List<ProvaAluno> findByProva(Prova prova); 
 
+    List<ProvaAluno> findByAlunoIdAluno(Long idAluno);
+  
     Optional<ProvaAluno> findByAlunoIdAlunoAndProvaIdProva(Long idAluno, Long idProva);
 }
