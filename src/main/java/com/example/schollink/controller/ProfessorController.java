@@ -59,7 +59,7 @@ public class ProfessorController {
         professor.setCargaHorariaSem(dto.getCargaHorariaSem());
         professor.setSalario(dto.getSalario());
         professor.setTurno(Turno.valueOf(dto.getTurno().toUpperCase()));
-        
+
         Endereco endereco = new Endereco();
         endereco.setCep(dto.getEnderecoDto().getCep());
         endereco.setPais(dto.getEnderecoDto().getPais());
@@ -202,9 +202,9 @@ public class ProfessorController {
         return professorService.buscarTodos();
     }
 
-    @GetMapping("buscar/turmasDisciplinas")
+    @GetMapping("/buscar/turmasDisciplinas")
     public ResponseEntity<List<BuscarDisciplinasDto>> buscarTurmasDisciplinas(HttpSession session) {
-        Long idUser = (Long) session.getAttribute("idUser");
+        Long idUser = (Long) session.getAttribute("userId");
         List<BuscarDisciplinasDto> buscarDisciplinasDto = professorService.buscarTurmasDisciplinas(idUser);
         if (buscarDisciplinasDto.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ArrayList<>());

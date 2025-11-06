@@ -12,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import com.example.schollink.Dto.AlunoRetornoProvaDto;
 import com.example.schollink.Dto.MediaDto;
 import com.example.schollink.Dto.NotaDto;
 import com.example.schollink.Dto.ProvaDto;
@@ -20,7 +21,6 @@ import com.example.schollink.service.ProfessorService;
 import com.example.schollink.service.ProvaService;
 
 import jakarta.servlet.http.HttpSession;
-
 
 @RestController
 @RequestMapping("/prova")
@@ -32,16 +32,19 @@ public class ProvaController {
     private ProfessorService professorService;
 
     // 🔹 Lançar ou atualizar notas para todos os alunos
-    @PostMapping("/{turmaDisciplinaId}/lancar-notas")
-    public ResponseEntity<Map<String, String>> lancarNotas(
-            @PathVariable Long turmaDisciplinaId,
-            @RequestBody List<ProvaDto> notasDtos) {
+    @PostMapping("/lancar-notas/turma")
+    public ResponseEntity<Map<String, String>> lancarNotas(@RequestBody List<NotaDto> notaDtos) {
 
-        provaService.lancarNotas(turmaDisciplinaId, notasDtos);
-
-        Map<String, String> response = new HashMap<>();
-        response.put("mensagem", "Notas lançadas com sucesso");
-        return ResponseEntity.ok(response);
+        boolean sucesso = provaService.lancarNotas(notaDtos);
+        if (sucesso) {
+            Map<String, String> response = new HashMap<>();
+            response.put("mensagem", "Notas lançadas com sucesso");
+            return ResponseEntity.ok(response);
+        } else {
+            Map<String, String> response = new HashMap<>();
+            response.put("mensagem", "Erro ao lançar notas.");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+        }
     }
 
     @PostMapping("/cadastrar")
@@ -95,10 +98,19 @@ public class ProvaController {
         Long idUser = (Long) session.getAttribute("userId");
         Long idProfessor = professorService.buscarIdProfessorPeloIdUser(idUser);
 
-        if(idProfessor == null){
+        if (idProfessor == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Usuário não está logado");
         }
         return ResponseEntity.ok(provaService.buscarProvasDoProfessor(idProfessor));
     }
-    
+
+    @GetMapping("/buscar/AlunoProva/{idProva}")
+    public ResponseEntity<?> buscarAlunosProva(@PathVariable Long idProva) {
+        List<AlunoRetornoProvaDto> dtosRetornos = provaService.buscarAlunosProva(idProva);
+        if (dtosRetornos.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Erro ao buscar alunos");
+        }
+        return ResponseEntity.ok(dtosRetornos);
+    }
+
 }
