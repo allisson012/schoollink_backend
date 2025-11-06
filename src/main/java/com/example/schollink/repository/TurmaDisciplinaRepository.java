@@ -15,7 +15,9 @@ public interface TurmaDisciplinaRepository extends JpaRepository<TurmaDisciplina
             Professor professor);
 
     List<TurmaDisciplina> findByTurma(Turma turma);
-    
+
+    List<TurmaDisciplina> findByProfessor(Professor professor);
+
     List<TurmaDisciplina> findByProfessorUserId(Long userId);
 
     List<TurmaDisciplina> findByTurmaIdAndProfessorId(Long turmaId, Long professorId);

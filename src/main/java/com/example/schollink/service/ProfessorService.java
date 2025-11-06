@@ -14,7 +14,9 @@ import org.springframework.stereotype.Service;
 
 import com.example.schollink.Dto.AlunoDto;
 import com.example.schollink.Dto.AulaRetornoDto;
+import com.example.schollink.Dto.BuscarDisciplinasDto;
 import com.example.schollink.Dto.ChamadaRequestDto;
+import com.example.schollink.Dto.DataDto;
 import com.example.schollink.Dto.ProfessorParaTurmaDto;
 import com.example.schollink.Dto.UserDto;
 import com.example.schollink.model.Aluno;
@@ -33,6 +35,7 @@ import com.example.schollink.repository.HistoricoAulaRepository;
 import com.example.schollink.repository.HorarioAulaRepository;
 import com.example.schollink.repository.PresencaRepository;
 import com.example.schollink.repository.ProfessorRepository;
+import com.example.schollink.repository.TurmaDisciplinaRepository;
 import com.example.schollink.repository.TurmaRepository;
 import com.example.schollink.repository.UserRepository;
 
@@ -58,6 +61,8 @@ public class ProfessorService {
     private PresencaRepository presencaRepository;
     @Autowired
     private AlunoRepository alunoRepository;
+    @Autowired
+    private TurmaDisciplinaRepository turmaDisciplinaRepository;
 
     @Transactional
     public void cadastrarProfessor(User user, Professor professor, String senha, String rfid) {
@@ -221,6 +226,36 @@ public class ProfessorService {
         return aulasRetornoDtos;
     }
 
+    public List<AulaRetornoDto> buscarAulasDia(DataDto dto) {
+
+        Optional<TurmaDisciplina> turmaDisciplinaOpt = turmaDisciplinaRepository.findById(dto.getIdTurmaDisciplina());
+        if (dto.getDia() == null || dto.getDia().isEmpty() || turmaDisciplinaOpt.isEmpty()) {
+            throw new IllegalArgumentException("O campo 'dia' não pode ser nulo ou vazio");
+        }
+        LocalDate data = LocalDate.parse(dto.getDia());
+        TurmaDisciplina turmaDisciplina = turmaDisciplinaOpt.get();
+
+        List<HorarioAula> horarioAulas = horarioAulaRepository.findByDataAndTurmaDisciplina(data, turmaDisciplina);
+
+        if (horarioAulas == null || horarioAulas.isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        List<AulaRetornoDto> aulasRetornoDtos = horarioAulas.stream().map(horarioAula -> {
+            AulaRetornoDto aulaRetorno = new AulaRetornoDto();
+            TurmaDisciplina td = horarioAula.getTurmaDisciplina();
+            aulaRetorno.setIdDisciplina(td.getDisciplina().getId());
+            aulaRetorno.setNomeDisciplina(td.getDisciplina().getNome());
+            aulaRetorno.setIdHorarioAula(horarioAula.getId());
+            aulaRetorno.setIdProfessor(td.getProfessor().getId());
+            aulaRetorno.setHorarioInicio(horarioAula.getHoraInicio());
+            aulaRetorno.setHorarioTermino(horarioAula.getHoraFim());
+            return aulaRetorno;
+        }).collect(Collectors.toList());
+
+        return aulasRetornoDtos;
+    }
+
     public boolean realizarChamada(List<AlunoDto> alunos, Long idHorarioAula, HistoricoAula historicoAula) {
 
         Optional<HorarioAula> horarioAulaOpt = horarioAulaRepository.findById(idHorarioAula);
@@ -262,6 +297,35 @@ public class ProfessorService {
         return professores.stream()
                 .map(p -> new ProfessorParaTurmaDto(p.getId(), p.getUser().getNome()))
                 .collect(Collectors.toList());
+    }
+
+    public Long buscarIdProfessorPeloIdUser(Long userId){
+        Professor professor = professorRepository.findByUser_Id(userId);
+        return professor.getId();
+    }
+
+    public List<BuscarDisciplinasDto> buscarTurmasDisciplinas(Long idUser) {
+        Professor professor = professorRepository.findByUser_Id(idUser);
+        if (professor == null) {
+            return new ArrayList<>();
+        }
+        List<TurmaDisciplina> turmasDisciplinas = turmaDisciplinaRepository.findByProfessor(professor);
+        if (turmasDisciplinas.isEmpty()) {
+            return new ArrayList<>();
+        }
+        List<BuscarDisciplinasDto> dtos = new ArrayList<>();
+        for (TurmaDisciplina turmaDisciplina : turmasDisciplinas) {
+            BuscarDisciplinasDto dto = new BuscarDisciplinasDto();
+            dto.setIdDisciplina(turmaDisciplina.getDisciplina().getId());
+            dto.setNomeDisciplina(turmaDisciplina.getDisciplina().getNome());
+            dto.setIdProfessor(turmaDisciplina.getProfessor().getId());
+            dto.setNomeProfessor(turmaDisciplina.getProfessor().getUser().getNome());
+            dto.setIdTurma(turmaDisciplina.getTurma().getId());
+            dto.setNomeTurma(turmaDisciplina.getTurma().getNome());
+            dto.setIdTurmaDisciplina(turmaDisciplina.getId());
+            dtos.add(dto);
+        }
+        return dtos;
     }
 
 }

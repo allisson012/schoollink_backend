@@ -27,4 +27,5 @@ public interface ProvaRepository extends JpaRepository<Prova, Long> {
 
    // @Query("SELECT p.aluno.id, AVG(p.nota) FROM Prova p WHERE p.turmaDisciplina.id = :turmaDisciplinaId GROUP BY p.aluno.id")
  //   List<Object[]> findMediasPorTurmaDisciplina(@Param("turmaDisciplinaId") Long turmaDisciplinaId);
+    List<Prova> findByTurmaDisciplinaProfessorId(Long professorId);
 }
