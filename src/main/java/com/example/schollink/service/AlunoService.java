@@ -168,7 +168,7 @@ public class AlunoService {
     public List<AlunoParaTurmaDto> buscarTodos() {
         List<Aluno> alunos = alunoRepository.findAll();
         return alunos.stream()
-                .map(a -> new AlunoParaTurmaDto(a.getIdAluno(), a.getUser().getNome()))
+                .map(a -> new AlunoParaTurmaDto(a.getIdAluno(), a.getUser().getNome(), a.getTurma() != null))
                 .collect(Collectors.toList());
     }
 
