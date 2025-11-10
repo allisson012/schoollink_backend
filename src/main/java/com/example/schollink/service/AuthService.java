@@ -6,6 +6,7 @@ import java.util.logging.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.example.schollink.Dto.AlterarSenhaDto;
 import com.example.schollink.model.Admin;
 import com.example.schollink.model.User;
 import com.example.schollink.model.UserRole;
@@ -60,5 +61,21 @@ public class AuthService {
             }
         }
         return Optional.empty();
+    }
+
+    public boolean alterarSenha(AlterarSenhaDto dto) {
+        Optional<User> userOpt = userRepository.findById(dto.getUserId());
+        if (userOpt.isEmpty()) {
+            return false;
+        }
+
+        User user = userOpt.get();
+        if (!passwordService.compararSenha(dto.getSenhaAtual(), user.getHash(), user.getSalt())) {
+            return false;
+        }
+
+        user.setHash(passwordService.gerarHash(dto.getNovaSenha(), user.getSalt()));
+        userRepository.save(user);
+        return true;
     }
 }
