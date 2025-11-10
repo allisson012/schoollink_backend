@@ -20,10 +20,14 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.schollink.Dto.AlunoDto;
 import com.example.schollink.Dto.AlunoParaTurmaDto;
+import com.example.schollink.Dto.AulaRetornoDto;
+import com.example.schollink.Dto.DataDto;
 import com.example.schollink.Dto.DisciplinaProfessorDto;
+import com.example.schollink.Dto.HistoricoAulaDto;
 import com.example.schollink.Dto.PresencasAlunoDto;
 import com.example.schollink.model.Aluno;
 import com.example.schollink.model.Endereco;
+import com.example.schollink.model.HistoricoAula;
 import com.example.schollink.model.StatusMatricula;
 import com.example.schollink.model.User;
 import com.example.schollink.model.UserRole;
@@ -208,6 +212,38 @@ public class AlunoController {
         Long id = (Long) session.getAttribute("userId");
         PresencasAlunoDto presencasAlunoDto = alunoService.buscarPresencas(id, idTurmaDisciplina);
         return ResponseEntity.ok(presencasAlunoDto);
+    }
+
+    @PostMapping("/buscar/aulas/dia")
+    public ResponseEntity<?> buscarAulasPeloDia(@RequestBody DataDto data, HttpSession session) {
+        Long idUser = (Long) session.getAttribute("userId");
+        if (idUser == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("message", "Usuário não autenticado"));
+        }
+        List<AulaRetornoDto> aulaRetornoDtos = alunoService.buscarAulasDia(data);
+        if (!aulaRetornoDtos.isEmpty()) {
+            return ResponseEntity.ok(aulaRetornoDtos);
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Map.of("message", "Erro ao buscar aulas ou lista vazia"));
+        }
+    }
+
+    @GetMapping("/buscar/historicoAula/{idHorarioAula}")
+    public ResponseEntity<?> buscarHistoricoAula(@PathVariable Long idHorarioAula, HttpSession session) {
+        Long idUser = (Long) session.getAttribute("userId");
+        if (idUser == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("message", "Usuário não autenticado"));
+        }
+        HistoricoAulaDto historicoAulaDto = alunoService.buscarHistoricoAula(idHorarioAula);
+        if (historicoAulaDto != null) {
+            return ResponseEntity.ok(historicoAulaDto);
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Map.of("message", "Erro ao buscar aulas ou lista vazia"));
+        }
     }
 
 }

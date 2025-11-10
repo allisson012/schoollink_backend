@@ -17,6 +17,7 @@ import com.example.schollink.Dto.AlunoRetornoProvaDto;
 import com.example.schollink.Dto.MediaDto;
 import com.example.schollink.Dto.NotaDto;
 import com.example.schollink.Dto.ProvaDto;
+import com.example.schollink.model.HistoricoAula;
 import com.example.schollink.model.Prova;
 import com.example.schollink.service.ProfessorService;
 import com.example.schollink.service.ProvaService;

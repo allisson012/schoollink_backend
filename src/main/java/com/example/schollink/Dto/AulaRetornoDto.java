@@ -9,6 +9,7 @@ public class AulaRetornoDto {
     private String nomeDisciplina;
     private LocalTime horarioInicio;
     private LocalTime horarioTermino;
+    private Long idTurmaDisciplina;
 
     public Long getIdHorarioAula() {
         return idHorarioAula;
@@ -56,6 +57,14 @@ public class AulaRetornoDto {
 
     public void setHorarioTermino(LocalTime horarioTermino) {
         this.horarioTermino = horarioTermino;
+    }
+
+    public Long getIdTurmaDisciplina() {
+        return idTurmaDisciplina;
+    }
+
+    public void setIdTurmaDisciplina(Long idTurmaDisciplina) {
+        this.idTurmaDisciplina = idTurmaDisciplina;
     }
 
 }
