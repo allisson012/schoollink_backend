@@ -230,21 +230,4 @@ public class AlunoController {
                     .body(Map.of("message", "Erro ao buscar aulas ou lista vazia"));
         }
     }
-
-    @GetMapping("/buscar/historicoAula/{idHorarioAula}")
-    public ResponseEntity<?> buscarHistoricoAula(@PathVariable Long idHorarioAula, HttpSession session) {
-        Long idUser = (Long) session.getAttribute("userId");
-        if (idUser == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(Map.of("message", "Usuário não autenticado"));
-        }
-        HistoricoAulaDto historicoAulaDto = alunoService.buscarHistoricoAula(idHorarioAula);
-        if (historicoAulaDto != null) {
-            return ResponseEntity.ok(historicoAulaDto);
-        } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(Map.of("message", "Erro ao buscar aulas ou lista vazia"));
-        }
-    }
-
 }

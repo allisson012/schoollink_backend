@@ -276,22 +276,4 @@ public class AlunoService {
 
         return aulasRetornoDtos;
     }
-    
-    public HistoricoAulaDto buscarHistoricoAula(Long idHorarioAula){
-      Optional<HorarioAula> horarioAulaOpt = horarioAulaRepository.findById(idHorarioAula);
-      if(horarioAulaOpt.isEmpty()){
-        return null;
-      }
-      HorarioAula horarioAula = horarioAulaOpt.get();
-      HistoricoAula historicoAula = historicoAulaRepository.findByHorarioAula(horarioAula);
-      if(historicoAula == null){
-        return null;
-      }
-      HistoricoAulaDto dto = new HistoricoAulaDto();
-      dto.setConteudoMinistrado(historicoAula.getConteudoMinistrado());
-      dto.setDataAula(historicoAula.getDataAula().toString());
-      dto.setDescricaoTarefa(historicoAula.getDescricaoTarefa());
-      dto.setResumoAula(historicoAula.getResumoAula());
-      return dto;
-    }
 }
