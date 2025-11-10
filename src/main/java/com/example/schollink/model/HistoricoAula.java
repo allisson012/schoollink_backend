@@ -8,6 +8,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 
 @Entity
 public class HistoricoAula {
@@ -23,6 +24,8 @@ public class HistoricoAula {
     private String resumoAula;
     private Boolean tarefa;
     private String descricaoTarefa;
+    @OneToOne
+    private HorarioAula horarioAula;
 
     public Long getId() {
         return id;
@@ -82,6 +85,14 @@ public class HistoricoAula {
 
     public void setTurmaDisciplina(TurmaDisciplina turmaDisciplina) {
         this.turmaDisciplina = turmaDisciplina;
+    }
+
+    public HorarioAula getHorarioAula() {
+        return horarioAula;
+    }
+
+    public void setHorarioAula(HorarioAula horarioAula) {
+        this.horarioAula = horarioAula;
     }
 
 }

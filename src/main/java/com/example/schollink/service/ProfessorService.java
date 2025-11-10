@@ -285,9 +285,21 @@ public class ProfessorService {
             }
         }
         if (historicoAula != null && Boolean.TRUE.equals(historicoAula.getTarefa()) && horarioAula != null) {
-            historicoAula.setDataAula(horarioAula.getData());
-            historicoAula.setTurmaDisciplina(horarioAula.getTurmaDisciplina());
-            historicoAulaRepository.save(historicoAula);
+
+            HistoricoAula historicoAulaExistente = historicoAulaRepository.findByHorarioAula(horarioAula);
+            if (historicoAulaExistente != null) {
+                historicoAulaExistente.setDataAula(horarioAula.getData());
+                historicoAulaExistente.setTurmaDisciplina(horarioAula.getTurmaDisciplina());
+                historicoAulaExistente.setHorarioAula(horarioAula);
+                historicoAulaExistente.setDescricaoTarefa(historicoAula.getDescricaoTarefa());
+                historicoAulaExistente.setTarefa(historicoAula.getTarefa());
+                historicoAulaRepository.save(historicoAulaExistente);
+            } else {
+                historicoAula.setDataAula(horarioAula.getData());
+                historicoAula.setTurmaDisciplina(horarioAula.getTurmaDisciplina());
+                historicoAula.setHorarioAula(horarioAula);
+                historicoAulaRepository.save(historicoAula);
+            }
         }
         return peloMenosUmSalvo;
     }
@@ -299,7 +311,7 @@ public class ProfessorService {
                 .collect(Collectors.toList());
     }
 
-    public Long buscarIdProfessorPeloIdUser(Long userId){
+    public Long buscarIdProfessorPeloIdUser(Long userId) {
         Professor professor = professorRepository.findByUser_Id(userId);
         return professor.getId();
     }

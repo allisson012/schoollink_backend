@@ -1,5 +1,6 @@
 package com.example.schollink.service;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -11,14 +12,18 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.example.schollink.Dto.AlunoParaTurmaDto;
+import com.example.schollink.Dto.AulaRetornoDto;
+import com.example.schollink.Dto.DataDto;
 import com.example.schollink.Dto.DisciplinaProfessorDto;
 import com.example.schollink.Dto.AlunoDto;
 import com.example.schollink.Dto.EnderecoDto;
+import com.example.schollink.Dto.HistoricoAulaDto;
 import com.example.schollink.Dto.PresencasAlunoDto;
 import com.example.schollink.Dto.UserDto;
 
 import com.example.schollink.model.Aluno;
 import com.example.schollink.model.Endereco;
+import com.example.schollink.model.HistoricoAula;
 import com.example.schollink.model.HorarioAula;
 import com.example.schollink.model.Presenca;
 import com.example.schollink.model.StatusMatricula;
@@ -27,6 +32,7 @@ import com.example.schollink.model.TurmaDisciplina;
 import com.example.schollink.model.User;
 import com.example.schollink.model.UserRole;
 import com.example.schollink.repository.AlunoRepository;
+import com.example.schollink.repository.HistoricoAulaRepository;
 import com.example.schollink.repository.HorarioAulaRepository;
 import com.example.schollink.repository.PresencaRepository;
 import com.example.schollink.repository.TurmaDisciplinaRepository;
@@ -45,7 +51,9 @@ public class AlunoService {
     @Autowired
     private HorarioAulaRepository horarioAulaRepository;
     @Autowired
-    private PresencaRepository presencaRepository;
+    private PresencaRepository presencaRepository; 
+    @Autowired
+    private HistoricoAulaRepository historicoAulaRepository;
 
     public void cadastrarAluno(User user, Aluno aluno, String senha) {
         byte salt[] = passwordService.gerarSalt();
@@ -214,7 +222,7 @@ public class AlunoService {
         }
         Aluno aluno = alunoOpt.get();
         TurmaDisciplina turmaDisciplina = turmaDisciplinaOpt.get();
-        if(!turmaDisciplina.getTurma().equals(aluno.getTurma())){
+        if (!turmaDisciplina.getTurma().equals(aluno.getTurma())) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND,
                     "Aluno não participa dessa turma");
         }
@@ -239,4 +247,51 @@ public class AlunoService {
         return presencasAlunoDto;
     }
 
+    public List<AulaRetornoDto> buscarAulasDia(DataDto dto) {
+
+        Optional<TurmaDisciplina> turmaDisciplinaOpt = turmaDisciplinaRepository.findById(dto.getIdTurmaDisciplina());
+        if (dto.getDia() == null || dto.getDia().isEmpty() || turmaDisciplinaOpt.isEmpty()) {
+            throw new IllegalArgumentException("O campo 'dia' não pode ser nulo ou vazio");
+        }
+        LocalDate data = LocalDate.parse(dto.getDia());
+        TurmaDisciplina turmaDisciplina = turmaDisciplinaOpt.get();
+
+        List<HorarioAula> horarioAulas = horarioAulaRepository.findByDataAndTurmaDisciplina(data, turmaDisciplina);
+
+        if (horarioAulas == null || horarioAulas.isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        List<AulaRetornoDto> aulasRetornoDtos = horarioAulas.stream().map(horarioAula -> {
+            AulaRetornoDto aulaRetorno = new AulaRetornoDto();
+            TurmaDisciplina td = horarioAula.getTurmaDisciplina();
+            aulaRetorno.setIdDisciplina(td.getDisciplina().getId());
+            aulaRetorno.setNomeDisciplina(td.getDisciplina().getNome());
+            aulaRetorno.setIdHorarioAula(horarioAula.getId());
+            aulaRetorno.setIdTurmaDisciplina(td.getId());
+            aulaRetorno.setHorarioInicio(horarioAula.getHoraInicio());
+            aulaRetorno.setHorarioTermino(horarioAula.getHoraFim());
+            return aulaRetorno;
+        }).collect(Collectors.toList());
+
+        return aulasRetornoDtos;
+    }
+    
+    public HistoricoAulaDto buscarHistoricoAula(Long idHorarioAula){
+      Optional<HorarioAula> horarioAulaOpt = horarioAulaRepository.findById(idHorarioAula);
+      if(horarioAulaOpt.isEmpty()){
+        return null;
+      }
+      HorarioAula horarioAula = horarioAulaOpt.get();
+      HistoricoAula historicoAula = historicoAulaRepository.findByHorarioAula(horarioAula);
+      if(historicoAula == null){
+        return null;
+      }
+      HistoricoAulaDto dto = new HistoricoAulaDto();
+      dto.setConteudoMinistrado(historicoAula.getConteudoMinistrado());
+      dto.setDataAula(historicoAula.getDataAula().toString());
+      dto.setDescricaoTarefa(historicoAula.getDescricaoTarefa());
+      dto.setResumoAula(historicoAula.getResumoAula());
+      return dto;
+    }
 }
