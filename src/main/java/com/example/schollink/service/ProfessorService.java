@@ -340,4 +340,11 @@ public class ProfessorService {
         return dtos;
     }
 
+    public Professor verProfessor(Long idProfessor) {
+        Optional<Professor> professorOpt = professorRepository.findById(idProfessor);
+        if (professorOpt.isEmpty()) {
+            throw new RuntimeException("Professor não encontrado");
+        }
+        return professorOpt.get();
+    }
 }
