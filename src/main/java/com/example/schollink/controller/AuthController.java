@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.schollink.Dto.AlterarSenhaDto;
 import com.example.schollink.model.Admin;
 import com.example.schollink.model.User;
 import com.example.schollink.model.UserRole;
@@ -108,6 +109,18 @@ public class AuthController {
     public ResponseEntity<Map<String, String>> logout(HttpSession session) {
         session.invalidate();
         return ResponseEntity.ok(Map.of("message", "Logout realizado com sucesso"));
+    }
+
+    @PostMapping("/alterarSenha")
+    public ResponseEntity<?> alterarSenha(@RequestBody AlterarSenhaDto dto, HttpSession session) {
+        Long idUser = (Long) session.getAttribute("userId");
+        dto.setUserId(idUser);
+        boolean alterada = authService.alterarSenha(dto);
+        if (alterada) {
+            return ResponseEntity.ok(Map.of("message", "Senha alterada com sucesso"));
+        } else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", "Senha atual incorreta"));
+        }
     }
 
 }
