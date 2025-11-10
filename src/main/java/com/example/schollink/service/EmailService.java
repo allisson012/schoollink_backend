@@ -48,4 +48,8 @@ public class EmailService {
         return this.email;
     }
 
+    public void enviarEmail(){
+        
+    }
+
 }

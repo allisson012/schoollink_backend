@@ -284,14 +284,16 @@ public class ProfessorService {
                 peloMenosUmSalvo = true;
             }
         }
-        if (historicoAula != null && Boolean.TRUE.equals(historicoAula.getTarefa()) && horarioAula != null) {
+        if (historicoAula != null && horarioAula != null) {
 
             HistoricoAula historicoAulaExistente = historicoAulaRepository.findByHorarioAula(horarioAula);
             if (historicoAulaExistente != null) {
                 historicoAulaExistente.setDataAula(horarioAula.getData());
                 historicoAulaExistente.setTurmaDisciplina(horarioAula.getTurmaDisciplina());
+                historicoAulaExistente.setConteudoMinistrado(historicoAula.getConteudoMinistrado());
                 historicoAulaExistente.setHorarioAula(horarioAula);
                 historicoAulaExistente.setDescricaoTarefa(historicoAula.getDescricaoTarefa());
+                historicoAulaExistente.setResumoAula(historicoAula.getResumoAula());
                 historicoAulaExistente.setTarefa(historicoAula.getTarefa());
                 historicoAulaRepository.save(historicoAulaExistente);
             } else {

@@ -179,13 +179,13 @@ public class ProfessorController {
     public ResponseEntity<?> realizarChamada(@RequestBody ChamadaRequestDto dto) {
         Long idHorarioAula = dto.getIdHorarioAula();
         List<AlunoDto> alunos = dto.getAlunos();
-        HistoricoAula historicoAula = new HistoricoAula();
-
-        boolean temTarefa = Boolean.TRUE.equals(dto.getTarefa());
-        if (temTarefa) {
+        HistoricoAula historicoAula = null;
+        if (dto.getConteudoMinistrado() != null || dto.getDescricao() != null || dto.getResumoAula() != null
+                || dto.getTarefa() != null) {
+            historicoAula = new HistoricoAula();
             historicoAula.setConteudoMinistrado(dto.getConteudoMinistrado());
             historicoAula.setDescricaoTarefa(dto.getDescricao());
-            historicoAula.setTarefa(true);
+            historicoAula.setTarefa(dto.getTarefa());
             historicoAula.setResumoAula(dto.getResumoAula());
         }
         boolean chamada = professorService.realizarChamada(alunos, idHorarioAula, historicoAula);
