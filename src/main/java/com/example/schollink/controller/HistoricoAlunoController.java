@@ -15,15 +15,26 @@ public class HistoricoAlunoController {
     @Autowired
     private HistoricoAlunoService historicoAlunoService;
 
-    @GetMapping("/teste")
-public String teste() {
-    return "Controller do histórico funcionando!";
-}
-
-
     @GetMapping("/{idAluno}/historico")
     public ResponseEntity<HistoricoAlunoDto> gerarHistorico(@PathVariable Long idAluno) {
         HistoricoAlunoDto historico = historicoAlunoService.gerarHistorico(idAluno);
         return ResponseEntity.ok(historico);
+    }
+
+    @PostMapping("/{idAluno}/historico/salvar")
+    public ResponseEntity<String> salvarHistorico(@PathVariable Long idAluno) {
+        try {
+            historicoAlunoService.atualizarHistoricoAluno(idAluno);
+            return ResponseEntity.ok("Histórico do aluno atualizado e salvo com sucesso!");
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body("Erro ao atualizar histórico: " + e.getMessage());
+        }
+    }
+    
+    @GetMapping("/{idAluno}/historico/salvo")
+    public ResponseEntity<HistoricoAlunoDto> buscarHistoricoSalvo(@PathVariable Long idAluno) {
+        var historicoOpt = historicoAlunoService.getHistoricoSalvo(idAluno);
+        return historicoOpt.map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 }
