@@ -111,16 +111,4 @@ public class AuthController {
         return ResponseEntity.ok(Map.of("message", "Logout realizado com sucesso"));
     }
 
-    @PostMapping("/alterarSenha")
-    public ResponseEntity<?> alterarSenha(@RequestBody AlterarSenhaDto dto, HttpSession session) {
-        Long idUser = (Long) session.getAttribute("userId");
-        dto.setUserId(idUser);
-        boolean alterada = authService.alterarSenha(dto);
-        if (alterada) {
-            return ResponseEntity.ok(Map.of("message", "Senha alterada com sucesso"));
-        } else {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", "Senha atual incorreta"));
-        }
-    }
-
 }
