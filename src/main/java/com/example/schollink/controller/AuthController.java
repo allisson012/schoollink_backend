@@ -123,4 +123,25 @@ public class AuthController {
         }
     }
 
+    @GetMapping("/esquecerSenha")
+    public ResponseEntity<?> esquecerSenha(HttpSession session) {
+        Long idUser = (Long) session.getAttribute("userId");
+        boolean valido = authService.esquecerSenha(idUser);
+        if (valido) {
+            return ResponseEntity.ok("Codigo enviado pelo email com sucesso");
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Erro ao enviar email");
+        }
+    }
+
+    @PostMapping("/alterarSenhaPeloCodigo")
+    public ResponseEntity<?> alterarSenhaPeloCodigo(@RequestBody AlterarSenhaDto dto, HttpSession session) {
+        Long idUser = (Long) session.getAttribute("userId");
+        boolean valido = authService.alterarSenhaPeloCodigo(idUser, dto.getNovaSenha(), dto.getCodigo());
+        if (valido) {
+            return ResponseEntity.ok("Senha trocada com sucesso");
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Erro ao trocar senha");
+        }
+    }
 }

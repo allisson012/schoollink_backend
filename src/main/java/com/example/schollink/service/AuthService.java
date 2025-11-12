@@ -1,5 +1,8 @@
 package com.example.schollink.service;
 
+import java.security.SecureRandom;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.logging.Logger;
 
@@ -7,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.example.schollink.Dto.AlterarSenhaDto;
+import com.example.schollink.Dto.CodigoEmail;
 import com.example.schollink.model.Admin;
 import com.example.schollink.model.User;
 import com.example.schollink.model.UserRole;
@@ -23,6 +27,8 @@ public class AuthService {
     private AdminRepository adminRepository;
     @Autowired
     private PasswordService passwordService;
+    @Autowired
+    private PasswordResetMemoryService passwordResetMemoryService;
 
     public Optional<User> autenticarProfessor(String email, String senha) {
         Optional<User> userOpt = userRepository.findByEmail(email);
@@ -76,6 +82,32 @@ public class AuthService {
 
         user.setHash(passwordService.gerarHash(dto.getNovaSenha(), user.getSalt()));
         userRepository.save(user);
+        return true;
+    }
+
+    public boolean esquecerSenha(Long idUser) {
+        Optional<User> userOpt = userRepository.findById(idUser);
+        if (userOpt.isEmpty()) {
+            return false;
+        }
+        User user = userOpt.get();
+        passwordResetMemoryService.gerarCodigo(user.getEmail());
+        return true;
+    }
+
+    public boolean alterarSenhaPeloCodigo(Long idUser, String novaSenha, String codigo){
+        Optional<User> userOpt = userRepository.findById(idUser);
+        if (userOpt.isEmpty()) {
+            return false;
+        }
+        User user = userOpt.get();
+        boolean codigoValido = passwordResetMemoryService.validarCodigo(user.getEmail(), codigo);
+        if(codigoValido){
+            user.setHash(passwordService.gerarHash(novaSenha, user.getSalt()));
+            userRepository.save(user);
+        }else{
+            return false;
+        }
         return true;
     }
 }
