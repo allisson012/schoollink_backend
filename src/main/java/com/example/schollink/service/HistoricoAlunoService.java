@@ -1,10 +1,12 @@
 package com.example.schollink.service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,11 +15,15 @@ import org.springframework.stereotype.Service;
 import com.example.schollink.Dto.DisciplinaNotasDto;
 import com.example.schollink.Dto.HistoricoAlunoDto;
 import com.example.schollink.model.Aluno;
+import com.example.schollink.model.HistoricoAluno;
 import com.example.schollink.model.Periodo;
 import com.example.schollink.model.Prova;
 import com.example.schollink.model.ProvaAluno;
 import com.example.schollink.repository.AlunoRepository;
+import com.example.schollink.repository.HistoricoAlunoRepository;
 import com.example.schollink.repository.ProvaAlunoRepository;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Service
 public class HistoricoAlunoService {
@@ -104,4 +110,38 @@ public class HistoricoAlunoService {
         double soma = notas.values().stream().mapToDouble(Double::doubleValue).sum();
         return soma / notas.size();
     }
+
+    @Autowired
+    private HistoricoAlunoRepository historicoAlunoRepository;
+
+    @Autowired
+    private ObjectMapper objectMapper; // para converter DTO em JSON
+
+    public void atualizarHistoricoAluno(Long idAluno) {
+        HistoricoAlunoDto historicoDto = gerarHistorico(idAluno);
+        String json;
+        try {
+            json = objectMapper.writeValueAsString(historicoDto);
+        } catch (Exception e) {
+            throw new RuntimeException("Erro ao converter histórico para JSON", e);
+        }
+
+        HistoricoAluno historico = historicoAlunoRepository.findByAlunoIdAluno(idAluno)
+            .orElse(new HistoricoAluno());
+        historico.setAluno(alunoRepository.findById(idAluno).orElseThrow());
+        historico.setConteudoJson(json);
+        historico.setUltimaAtualizacao(LocalDateTime.now());
+        historicoAlunoRepository.save(historico);
+    }
+
+    public Optional<HistoricoAlunoDto> getHistoricoSalvo(Long idAluno) {
+    return historicoAlunoRepository.findByAlunoIdAluno(idAluno)
+            .map(historico -> {
+                try {
+                    return objectMapper.readValue(historico.getConteudoJson(), HistoricoAlunoDto.class);
+                } catch (JsonProcessingException e) {
+                    throw new RuntimeException("Erro ao converter JSON do histórico", e);
+                }
+            });
+}
 }

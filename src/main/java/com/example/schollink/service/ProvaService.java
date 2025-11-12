@@ -3,6 +3,7 @@ package com.example.schollink.service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -82,6 +83,23 @@ public class ProvaService {
 
         return sucesso;
     }
+
+    @Autowired
+    private HistoricoAlunoService historicoAlunoService;
+
+    public void lancarNotas(Long turmaDisciplinaId, List<ProvaDto> notasDtos) {
+    // ... já atualiza as provas normalmente
+
+    // Após salvar as notas, atualiza o histórico de cada aluno afetado
+        Set<Long> alunosAfetados = notasDtos.stream()
+        .map(ProvaDto::getAlunoId)
+        .collect(Collectors.toSet());
+
+        for (Long idAluno : alunosAfetados) {
+            historicoAlunoService.atualizarHistoricoAluno(idAluno);
+        }
+    }
+
 
     public boolean salvarNota(Long idAluno, Long idProva, double nota) {
         Optional<Aluno> alunoOpt = alunoRepository.findById(idAluno);

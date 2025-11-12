@@ -34,6 +34,7 @@ public class HistoricoAulaService {
         dto.setDataAula(historicoAula.getDataAula().toString());
         dto.setDescricaoTarefa(historicoAula.getDescricaoTarefa());
         dto.setResumoAula(historicoAula.getResumoAula());
+        dto.setTarefa(historicoAula.getTarefa());
         return dto;
       }
 }

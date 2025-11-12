@@ -26,6 +26,7 @@ import com.example.schollink.Dto.DataDto;
 import com.example.schollink.Dto.ProfessorDto;
 import com.example.schollink.Dto.ProfessorHorarioDto;
 import com.example.schollink.Dto.ProfessorParaTurmaDto;
+import com.example.schollink.model.Aluno;
 import com.example.schollink.model.Endereco;
 import com.example.schollink.model.HistoricoAula;
 import com.example.schollink.model.Professor;
@@ -210,6 +211,22 @@ public class ProfessorController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ArrayList<>());
         }
         return ResponseEntity.ok(buscarDisciplinasDto);
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<?> verProfessor(HttpSession session) {
+        Long id = (Long) session.getAttribute("userId");
+        if (id == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("message", "Usuário não logado ou ID do aluno não informado"));
+        }
+        try {
+            Long idProfessor = professorService.buscarIdProfessorPeloIdUser(id);
+            Professor professor = professorService.verProfessor(idProfessor);
+            return ResponseEntity.ok().body(Map.of("nome", professor.getUser().getNome()));
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", e.getMessage()));
+        }
     }
 
 }
