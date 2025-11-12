@@ -68,46 +68,4 @@ public class AuthService {
         }
         return Optional.empty();
     }
-
-    public boolean alterarSenha(AlterarSenhaDto dto) {
-        Optional<User> userOpt = userRepository.findById(dto.getUserId());
-        if (userOpt.isEmpty()) {
-            return false;
-        }
-
-        User user = userOpt.get();
-        if (!passwordService.compararSenha(dto.getSenhaAtual(), user.getHash(), user.getSalt())) {
-            return false;
-        }
-
-        user.setHash(passwordService.gerarHash(dto.getNovaSenha(), user.getSalt()));
-        userRepository.save(user);
-        return true;
-    }
-
-    public boolean esquecerSenha(Long idUser) {
-        Optional<User> userOpt = userRepository.findById(idUser);
-        if (userOpt.isEmpty()) {
-            return false;
-        }
-        User user = userOpt.get();
-        passwordResetMemoryService.gerarCodigo(user.getEmail());
-        return true;
-    }
-
-    public boolean alterarSenhaPeloCodigo(Long idUser, String novaSenha, String codigo){
-        Optional<User> userOpt = userRepository.findById(idUser);
-        if (userOpt.isEmpty()) {
-            return false;
-        }
-        User user = userOpt.get();
-        boolean codigoValido = passwordResetMemoryService.validarCodigo(user.getEmail(), codigo);
-        if(codigoValido){
-            user.setHash(passwordService.gerarHash(novaSenha, user.getSalt()));
-            userRepository.save(user);
-        }else{
-            return false;
-        }
-        return true;
-    }
 }

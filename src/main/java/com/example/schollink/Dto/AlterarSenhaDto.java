@@ -5,6 +5,7 @@ public class AlterarSenhaDto {
     private String codigo;
     private String senhaAtual;
     private String novaSenha;
+    private String email;
 
     public Long getUserId() {
         return userId;
@@ -36,6 +37,14 @@ public class AlterarSenhaDto {
 
     public void setCodigo(String codigo) {
         this.codigo = codigo;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 
 }
