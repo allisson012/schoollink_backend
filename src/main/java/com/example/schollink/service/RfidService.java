@@ -2,6 +2,7 @@ package com.example.schollink.service;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -36,6 +37,8 @@ public class RfidService {
     private PontoRepository pontoRepository;
     @Autowired
     private TurmaDisciplinaRepository turmaDisciplinaRepository;
+    @Autowired
+    private EmailService emailService;
 
     public boolean registrarPonto(String rfid) {
         Optional<Aluno> alunoOpt = alunoRepository.findByRfid(rfid);
@@ -45,6 +48,7 @@ public class RfidService {
 
         Aluno aluno = alunoOpt.get();
         LocalDate dataAtual = LocalDate.now();
+        LocalTime horaAtual = LocalTime.now();
 
         // Buscar todas as TurmaDisciplina da turma do aluno
         List<TurmaDisciplina> turmasDisciplinas = turmaDisciplinaRepository.findByTurma(aluno.getTurma());
@@ -68,7 +72,11 @@ public class RfidService {
                 presencaRepository.save(presenca);
             }
         }
-
+        String horaFormatada = horaAtual.format(DateTimeFormatter.ofPattern("HH:mm"));
+        String assunto = "Envio de registro de ponto dia " + dataAtual.toString();
+        String mensagem = "Aluno: " + aluno.getUser().getNome() + " ponto batido no dia " + dataAtual.toString()
+                + " no horario " + horaFormatada;
+        emailService.enviarEmail(aluno.getUser().getEmail(), assunto, mensagem);
         return true;
     }
 
@@ -85,6 +93,12 @@ public class RfidService {
                     Ponto pontoCadastrado = pontoCadastradoOpt.get();
                     pontoCadastrado.setHorarioSaida(horaAtual);
                     pontoRepository.save(pontoCadastrado);
+                    String horaFormatada = horaAtual.format(DateTimeFormatter.ofPattern("HH:mm"));
+                    String assunto = "Envio de registro de ponto dia " + dataAtual.toString();
+                    String mensagem = "Funcionario: " + funcionario.getNome() + " ponto batido no dia "
+                            + dataAtual.toString()
+                            + " no horario " + horaFormatada;
+                    emailService.enviarEmail(funcionario.getEmail(), assunto, mensagem);
                     return true;
                 }
             }
@@ -93,6 +107,11 @@ public class RfidService {
             ponto.setHorarioEntrada(horaAtual);
             ponto.setFuncionario(funcionario);
             pontoRepository.save(ponto);
+            String horaFormatada = horaAtual.format(DateTimeFormatter.ofPattern("HH:mm"));
+            String assunto = "Envio de registro de ponto dia " + dataAtual.toString();
+            String mensagem = "Funcionario: " + funcionario.getNome() + " ponto batido no dia " + dataAtual.toString()
+                    + " no horario " + horaFormatada;
+            emailService.enviarEmail(funcionario.getEmail(), assunto, mensagem);
             return true;
         } else {
             return false;
