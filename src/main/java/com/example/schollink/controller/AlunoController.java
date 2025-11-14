@@ -168,7 +168,8 @@ public class AlunoController {
         try {
             Aluno aluno = alunoService.verAluno(id);
             return ResponseEntity.ok().body(Map.of("nome", aluno.getUser().getNome(),
-            "email", aluno.getUser().getEmail()));
+            "email", aluno.getUser().getEmail(),
+                "idTurma", aluno.getTurma().getId()));
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", e.getMessage()));
         }

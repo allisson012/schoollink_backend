@@ -21,8 +21,11 @@ public class MuralController {
     private MuralService muralService;
 
     @PostMapping("/cadastrarAviso")
-    public ResponseEntity<?> cadastrarAviso(@RequestBody AvisoDto dto) {
-        boolean cadastrado = muralService.cadastrarAviso(dto);
+    public ResponseEntity<?> cadastrarAviso(@RequestBody AvisoDto dto, HttpSession session) {
+        if (session.getAttribute("userId") == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Usuario não logado");
+        }
+        boolean cadastrado = muralService.cadastrarAviso(dto, session);
         if (cadastrado) {
             return ResponseEntity.ok().body("Aviso cadastrado com sucesso");
         } else {
@@ -32,10 +35,9 @@ public class MuralController {
     
     @GetMapping("/buscarAvisos")
     public ResponseEntity<?> buscarAvisos(HttpSession session) {
-        Long idUser = (Long) session.getAttribute("userId");
-        if (idUser == null) {
+        if (session.getAttribute("userId") == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Usuario não logado");
         }
-        return ResponseEntity.ok(muralService.buscarAvisos(idUser));
+        return ResponseEntity.ok(muralService.buscarAvisos(session));
     }
 }
