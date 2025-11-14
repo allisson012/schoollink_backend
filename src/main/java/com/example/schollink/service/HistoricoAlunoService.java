@@ -27,11 +27,22 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Service
 public class HistoricoAlunoService {
+
     @Autowired
     private ProvaAlunoRepository provaAlunoRepository;
 
     @Autowired
     private AlunoRepository alunoRepository;
+
+    @Autowired
+    private HistoricoAlunoRepository historicoAlunoRepository;
+
+    @Autowired
+    private ObjectMapper objectMapper;
+
+    private Map<String, Double> safe(Map<String, Double> map) {
+        return map != null ? map : new HashMap<>();
+    }
 
     public HistoricoAlunoDto gerarHistorico(Long idAluno){
         Aluno aluno = alunoRepository.findById(idAluno).orElseThrow(() -> new RuntimeException("Aluno não encontrado"));
@@ -43,26 +54,21 @@ public class HistoricoAlunoService {
         for(ProvaAluno pa : provasAluno){
             Prova prova = pa.getProva();
             String nomeDisciplina = prova.getTurmaDisciplina().getDisciplina().getNome();
-            Periodo periodo = prova.getPeriodo(); // (PRIMEIRO, SEGUNDO, TERCEIRO, QUARTO)
+            Periodo periodo = prova.getPeriodo();
 
             DisciplinaNotasDto disciplinaDto = disciplinasMap.computeIfAbsent(nomeDisciplina, k -> new DisciplinaNotasDto());
             disciplinaDto.setNomeDisciplina(nomeDisciplina);
 
             Map<String, Double> notasBimestre = switch (periodo) {
-                case PRIMEIRO_BIMESTRE -> disciplinaDto.getPrimeiroBimestre();
-                case SEGUNDO_BIMESTRE -> disciplinaDto.getSegundoBimestre();
-                case TERCEIRO_BIMESTRE -> disciplinaDto.getTerceiroBimestre();
-                case QUARTO_BIMESTRE -> disciplinaDto.getQuartoBimestre();
+                case PRIMEIRO_BIMESTRE -> safe(disciplinaDto.getPrimeiroBimestre());
+                case SEGUNDO_BIMESTRE -> safe(disciplinaDto.getSegundoBimestre());
+                case TERCEIRO_BIMESTRE -> safe(disciplinaDto.getTerceiroBimestre());
+                case QUARTO_BIMESTRE -> safe(disciplinaDto.getQuartoBimestre());
                 default -> new HashMap<>();
             };
 
-            if (notasBimestre == null)
-                notasBimestre = new HashMap<>();
-
-            
             notasBimestre.put(prova.getTipo().name(), pa.getNota());
 
-            // Atualiza o bimestre no DTO
             switch (periodo) {
                 case PRIMEIRO_BIMESTRE -> disciplinaDto.setPrimeiroBimestre(notasBimestre);
                 case SEGUNDO_BIMESTRE -> disciplinaDto.setSegundoBimestre(notasBimestre);
@@ -85,12 +91,11 @@ public class HistoricoAlunoService {
     }
 
     private void calcularMedias(DisciplinaNotasDto dto) {
-        dto.setMediaPrimeiroBi(calcularMedia(dto.getPrimeiroBimestre()));
-        dto.setMediaSegundoBi(calcularMedia(dto.getSegundoBimestre()));
-        dto.setMediaTerceiroBi(calcularMedia(dto.getTerceiroBimestre()));
-        dto.setMediaQuartoBi(calcularMedia(dto.getQuartoBimestre()));
+        dto.setMediaPrimeiroBi(calcularMedia(safe(dto.getPrimeiroBimestre())));
+        dto.setMediaSegundoBi(calcularMedia(safe(dto.getSegundoBimestre())));
+        dto.setMediaTerceiroBi(calcularMedia(safe(dto.getTerceiroBimestre())));
+        dto.setMediaQuartoBi(calcularMedia(safe(dto.getQuartoBimestre())));
 
-        // Média final = média das médias dos bimestres não nulos
         Double mediaFinal = Stream.of(
                 dto.getMediaPrimeiroBi(),
                 dto.getMediaSegundoBi(),
@@ -104,18 +109,12 @@ public class HistoricoAlunoService {
         dto.setMediaFinal(mediaFinal);
     }
 
+
     private Double calcularMedia(Map<String, Double> notas) {
         if (notas == null || notas.isEmpty())
             return null;
-        double soma = notas.values().stream().mapToDouble(Double::doubleValue).sum();
-        return soma / notas.size();
+        return notas.values().stream().mapToDouble(Double::doubleValue).average().orElse(0);
     }
-
-    @Autowired
-    private HistoricoAlunoRepository historicoAlunoRepository;
-
-    @Autowired
-    private ObjectMapper objectMapper; // para converter DTO em JSON
 
     public void atualizarHistoricoAluno(Long idAluno) {
         HistoricoAlunoDto historicoDto = gerarHistorico(idAluno);
@@ -128,6 +127,7 @@ public class HistoricoAlunoService {
 
         HistoricoAluno historico = historicoAlunoRepository.findByAlunoIdAluno(idAluno)
             .orElse(new HistoricoAluno());
+
         historico.setAluno(alunoRepository.findById(idAluno).orElseThrow());
         historico.setConteudoJson(json);
         historico.setUltimaAtualizacao(LocalDateTime.now());
@@ -135,13 +135,13 @@ public class HistoricoAlunoService {
     }
 
     public Optional<HistoricoAlunoDto> getHistoricoSalvo(Long idAluno) {
-    return historicoAlunoRepository.findByAlunoIdAluno(idAluno)
-            .map(historico -> {
-                try {
-                    return objectMapper.readValue(historico.getConteudoJson(), HistoricoAlunoDto.class);
-                } catch (JsonProcessingException e) {
-                    throw new RuntimeException("Erro ao converter JSON do histórico", e);
-                }
-            });
-}
+        return historicoAlunoRepository.findByAlunoIdAluno(idAluno)
+                .map(historico -> {
+                    try {
+                        return objectMapper.readValue(historico.getConteudoJson(), HistoricoAlunoDto.class);
+                    } catch (JsonProcessingException e) {
+                        throw new RuntimeException("Erro ao converter JSON do histórico", e);
+                    }
+                });
+    }
 }
