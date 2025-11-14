@@ -1,5 +1,6 @@
 package com.example.schollink.model;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import jakarta.persistence.Entity;
@@ -32,6 +33,7 @@ public class TurmaDisciplina {
     private List<Prova> provas;
 
     private String turno;
+    
     private String sala;
 
     public Long getId() {
