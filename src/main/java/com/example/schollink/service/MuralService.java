@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import com.example.schollink.Dto.AdminDto;
 import com.example.schollink.Dto.AvisoDto;
+import com.example.schollink.Dto.UserDto;
 import com.example.schollink.model.Admin;
 import com.example.schollink.model.Aluno;
 import com.example.schollink.model.Aviso;
@@ -96,8 +97,15 @@ public class MuralService {
         AvisoDto dto = new AvisoDto();
         dto.setId(aviso.getId());
         dto.setMensagem(aviso.getMensagem());
-        dto.setIdTurma(aviso.getTurma().getId());
+        if (aviso.getTurma() != null) {
+          dto.setIdTurma(aviso.getTurma().getId());
+        } else {
+          dto.setIdTurma(null);
+        }
         if (aviso.getUser() != null) {
+          UserDto userDto = new UserDto();
+          userDto.setUserId(aviso.getUser().getId());
+          dto.setUserDto(userDto);
           dto.setNomeProfessor(aviso.getUser().getNome());
         }
         if (aviso.getAdmin() != null) {

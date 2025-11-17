@@ -223,7 +223,8 @@ public class ProfessorController {
         try {
             Long idProfessor = professorService.buscarIdProfessorPeloIdUser(id);
             Professor professor = professorService.verProfessor(idProfessor);
-            return ResponseEntity.ok().body(Map.of("nome", professor.getUser().getNome()));
+            return ResponseEntity.ok().body(Map.of("nome", professor.getUser().getNome(),
+                                                "userId", professor.getUser().getId()));
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", e.getMessage()));
         }
