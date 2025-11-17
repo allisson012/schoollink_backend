@@ -17,10 +17,12 @@ import com.example.schollink.Dto.AulaRetornoDto;
 import com.example.schollink.Dto.BuscarDisciplinasDto;
 import com.example.schollink.Dto.ChamadaRequestDto;
 import com.example.schollink.Dto.DataDto;
+import com.example.schollink.Dto.ProfessorDto;
 import com.example.schollink.Dto.ProfessorParaTurmaDto;
 import com.example.schollink.Dto.UserDto;
 import com.example.schollink.model.Aluno;
 import com.example.schollink.model.Disciplina;
+import com.example.schollink.model.Endereco;
 import com.example.schollink.model.Funcionario;
 import com.example.schollink.model.HistoricoAula;
 import com.example.schollink.model.HorarioAula;
@@ -28,6 +30,7 @@ import com.example.schollink.model.Presenca;
 import com.example.schollink.model.Professor;
 import com.example.schollink.model.Turma;
 import com.example.schollink.model.TurmaDisciplina;
+import com.example.schollink.model.Turno;
 import com.example.schollink.model.User;
 import com.example.schollink.model.UserRole;
 import com.example.schollink.repository.AlunoRepository;
@@ -63,11 +66,42 @@ public class ProfessorService {
     private AlunoRepository alunoRepository;
     @Autowired
     private TurmaDisciplinaRepository turmaDisciplinaRepository;
+    @Autowired
+    private EmailService emailService;
 
     @Transactional
-    public void cadastrarProfessor(User user, Professor professor, String senha, String rfid) {
+    public boolean cadastrarProfessor(ProfessorDto dto) {
+        boolean valido = emailService.ValidateEmail(dto.getUserDto().getEmail());
+        if (!valido) {
+            return false;
+        }
+
+        User user = new User();
+        user.setNome(dto.getUserDto().getNome());
+        user.setEmail(dto.getUserDto().getEmail());
+        user.setCpf(dto.getUserDto().getCpf());
+        user.setTelefone(dto.getUserDto().getTelefone());
+        user.setDataNascimento(dto.getUserDto().getDataNascimento());
+        user.setGenero(dto.getUserDto().getGenero());
+
+        Professor professor = new Professor();
+        professor.setFormacaoAcademica(dto.getFormacaoAcademica());
+        professor.setRegistroProfissional(dto.getRegistroProfissional());
+        professor.setDataContratacao(dto.getDataContratacao());
+        professor.setCargaHorariaSem(dto.getCargaHorariaSem());
+        professor.setSalario(dto.getSalario());
+        professor.setTurno(Turno.valueOf(dto.getTurno().toUpperCase()));
+
+        Endereco endereco = new Endereco();
+        endereco.setCep(dto.getEnderecoDto().getCep());
+        endereco.setPais(dto.getEnderecoDto().getPais());
+        endereco.setEstado(dto.getEnderecoDto().getEstado());
+        endereco.setCidade(dto.getEnderecoDto().getCidade());
+        endereco.setRua(dto.getEnderecoDto().getRua());
+        endereco.setNumero(dto.getEnderecoDto().getNumero());
+        professor.setEndereco(endereco);
         byte[] salt = passwordService.gerarSalt();
-        byte[] hash = passwordService.gerarHash(senha, salt);
+        byte[] hash = passwordService.gerarHash(dto.getUserDto().getSenha(), salt);
         user.setSalt(salt);
         user.setHash(hash);
         user.setUserRole(UserRole.PROFESSOR);
@@ -78,13 +112,15 @@ public class ProfessorService {
         funcionario.setGenero(user.getGenero());
         funcionario.setCpf(user.getCpf());
         funcionario.setTelefone(user.getTelefone());
-        funcionario.setRfid(rfid);
+        funcionario.setRfid(dto.getRfid());
         Funcionario funcionarioSalvo = funcionarioService.cadastrarFuncionario(funcionario);
 
         professor.setUser(savedUser);
         professor.setFuncionario(funcionarioSalvo);
 
         professorRepository.save(professor);
+
+        return true;
     }
 
     public Professor editarProfessor(Professor novo, Long id) {
