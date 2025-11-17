@@ -13,7 +13,7 @@ import com.example.schollink.service.HistoricoAlunoService;
 
 @RestController
 @RequestMapping("/alunos")
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins = "*", allowCredentials = "false")
 public class HistoricoAlunoController {
 
     @Autowired
@@ -66,7 +66,8 @@ public class HistoricoAlunoController {
     }
 
     private String capitalize(String nome) {
-        if (nome == null || nome.isEmpty()) return nome;
+        if (nome == null || nome.isEmpty())
+            return nome;
         return Character.toUpperCase(nome.charAt(0)) + nome.substring(1);
     }
 }
