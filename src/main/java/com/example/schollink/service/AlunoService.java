@@ -91,7 +91,6 @@ public class AlunoService {
         user.setHash(hash);
         user.setUserRole(UserRole.ALUNO);
 
-        // Salva apenas aqui, quando já está tudo completo
         User userCreate = userRepository.save(user);
 
         Aluno aluno = new Aluno();
