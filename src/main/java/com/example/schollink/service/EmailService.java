@@ -14,10 +14,11 @@ public class EmailService {
     private String email;
     private static final String[] ALLOWED_PROVIDERS = { "gmail.com", "outlook.com", "hotmail.com", "yahoo.com",
             "yahoo.com.br",
-            "icloud.com", "fatec.sp.gov.br" };
+            "icloud.com", "fatec.sp.gov.br",
+            "escola.com"
+    };
 
     public boolean ValidateEmail(String email) {
-
         boolean hasAtSymbol = false;
         boolean hasDotAfterAt = false;
         int atPosicion = -1;
