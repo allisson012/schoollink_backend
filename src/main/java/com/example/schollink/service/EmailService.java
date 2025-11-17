@@ -11,42 +11,41 @@ import org.springframework.stereotype.Service;
 public class EmailService {
     @Autowired
     private JavaMailSender mailSender;
-    private boolean hasAtSymbol;
     private String email;
-    private boolean hasDotAfterAt;
-    private int atPosicion;
-    private String provedor;
-    private boolean hasProvedor = false;
     private static final String[] ALLOWED_PROVIDERS = { "gmail.com", "outlook.com", "hotmail.com", "yahoo.com",
             "yahoo.com.br",
-            "icloud.com", "fatec.sp.gov.br" };
+            "icloud.com", "fatec.sp.gov.br",
+            "escola.com"
+    };
 
     public boolean ValidateEmail(String email) {
-        for (int i = 0; i < email.length(); i++) {
+        boolean hasAtSymbol = false;
+        boolean hasDotAfterAt = false;
+        int atPosicion = -1;
 
-            char caracteres = email.charAt(i);
-            if (caracteres == '@') {
+        for (int i = 0; i < email.length(); i++) {
+            char c = email.charAt(i);
+
+            if (c == '@') {
                 if (hasAtSymbol) {
-                    return false;
+                    return false; // dois @
                 }
                 hasAtSymbol = true;
                 atPosicion = i;
-            } else if (caracteres == '.' && hasAtSymbol && i > atPosicion + 1) {
+            } else if (c == '.' && hasAtSymbol && i > atPosicion + 1) {
                 hasDotAfterAt = true;
             }
         }
-        int index = atPosicion + 1;
-        provedor = email.substring(index, email.length());
 
-        if (provedor != null && Arrays.asList(ALLOWED_PROVIDERS).contains(provedor)) {
-            hasProvedor = true;
+        if (!hasAtSymbol || !hasDotAfterAt) {
+            return false;
         }
 
-        if (hasAtSymbol && hasDotAfterAt && hasProvedor) {
-            this.email = email;
-        }
+        String provedor = email.substring(atPosicion + 1);
 
-        return hasAtSymbol && hasDotAfterAt && hasProvedor;
+        boolean hasProvedor = Arrays.asList(ALLOWED_PROVIDERS).contains(provedor);
+
+        return hasProvedor;
     }
 
     public String getEmail() {
