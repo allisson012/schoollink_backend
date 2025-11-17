@@ -9,4 +9,5 @@ import java.util.List;
 @Repository
 public interface AvisoRepository extends JpaRepository<Aviso, Long>{
     List<Aviso> findByTurmaId(Long turmaId);
+    List<Aviso> findByTurmaIdOrTurmaIsNull(Long turmaId);
 }
