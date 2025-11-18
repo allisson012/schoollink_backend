@@ -29,6 +29,8 @@ public class User {
     private String telefone;
     private LocalDate dataNascimento;
     private String genero;
+    private String caminhoFoto;
+    
     
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "idEndereco", referencedColumnName = "id")
@@ -120,6 +122,14 @@ public class User {
 
     public void setEndereco(Endereco endereco) {
         this.endereco = endereco;
+    }
+
+    public String getCaminhoFoto() {
+        return caminhoFoto;
+    }
+
+    public void setCaminhoFoto(String caminhoFoto) {
+        this.caminhoFoto = caminhoFoto;
     }
 
 }
