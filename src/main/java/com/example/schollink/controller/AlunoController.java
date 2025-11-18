@@ -148,17 +148,26 @@ public class AlunoController {
     @GetMapping("/me")
     public ResponseEntity<?> verAluno(HttpSession session) {
         Long id = (Long) session.getAttribute("userId");
+
         if (id == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(Map.of("message", "Usuário não logado ou ID do aluno não informado"));
         }
+
         try {
             Aluno aluno = alunoService.verAluno(id);
-            return ResponseEntity.ok().body(Map.of("nome", aluno.getUser().getNome(),
-                    "email", aluno.getUser().getEmail(),
-                    "idTurma", aluno.getTurma().getId()));
+
+            Map<String, Object> resposta = new HashMap<>();
+            resposta.put("nome", aluno.getUser().getNome());
+            resposta.put("email", aluno.getUser().getEmail());
+            resposta.put("idTurma", aluno.getTurma() != null ? aluno.getTurma().getId() : null);
+            resposta.put("caminhoFoto", aluno.getUser().getCaminhoFoto());
+
+            return ResponseEntity.ok(resposta);
+
         } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", e.getMessage()));
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Map.of("message", e.getMessage()));
         }
     }
 
