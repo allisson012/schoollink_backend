@@ -213,7 +213,7 @@ public class AlunoService {
                 .collect(Collectors.toList());
     }
 
-    public Optional<List<Aluno>> buscar(String nome, String matricula, String email) {
+    public Optional<List<AlunoDto>> buscar(String nome, String matricula, String email) {
         List<Aluno> alunos = new ArrayList<>();
 
         if (email != null && !email.isEmpty()) {
@@ -224,7 +224,15 @@ public class AlunoService {
             alunos = alunoRepository.findByUserNomeContainingIgnoreCase(nome);
         }
 
-        return alunos.isEmpty() ? Optional.empty() : Optional.of(alunos);
+        if (alunos.isEmpty()) {
+            return Optional.empty();
+        }
+
+        List<AlunoDto> dtos = alunos.stream()
+                .map(this::toDto)
+                .toList();
+
+        return Optional.of(dtos);
     }
 
     public List<DisciplinaProfessorDto> buscarDisciplinas(Long idUser) {
@@ -317,4 +325,37 @@ public class AlunoService {
 
         return aulasRetornoDtos;
     }
+
+    private AlunoDto toDto(Aluno aluno) {
+        AlunoDto dto = new AlunoDto();
+
+        dto.setIdAluno(aluno.getIdAluno());
+        dto.setMatricula(aluno.getMatricula());
+        dto.setDataMatricula(aluno.getDataMatricula());
+        dto.setStatusMatricula(aluno.getStatusMatricula().name());
+        dto.setNomeResponsavel(aluno.getNomeResponsavel());
+        dto.setTelefoneResponsavel(aluno.getTelefoneResponsavel());
+        dto.setRfid(aluno.getRfid());
+
+        UserDto userDto = new UserDto();
+        userDto.setNome(aluno.getUser().getNome());
+        userDto.setEmail(aluno.getUser().getEmail());
+        userDto.setCpf(aluno.getUser().getCpf());
+        userDto.setDataNascimento(aluno.getUser().getDataNascimento());
+        userDto.setGenero(aluno.getUser().getGenero());
+        userDto.setTelefone(aluno.getUser().getTelefone());
+        dto.setUserDto(userDto);
+
+        EnderecoDto end = new EnderecoDto();
+        end.setCep(aluno.getUser().getEndereco().getCep());
+        end.setPais(aluno.getUser().getEndereco().getPais());
+        end.setEstado(aluno.getUser().getEndereco().getEstado());
+        end.setCidade(aluno.getUser().getEndereco().getCidade());
+        end.setRua(aluno.getUser().getEndereco().getRua());
+        end.setNumero(aluno.getUser().getEndereco().getNumero());
+        dto.setEnderecoDto(end);
+
+        return dto;
+    }
+
 }
