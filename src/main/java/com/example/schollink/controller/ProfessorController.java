@@ -200,7 +200,9 @@ public class ProfessorController {
             Long idProfessor = professorService.buscarIdProfessorPeloIdUser(id);
             Professor professor = professorService.verProfessor(idProfessor);
             return ResponseEntity.ok().body(Map.of("nome", professor.getUser().getNome(),
-                                                "userId", professor.getUser().getId()));
+                                                "userId", professor.getUser().getId(),
+                                                "caminhoFoto", professor.getUser().getCaminhoFoto(),
+                                                "email", professor.getUser().getEmail()));
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", e.getMessage()));
         }
