@@ -2,12 +2,17 @@ package com.example.schollink.service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.example.schollink.Dto.AlunoDto;
+import com.example.schollink.Dto.DisciplinaDto;
 import com.example.schollink.Dto.DisciplinaProfessorDto;
+import com.example.schollink.Dto.TurmaDisciplinaDto;
 import com.example.schollink.Dto.TurmaDto;
+import com.example.schollink.Dto.TurmaRetornoDto;
 import com.example.schollink.model.Aluno;
 import com.example.schollink.model.Disciplina;
 import com.example.schollink.model.Professor;
@@ -25,7 +30,7 @@ import jakarta.transaction.Transactional;
 public class TurmaService {
     @Autowired
     private TurmaRepository turmaRepository;
-    
+
     @Autowired
     private TurmaDisciplinaRepository turmaDisciplinaRepository;
 
@@ -237,5 +242,29 @@ public class TurmaService {
         } else {
             return new ArrayList<>();
         }
+    }
+
+    public boolean buscarTurmacompleta(Long idTurma) {
+        Optional<Turma> turmaOpt = turmaRepository.findById(idTurma);
+        if (turmaOpt.isEmpty()) {
+            return false;
+        }
+        Turma turma = turmaOpt.get();
+        List<TurmaDisciplina> turmasDisciplinas = turmaDisciplinaRepository.findByTurma(turma);
+        if (turmasDisciplinas.isEmpty()) {
+            return false;
+        }
+        TurmaRetornoDto turmaRetornoDto = new TurmaRetornoDto();
+        List<TurmaDisciplinaDto> dtos = new ArrayList<>();
+        List<AlunoDto> dtosAluno = new ArrayList<>();
+        for (TurmaDisciplina turmaDisciplina : turmasDisciplinas) {
+            DisciplinaDto dtoDisciplina = new DisciplinaDto(turmaDisciplina.getDisciplina().getId(),
+                    turmaDisciplina.getDisciplina().getNome());
+            TurmaDisciplinaDto dtoTurmaDisciplina = new TurmaDisciplinaDto();
+            dtoTurmaDisciplina.setDisciplinaDto(dtoDisciplina);
+            // tenho que mudar o TurmaDisciplinaDto para ele retornar o nome do professor
+            // tambem
+        }
+        return true;
     }
 }
