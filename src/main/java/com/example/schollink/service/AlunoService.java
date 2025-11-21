@@ -38,6 +38,8 @@ import com.example.schollink.repository.PresencaRepository;
 import com.example.schollink.repository.TurmaDisciplinaRepository;
 import com.example.schollink.repository.UserRepository;
 
+import jakarta.transaction.Transactional;
+
 @Service
 public class AlunoService {
     @Autowired
@@ -51,19 +53,58 @@ public class AlunoService {
     @Autowired
     private HorarioAulaRepository horarioAulaRepository;
     @Autowired
-    private PresencaRepository presencaRepository; 
+    private PresencaRepository presencaRepository;
     @Autowired
     private HistoricoAulaRepository historicoAulaRepository;
+    @Autowired
+    private EmailService emailService;
 
-    public void cadastrarAluno(User user, Aluno aluno, String senha) {
+    @Transactional
+    public boolean cadastrarAluno(AlunoDto alunoDto) {
+
+        boolean valido = emailService.ValidateEmail(alunoDto.getUserDto().getEmail());
+        if (!valido) {
+            return false;
+        }
+
+        User user = new User();
+        user.setNome(alunoDto.getUserDto().getNome());
+        user.setEmail(alunoDto.getUserDto().getEmail());
+        user.setCpf(alunoDto.getUserDto().getCpf());
+        user.setDataNascimento(alunoDto.getUserDto().getDataNascimento());
+        user.setGenero(alunoDto.getUserDto().getGenero());
+        user.setTelefone(alunoDto.getUserDto().getTelefone());
+
+        Endereco endereco = new Endereco();
+        endereco.setCep(alunoDto.getEnderecoDto().getCep());
+        endereco.setPais(alunoDto.getEnderecoDto().getPais());
+        endereco.setEstado(alunoDto.getEnderecoDto().getEstado());
+        endereco.setCidade(alunoDto.getEnderecoDto().getCidade());
+        endereco.setRua(alunoDto.getEnderecoDto().getRua());
+        endereco.setNumero(alunoDto.getEnderecoDto().getNumero());
+
+        user.setEndereco(endereco);
+
         byte salt[] = passwordService.gerarSalt();
-        byte hash[] = passwordService.gerarHash(senha, salt);
+        byte hash[] = passwordService.gerarHash(alunoDto.getUserDto().getSenha(), salt);
         user.setSalt(salt);
         user.setHash(hash);
         user.setUserRole(UserRole.ALUNO);
+
         User userCreate = userRepository.save(user);
+
+        Aluno aluno = new Aluno();
+        aluno.setMatricula(alunoDto.getMatricula());
+        aluno.setDataMatricula(alunoDto.getDataMatricula());
+        aluno.setStatusMatricula(StatusMatricula.valueOf(alunoDto.getStatusMatricula()));
+        aluno.setNomeResponsavel(alunoDto.getNomeResponsavel());
+        aluno.setTelefoneResponsavel(alunoDto.getTelefoneResponsavel());
+        aluno.setRfid(alunoDto.getRfid());
         aluno.setUser(userCreate);
+
         alunoRepository.save(aluno);
+
+        return true;
     }
 
     public Aluno editarAluno(AlunoDto alunoDto, Long id) {
@@ -172,7 +213,7 @@ public class AlunoService {
                 .collect(Collectors.toList());
     }
 
-    public Optional<List<Aluno>> buscar(String nome, String matricula, String email) {
+    public Optional<List<AlunoDto>> buscar(String nome, String matricula, String email) {
         List<Aluno> alunos = new ArrayList<>();
 
         if (email != null && !email.isEmpty()) {
@@ -183,7 +224,15 @@ public class AlunoService {
             alunos = alunoRepository.findByUserNomeContainingIgnoreCase(nome);
         }
 
-        return alunos.isEmpty() ? Optional.empty() : Optional.of(alunos);
+        if (alunos.isEmpty()) {
+            return Optional.empty();
+        }
+
+        List<AlunoDto> dtos = alunos.stream()
+                .map(this::toDto)
+                .toList();
+
+        return Optional.of(dtos);
     }
 
     public List<DisciplinaProfessorDto> buscarDisciplinas(Long idUser) {
@@ -276,4 +325,37 @@ public class AlunoService {
 
         return aulasRetornoDtos;
     }
+
+    private AlunoDto toDto(Aluno aluno) {
+        AlunoDto dto = new AlunoDto();
+
+        dto.setIdAluno(aluno.getIdAluno());
+        dto.setMatricula(aluno.getMatricula());
+        dto.setDataMatricula(aluno.getDataMatricula());
+        dto.setStatusMatricula(aluno.getStatusMatricula().name());
+        dto.setNomeResponsavel(aluno.getNomeResponsavel());
+        dto.setTelefoneResponsavel(aluno.getTelefoneResponsavel());
+        dto.setRfid(aluno.getRfid());
+
+        UserDto userDto = new UserDto();
+        userDto.setNome(aluno.getUser().getNome());
+        userDto.setEmail(aluno.getUser().getEmail());
+        userDto.setCpf(aluno.getUser().getCpf());
+        userDto.setDataNascimento(aluno.getUser().getDataNascimento());
+        userDto.setGenero(aluno.getUser().getGenero());
+        userDto.setTelefone(aluno.getUser().getTelefone());
+        dto.setUserDto(userDto);
+
+        EnderecoDto end = new EnderecoDto();
+        end.setCep(aluno.getUser().getEndereco().getCep());
+        end.setPais(aluno.getUser().getEndereco().getPais());
+        end.setEstado(aluno.getUser().getEndereco().getEstado());
+        end.setCidade(aluno.getUser().getEndereco().getCidade());
+        end.setRua(aluno.getUser().getEndereco().getRua());
+        end.setNumero(aluno.getUser().getEndereco().getNumero());
+        dto.setEnderecoDto(end);
+
+        return dto;
+    }
+
 }

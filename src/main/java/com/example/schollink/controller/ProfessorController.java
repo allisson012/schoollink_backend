@@ -26,12 +26,8 @@ import com.example.schollink.Dto.DataDto;
 import com.example.schollink.Dto.ProfessorDto;
 import com.example.schollink.Dto.ProfessorHorarioDto;
 import com.example.schollink.Dto.ProfessorParaTurmaDto;
-import com.example.schollink.model.Aluno;
-import com.example.schollink.model.Endereco;
 import com.example.schollink.model.HistoricoAula;
 import com.example.schollink.model.Professor;
-import com.example.schollink.model.Turno;
-import com.example.schollink.model.User;
 import com.example.schollink.service.ProfessorService;
 
 import jakarta.servlet.http.HttpSession;
@@ -45,36 +41,16 @@ public class ProfessorController {
 
     @PostMapping("/cadastrar")
     public ResponseEntity<Map<String, String>> cadastrarProfessor(@RequestBody ProfessorDto dto) {
-        User user = new User();
-        user.setNome(dto.getUserDto().getNome());
-        user.setEmail(dto.getUserDto().getEmail());
-        user.setCpf(dto.getUserDto().getCpf());
-        user.setTelefone(dto.getUserDto().getTelefone());
-        user.setDataNascimento(dto.getUserDto().getDataNascimento());
-        user.setGenero(dto.getUserDto().getGenero());
-
-        Professor professor = new Professor();
-        professor.setFormacaoAcademica(dto.getFormacaoAcademica());
-        professor.setRegistroProfissional(dto.getRegistroProfissional());
-        professor.setDataContratacao(dto.getDataContratacao());
-        professor.setCargaHorariaSem(dto.getCargaHorariaSem());
-        professor.setSalario(dto.getSalario());
-        professor.setTurno(Turno.valueOf(dto.getTurno().toUpperCase()));
-
-        Endereco endereco = new Endereco();
-        endereco.setCep(dto.getEnderecoDto().getCep());
-        endereco.setPais(dto.getEnderecoDto().getPais());
-        endereco.setEstado(dto.getEnderecoDto().getEstado());
-        endereco.setCidade(dto.getEnderecoDto().getCidade());
-        endereco.setRua(dto.getEnderecoDto().getRua());
-        endereco.setNumero(dto.getEnderecoDto().getNumero());
-        professor.setEndereco(endereco);
-
-        professorService.cadastrarProfessor(user, professor, dto.getUserDto().getSenha(), dto.getRfid());
-
-        Map<String, String> response = new HashMap<>();
-        response.put("mensagem", "Professor cadastrado com sucesso");
-        return ResponseEntity.ok(response);
+        boolean cadastrado = professorService.cadastrarProfessor(dto);
+        if (cadastrado) {
+            Map<String, String> response = new HashMap<>();
+            response.put("mensagem", "Professor Cadastrado com sucesso");
+            return ResponseEntity.ok(response);
+        } else {
+            Map<String, String> response = new HashMap<>();
+            response.put("mensagem", "Erro ao cadastrar Professor");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+        }
     }
 
     @PutMapping("/editar")
@@ -223,7 +199,10 @@ public class ProfessorController {
         try {
             Long idProfessor = professorService.buscarIdProfessorPeloIdUser(id);
             Professor professor = professorService.verProfessor(idProfessor);
-            return ResponseEntity.ok().body(Map.of("nome", professor.getUser().getNome()));
+            return ResponseEntity.ok().body(Map.of("nome", professor.getUser().getNome(),
+                                                "userId", professor.getUser().getId(),
+                                                "caminhoFoto", professor.getUser().getCaminhoFoto(),
+                                                "email", professor.getUser().getEmail()));
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", e.getMessage()));
         }

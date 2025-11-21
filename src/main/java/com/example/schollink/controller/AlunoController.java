@@ -44,34 +44,21 @@ public class AlunoController {
 
     @PostMapping("/cadastrar")
     public ResponseEntity<Map<String, String>> CadastrarAluno(@RequestBody AlunoDto alunoDto) {
-        User user = new User();
-        user.setNome(alunoDto.getUserDto().getNome());
-        user.setEmail(alunoDto.getUserDto().getEmail());
-        user.setCpf(alunoDto.getUserDto().getCpf());
-        user.setDataNascimento(alunoDto.getUserDto().getDataNascimento());
-        user.setGenero(alunoDto.getUserDto().getGenero());
-        user.setTelefone(alunoDto.getUserDto().getTelefone());
-        if (user.getEndereco() == null) {
-            user.setEndereco(new Endereco());
+        System.out.println(alunoDto.getUserDto().getNome());
+        System.out.println(alunoDto.getUserDto().getEmail());
+        System.out.println(alunoDto.getStatusMatricula().toString());
+        System.out.println(alunoDto.getUserDto().getSenha());
+        System.out.println(alunoDto.getUserDto().getGenero().toString());
+        boolean cadastrado = alunoService.cadastrarAluno(alunoDto);
+        if (cadastrado) {
+            Map<String, String> response = new HashMap<>();
+            response.put("mensagem", "Aluno Cadastrado com sucesso");
+            return ResponseEntity.ok(response);
+        } else {
+            Map<String, String> response = new HashMap<>();
+            response.put("mensagem", "Erro ao cadastrar Aluno");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
         }
-        user.getEndereco().setCep(alunoDto.getEnderecoDto().getCep());
-        user.getEndereco().setPais(alunoDto.getEnderecoDto().getPais());
-        user.getEndereco().setEstado(alunoDto.getEnderecoDto().getEstado());
-        user.getEndereco().setCidade(alunoDto.getEnderecoDto().getCidade());
-        user.getEndereco().setRua(alunoDto.getEnderecoDto().getRua());
-        user.getEndereco().setNumero(alunoDto.getEnderecoDto().getNumero());
-        Aluno aluno = new Aluno();
-        aluno.setMatricula(alunoDto.getMatricula());
-        aluno.setDataMatricula(alunoDto.getDataMatricula());
-        aluno.setStatusMatricula(StatusMatricula.valueOf(alunoDto.getStatusMatricula()));
-        aluno.setNomeResponsavel(alunoDto.getNomeResponsavel());
-        aluno.setTelefoneResponsavel(alunoDto.getTelefoneResponsavel());
-        aluno.setRfid(alunoDto.getRfid());
-
-        alunoService.cadastrarAluno(user, aluno, alunoDto.getUserDto().getSenha());
-        Map<String, String> response = new HashMap<>();
-        response.put("mensagem", "Aluno Cadastrado com sucesso");
-        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/buscar-todos")
@@ -161,17 +148,26 @@ public class AlunoController {
     @GetMapping("/me")
     public ResponseEntity<?> verAluno(HttpSession session) {
         Long id = (Long) session.getAttribute("userId");
+
         if (id == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(Map.of("message", "Usuário não logado ou ID do aluno não informado"));
         }
+
         try {
             Aluno aluno = alunoService.verAluno(id);
-            return ResponseEntity.ok().body(Map.of("nome", aluno.getUser().getNome(),
-            "email", aluno.getUser().getEmail(),
-                "idTurma", aluno.getTurma().getId()));
+
+            Map<String, Object> resposta = new HashMap<>();
+            resposta.put("nome", aluno.getUser().getNome());
+            resposta.put("email", aluno.getUser().getEmail());
+            resposta.put("idTurma", aluno.getTurma() != null ? aluno.getTurma().getId() : null);
+            resposta.put("caminhoFoto", aluno.getUser().getCaminhoFoto());
+
+            return ResponseEntity.ok(resposta);
+
         } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", e.getMessage()));
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Map.of("message", e.getMessage()));
         }
     }
 
@@ -194,13 +190,12 @@ public class AlunoController {
             @RequestParam(required = false) String nome,
             @RequestParam(required = false) String matricula,
             @RequestParam(required = false) String email) {
-        Optional<List<Aluno>> aluno = alunoService.buscar(nome, matricula, email);
 
-        if (aluno.isPresent()) {
-            return ResponseEntity.ok(aluno.get());
-        } else {
-            return ResponseEntity.status(404).body("Aluno não encontrado");
-        }
+        Optional<List<AlunoDto>> alunos = alunoService.buscar(nome, matricula, email);
+
+        return alunos.isPresent()
+                ? ResponseEntity.ok(alunos.get())
+                : ResponseEntity.status(404).body("Aluno não encontrado");
     }
 
     @GetMapping("/buscarDisciplinas")
