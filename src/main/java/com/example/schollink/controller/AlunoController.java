@@ -190,13 +190,12 @@ public class AlunoController {
             @RequestParam(required = false) String nome,
             @RequestParam(required = false) String matricula,
             @RequestParam(required = false) String email) {
-        Optional<List<Aluno>> aluno = alunoService.buscar(nome, matricula, email);
 
-        if (aluno.isPresent()) {
-            return ResponseEntity.ok(aluno.get());
-        } else {
-            return ResponseEntity.status(404).body("Aluno não encontrado");
-        }
+        Optional<List<AlunoDto>> alunos = alunoService.buscar(nome, matricula, email);
+
+        return alunos.isPresent()
+                ? ResponseEntity.ok(alunos.get())
+                : ResponseEntity.status(404).body("Aluno não encontrado");
     }
 
     @GetMapping("/buscarDisciplinas")

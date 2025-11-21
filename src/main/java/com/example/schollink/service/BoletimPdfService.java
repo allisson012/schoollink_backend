@@ -5,6 +5,7 @@ import com.example.schollink.Dto.HistoricoAlunoDto;
 import com.lowagie.text.*;
 import com.lowagie.text.pdf.*;
 import org.springframework.stereotype.Service;
+import org.springframework.core.io.ClassPathResource;
 
 import java.awt.Color;
 import java.io.ByteArrayInputStream;
@@ -21,11 +22,32 @@ public class BoletimPdfService {
         try {
             PdfWriter.getInstance(document, out);
             document.open();
+            BaseFont bf = BaseFont.createFont(
+                BaseFont.HELVETICA,
+                BaseFont.CP1252,
+                BaseFont.EMBEDDED
+            );
 
-            Font tituloFont = new Font(Font.HELVETICA, 22, Font.BOLD, new Color(0, 70, 140));
-            Font etiquetaFont = new Font(Font.HELVETICA, 15, Font.BOLD, Color.BLACK); // Nome, Matrícula e Turma
-            Font subtituloFont = new Font(Font.HELVETICA, 11, Font.BOLD, Color.BLACK); // Cabeçalhos P1/P2/AC/AF
-            Font textoFont = new Font(Font.HELVETICA, 10, Font.NORMAL, Color.BLACK); // Conteúdo das células
+            try {
+                ClassPathResource imgFile = new ClassPathResource("static/images/Logo.png");
+                byte[] imageBytes = imgFile.getInputStream().readAllBytes();
+
+                Image logo = Image.getInstance(imageBytes);
+
+                logo.scaleToFit(90, 90);
+                logo.setAbsolutePosition(
+                document.getPageSize().getWidth() - 110,
+                document.getPageSize().getHeight() - 110  
+            );
+                document.add(logo);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            Font tituloFont = new Font(bf, 22, Font.BOLD, new Color(0, 70, 140));
+            Font etiquetaFont = new Font(bf, 15, Font.BOLD, Color.BLACK);
+            Font subtituloFont = new Font(bf, 11, Font.BOLD, Color.BLACK);
+            Font textoFont = new Font(bf, 10, Font.NORMAL, Color.BLACK);
 
             Paragraph titulo = new Paragraph("BOLETIM ESCOLAR - 2025", tituloFont);
             titulo.setAlignment(Element.ALIGN_CENTER);
