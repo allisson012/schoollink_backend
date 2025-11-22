@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import com.example.schollink.Dto.TurmaDto;
+import com.example.schollink.Dto.TurmaRetornoDto;
 import com.example.schollink.model.Turma;
 import com.example.schollink.service.TurmaService;
 
@@ -118,8 +119,8 @@ public class TurmaController {
     }
     
     @PostMapping("/buscarTurma/{idTurma}")
-    public ResponseEntity<?> buscarTurmacompleta(@RequestParam Long idTurma){
-
+    public ResponseEntity<TurmaRetornoDto> buscarTurmacompleta(@RequestParam Long idTurma){
+      
       return null;
     }
 }

@@ -13,6 +13,7 @@ import com.example.schollink.Dto.DisciplinaProfessorDto;
 import com.example.schollink.Dto.TurmaDisciplinaDto;
 import com.example.schollink.Dto.TurmaDto;
 import com.example.schollink.Dto.TurmaRetornoDto;
+import com.example.schollink.Dto.UserDto;
 import com.example.schollink.model.Aluno;
 import com.example.schollink.model.Disciplina;
 import com.example.schollink.model.Professor;
@@ -244,16 +245,27 @@ public class TurmaService {
         }
     }
 
-    public boolean buscarTurmacompleta(Long idTurma) {
+    public TurmaRetornoDto buscarTurmacompleta(Long idTurma) {
         Optional<Turma> turmaOpt = turmaRepository.findById(idTurma);
         if (turmaOpt.isEmpty()) {
-            return false;
+            return null;
         }
         Turma turma = turmaOpt.get();
         List<TurmaDisciplina> turmasDisciplinas = turmaDisciplinaRepository.findByTurma(turma);
         if (turmasDisciplinas.isEmpty()) {
-            return false;
+            return null;
         }
+        List<Aluno> alunos = turma.getAlunos();
+        List<AlunoDto> alunosDtos = new ArrayList<>();
+        for (Aluno aluno : alunos) {
+            AlunoDto alunoDto = new AlunoDto();
+            UserDto userDto = new UserDto();
+            userDto.setNome(aluno.getUser().getNome());
+            userDto.setEmail(aluno.getUser().getEmail());
+            alunoDto.setUserDto(userDto);
+            //alunoDto
+        }
+        //
         TurmaRetornoDto turmaRetornoDto = new TurmaRetornoDto();
         List<TurmaDisciplinaDto> dtos = new ArrayList<>();
         List<AlunoDto> dtosAluno = new ArrayList<>();
@@ -265,6 +277,6 @@ public class TurmaService {
             // tenho que mudar o TurmaDisciplinaDto para ele retornar o nome do professor
             // tambem
         }
-        return true;
+        return null;
     }
 }

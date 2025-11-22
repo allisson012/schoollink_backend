@@ -3,6 +3,7 @@ package com.example.schollink.model;
 import java.time.LocalDate;
 
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -18,8 +19,8 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
     private String nome;
+    @Column(unique = true, nullable = false)
     private String email;
     private byte[] hash;
     private byte[] salt;
@@ -30,8 +31,7 @@ public class User {
     private LocalDate dataNascimento;
     private String genero;
     private String caminhoFoto;
-    
-    
+
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "idEndereco", referencedColumnName = "id")
     private Endereco endereco;
