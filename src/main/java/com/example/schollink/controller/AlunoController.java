@@ -158,11 +158,11 @@ public class AlunoController {
             Aluno aluno = alunoService.verAluno(id);
 
             Map<String, Object> resposta = new HashMap<>();
+            resposta.put("idAluno", aluno.getIdAluno());
             resposta.put("nome", aluno.getUser().getNome());
             resposta.put("email", aluno.getUser().getEmail());
             resposta.put("idTurma", aluno.getTurma() != null ? aluno.getTurma().getId() : null);
             resposta.put("caminhoFoto", aluno.getUser().getCaminhoFoto());
-
             return ResponseEntity.ok(resposta);
 
         } catch (RuntimeException e) {

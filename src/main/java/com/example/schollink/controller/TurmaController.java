@@ -10,12 +10,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import com.example.schollink.Dto.TurmaDto;
+import com.example.schollink.Dto.TurmaRetornoDto;
 import com.example.schollink.model.Turma;
 import com.example.schollink.service.TurmaService;
 
@@ -114,5 +116,11 @@ public class TurmaController {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Usuário não está logado");
         }
         return ResponseEntity.ok(turmaService.listarTurmasDoProfessor(id));
+    }
+    
+    @PostMapping("/buscarTurma/{idTurma}")
+    public ResponseEntity<TurmaRetornoDto> buscarTurmacompleta(@RequestParam Long idTurma){
+      
+      return null;
     }
 }
