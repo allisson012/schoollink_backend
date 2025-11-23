@@ -1,5 +1,6 @@
 package com.example.schollink.controller;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -10,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -23,10 +25,12 @@ import com.example.schollink.Dto.BuscarAulasDto;
 import com.example.schollink.Dto.BuscarDisciplinasDto;
 import com.example.schollink.Dto.ChamadaRequestDto;
 import com.example.schollink.Dto.DataDto;
+import com.example.schollink.Dto.PontoRetornoDto;
 import com.example.schollink.Dto.ProfessorDto;
 import com.example.schollink.Dto.ProfessorHorarioDto;
 import com.example.schollink.Dto.ProfessorParaTurmaDto;
 import com.example.schollink.model.HistoricoAula;
+import com.example.schollink.model.Ponto;
 import com.example.schollink.model.Professor;
 import com.example.schollink.service.ProfessorService;
 
@@ -200,11 +204,39 @@ public class ProfessorController {
             Long idProfessor = professorService.buscarIdProfessorPeloIdUser(id);
             Professor professor = professorService.verProfessor(idProfessor);
             return ResponseEntity.ok().body(Map.of("nome", professor.getUser().getNome(),
-                                                "userId", professor.getUser().getId(),
-                                                "caminhoFoto", professor.getUser().getCaminhoFoto(),
-                                                "email", professor.getUser().getEmail()));
+                    "userId", professor.getUser().getId(),
+                    "caminhoFoto", professor.getUser().getCaminhoFoto(),
+                    "email", professor.getUser().getEmail()));
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", e.getMessage()));
+        }
+    }
+
+    @GetMapping("/buscarPontos-semana")
+    public ResponseEntity<List<PontoRetornoDto>> buscarPontoSemana(HttpSession session) {
+        Long id = (Long) session.getAttribute("userId");
+        if (id == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        }
+        List<PontoRetornoDto> pontos = professorService.buscarPontoSemana(id);
+        if (pontos.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        } else {
+            return ResponseEntity.ok().body(pontos);
+        }
+    }
+
+    @GetMapping("/buscarPonto/{data}")
+    public ResponseEntity<PontoRetornoDto> buscarPontoPelaData(@PathVariable LocalDate data, HttpSession session) {
+        Long id = (Long) session.getAttribute("userId");
+        if (id == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        }
+        PontoRetornoDto ponto = professorService.buscarPontoPelaData(id, data);
+        if (ponto == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        } else {
+            return ResponseEntity.ok().body(ponto);
         }
     }
 

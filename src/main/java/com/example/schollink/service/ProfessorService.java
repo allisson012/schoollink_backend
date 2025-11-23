@@ -17,6 +17,7 @@ import com.example.schollink.Dto.AulaRetornoDto;
 import com.example.schollink.Dto.BuscarDisciplinasDto;
 import com.example.schollink.Dto.ChamadaRequestDto;
 import com.example.schollink.Dto.DataDto;
+import com.example.schollink.Dto.PontoRetornoDto;
 import com.example.schollink.Dto.ProfessorDto;
 import com.example.schollink.Dto.ProfessorParaTurmaDto;
 import com.example.schollink.Dto.UserDto;
@@ -26,6 +27,7 @@ import com.example.schollink.model.Endereco;
 import com.example.schollink.model.Funcionario;
 import com.example.schollink.model.HistoricoAula;
 import com.example.schollink.model.HorarioAula;
+import com.example.schollink.model.Ponto;
 import com.example.schollink.model.Presenca;
 import com.example.schollink.model.Professor;
 import com.example.schollink.model.Turma;
@@ -36,6 +38,7 @@ import com.example.schollink.model.UserRole;
 import com.example.schollink.repository.AlunoRepository;
 import com.example.schollink.repository.HistoricoAulaRepository;
 import com.example.schollink.repository.HorarioAulaRepository;
+import com.example.schollink.repository.PontoRepository;
 import com.example.schollink.repository.PresencaRepository;
 import com.example.schollink.repository.ProfessorRepository;
 import com.example.schollink.repository.TurmaDisciplinaRepository;
@@ -68,7 +71,8 @@ public class ProfessorService {
     private TurmaDisciplinaRepository turmaDisciplinaRepository;
     @Autowired
     private EmailService emailService;
-
+    @Autowired
+    private PontoRepository pontoRepository;
     @Transactional
     public boolean cadastrarProfessor(ProfessorDto dto) {
         boolean valido = emailService.ValidateEmail(dto.getUserDto().getEmail());
@@ -384,5 +388,73 @@ public class ProfessorService {
             throw new RuntimeException("Professor não encontrado");
         }
         return professorOpt.get();
+    }
+    public List<PontoRetornoDto> buscarPontoSemana(Long idUser) {
+
+        Professor professor = professorRepository.findByUser_Id(idUser);
+        if (professor == null) {
+            return null;
+        }
+    
+        Funcionario funcionario = professor.getFuncionario();
+    
+        LocalDate hoje = LocalDate.now();
+        LocalDate segunda = hoje.with(DayOfWeek.MONDAY);
+        LocalDate domingo = hoje.with(DayOfWeek.SUNDAY);
+    
+        List<PontoRetornoDto> listaSemana = new ArrayList<>();
+    
+        LocalDate dia = segunda;
+    
+        while (!dia.isAfter(domingo)) {
+    
+            Optional<Ponto> pontoOpt = pontoRepository.findByDataAndFuncionario(dia, funcionario);
+    
+            PontoRetornoDto dto = new PontoRetornoDto();
+            dto.setData(dia);
+            dto.setDiaDaSemana(dia.getDayOfWeek().name()); // SEGUNDA, TERCA etc
+    
+            if (pontoOpt.isPresent()) {
+                Ponto ponto = pontoOpt.get();
+                dto.setExiste(true);
+                dto.setHoraEntrada(ponto.getHorarioEntrada() != null ? ponto.getHorarioEntrada().toString() : null);
+                dto.setHoraSaida(ponto.getHorarioSaida() != null ? ponto.getHorarioSaida().toString() : null);
+            } else {
+                dto.setExiste(false);
+                dto.setHoraEntrada(null);
+                dto.setHoraSaida(null);
+            }
+    
+            listaSemana.add(dto);
+            dia = dia.plusDays(1);
+        }
+    
+        return listaSemana;
+    }
+
+    public PontoRetornoDto buscarPontoPelaData(Long idUser, LocalDate data){
+        Professor professor = professorRepository.findByUser_Id(idUser);
+        if (professor == null) {
+            return null;
+        }
+    
+        Funcionario funcionario = professor.getFuncionario();
+        Optional<Ponto> pontoOpt = pontoRepository.findByDataAndFuncionario(data, funcionario);
+    
+        PontoRetornoDto dto = new PontoRetornoDto();
+        dto.setData(data);
+        dto.setDiaDaSemana(data.getDayOfWeek().name());
+
+        if (pontoOpt.isPresent()) {
+            Ponto ponto = pontoOpt.get();
+            dto.setExiste(true);
+            dto.setHoraEntrada(ponto.getHorarioEntrada() != null ? ponto.getHorarioEntrada().toString() : null);
+            dto.setHoraSaida(ponto.getHorarioSaida() != null ? ponto.getHorarioSaida().toString() : null);
+        } else {
+            dto.setExiste(false);
+            dto.setHoraEntrada(null);
+            dto.setHoraSaida(null);
+        }
+        return dto;
     }
 }

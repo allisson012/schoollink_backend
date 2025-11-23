@@ -1,6 +1,8 @@
 package com.example.schollink.service;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,5 +56,27 @@ public class ConversaService {
         mensagem.setMensagem(dto.getMensagem());
         mensagemRepository.save(mensagem);
         return true;
+    }
+
+    public List<MensagemDto> buscarMensagens(Long idConversa){
+        Optional<Conversa> conversaOpt = conversaRepository.findById(idConversa);
+        if(conversaOpt.isEmpty()){
+            return null;
+        }
+        Conversa conversa = conversaOpt.get();
+        List<Mensagem> mensagens = conversa.getMensagens();
+        List<MensagemDto> dtos = new ArrayList<>();
+        for (Mensagem mensagem : mensagens) {
+            MensagemDto dto = new MensagemDto();
+            if(mensagem.getTipo().equals("ALUNO")){
+            dto.setNomeAluno(mensagem.getConversa().getAluno().getUser().getNome());
+            dto.setIdAluno(mensagem.getConversa().getAluno().getIdAluno());
+            }
+            dto.setMensagem(mensagem.getMensagem());
+            dto.setIdRemetente(mensagem.getIdRementente());
+            dto.setIdMensagem(mensagem.getId());
+            dtos.add(dto);
+        }
+        return dtos;
     }
 }
