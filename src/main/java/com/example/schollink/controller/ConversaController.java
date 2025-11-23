@@ -40,10 +40,20 @@ public class ConversaController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Erro ao enviar mensagem");
         }
     }
-
-    public void buscarConversaAluno() {
-
-    }
+   
+    @GetMapping("/buscarConversaAluno")
+    public ResponseEntity<?> buscarConversaAluno(HttpSession session) {
+        Long idUser = (Long) session.getAttribute("userId");
+        if (idUser == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Usuario não logado");
+        }
+        Long idConversa = conversaService.buscarConversaAluno(idUser);
+        if(idConversa == null){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Erro ao buscar conversa");
+        }else{
+          return ResponseEntity.ok(idConversa);
+        }
+    } 
 
     public void todosOsChats() {
 

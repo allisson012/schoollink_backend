@@ -79,4 +79,18 @@ public class ConversaService {
         }
         return dtos;
     }
+
+    public Long buscarConversaAluno(Long idUser){
+        Optional<Aluno> alunoOpt = alunoRepository.findByUserId(idUser);
+        if (alunoOpt.isEmpty()) {
+            return null;
+        }
+        Aluno aluno = alunoOpt.get();
+        Optional<Conversa> conversaOpt = conversaRepository.findByAluno(aluno);
+        if(conversaOpt.isEmpty()){
+            return null;
+        }
+        Conversa conversa = conversaOpt.get();
+        return conversa.getId();
+    }
 }
