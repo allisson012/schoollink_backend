@@ -8,6 +8,7 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.example.schollink.Dto.ConversaDto;
 import com.example.schollink.Dto.MensagemDto;
 import com.example.schollink.model.Aluno;
 import com.example.schollink.model.Conversa;
@@ -58,9 +59,9 @@ public class ConversaService {
         return true;
     }
 
-    public List<MensagemDto> buscarMensagens(Long idConversa){
+    public List<MensagemDto> buscarMensagens(Long idConversa) {
         Optional<Conversa> conversaOpt = conversaRepository.findById(idConversa);
-        if(conversaOpt.isEmpty()){
+        if (conversaOpt.isEmpty()) {
             return null;
         }
         Conversa conversa = conversaOpt.get();
@@ -68,29 +69,46 @@ public class ConversaService {
         List<MensagemDto> dtos = new ArrayList<>();
         for (Mensagem mensagem : mensagens) {
             MensagemDto dto = new MensagemDto();
-            if(mensagem.getTipo().equals("ALUNO")){
-            dto.setNomeAluno(mensagem.getConversa().getAluno().getUser().getNome());
-            dto.setIdAluno(mensagem.getConversa().getAluno().getIdAluno());
+            if (mensagem.getTipo().equals("ALUNO")) {
+                dto.setNomeAluno(mensagem.getConversa().getAluno().getUser().getNome());
+                dto.setIdAluno(mensagem.getConversa().getAluno().getIdAluno());
             }
             dto.setMensagem(mensagem.getMensagem());
             dto.setIdRemetente(mensagem.getIdRementente());
             dto.setIdMensagem(mensagem.getId());
+            dto.setTipo(mensagem.getTipo());
             dtos.add(dto);
         }
         return dtos;
     }
 
-    public Long buscarConversaAluno(Long idUser){
+    public Long buscarConversaAluno(Long idUser) {
         Optional<Aluno> alunoOpt = alunoRepository.findByUserId(idUser);
         if (alunoOpt.isEmpty()) {
             return null;
         }
         Aluno aluno = alunoOpt.get();
         Optional<Conversa> conversaOpt = conversaRepository.findByAluno(aluno);
-        if(conversaOpt.isEmpty()){
+        if (conversaOpt.isEmpty()) {
             return null;
         }
         Conversa conversa = conversaOpt.get();
         return conversa.getId();
+    }
+
+    public List<ConversaDto> buscarTodosChats() {
+        List<Conversa> conversas = conversaRepository.findAll();
+        List<ConversaDto> dtos = new ArrayList<>();
+        if (conversas.isEmpty()) {
+            return null;
+        }
+        for (Conversa conversa : conversas) {
+            ConversaDto dto = new ConversaDto();
+            dto.setIdConversa(conversa.getId());
+            dto.setNomeAluno(conversa.getAluno().getUser().getNome());
+            dto.setIdAluno(conversa.getAluno().getIdAluno());
+            dtos.add(dto);
+        }
+        return dtos;
     }
 }
