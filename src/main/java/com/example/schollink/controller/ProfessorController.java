@@ -200,18 +200,25 @@ public class ProfessorController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(Map.of("message", "Usuário não logado ou ID do aluno não informado"));
         }
+    
         try {
             Long idProfessor = professorService.buscarIdProfessorPeloIdUser(id);
             Professor professor = professorService.verProfessor(idProfessor);
-            return ResponseEntity.ok().body(Map.of("nome", professor.getUser().getNome(),
-                    "userId", professor.getUser().getId(),
-                    "caminhoFoto", professor.getUser().getCaminhoFoto(),
-                    "email", professor.getUser().getEmail()));
+    
+            Map<String, Object> dados = new HashMap<>();
+            dados.put("nome", professor.getUser() != null ? professor.getUser().getNome() : null);
+            dados.put("userId", professor.getUser() != null ? professor.getUser().getId() : null);
+            dados.put("caminhoFoto", professor.getUser() != null ? professor.getUser().getCaminhoFoto() : null);
+            dados.put("email", professor.getUser() != null ? professor.getUser().getEmail() : null);
+    
+            return ResponseEntity.ok(dados);
+    
         } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", e.getMessage()));
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Map.of("message", e.getMessage()));
         }
     }
-
+    
     @GetMapping("/buscarPontos-semana")
     public ResponseEntity<List<PontoRetornoDto>> buscarPontoSemana(HttpSession session) {
         Long id = (Long) session.getAttribute("userId");

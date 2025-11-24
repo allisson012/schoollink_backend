@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.schollink.Dto.ConversaDto;
 import com.example.schollink.Dto.MensagemDto;
 import com.example.schollink.model.UserRole;
 import com.example.schollink.service.ConversaService;
@@ -33,6 +34,9 @@ public class ConversaController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Usuario não logado");
         }
         UserRole role = (UserRole) session.getAttribute("UserRole");
+        System.out.println(dto.getIdRemetente());
+        System.out.println(dto.getIdAluno());
+        System.out.println(dto.getMensagem());
         boolean enviado = conversaService.enviarMensagem(role, dto);
         if (enviado) {
             return ResponseEntity.ok().body("Mensagem enviada com sucesso");
@@ -40,7 +44,7 @@ public class ConversaController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Erro ao enviar mensagem");
         }
     }
-   
+
     @GetMapping("/buscarConversaAluno")
     public ResponseEntity<?> buscarConversaAluno(HttpSession session) {
         Long idUser = (Long) session.getAttribute("userId");
@@ -48,15 +52,26 @@ public class ConversaController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Usuario não logado");
         }
         Long idConversa = conversaService.buscarConversaAluno(idUser);
-        if(idConversa == null){
+        if (idConversa == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Erro ao buscar conversa");
-        }else{
-          return ResponseEntity.ok(idConversa);
+        } else {
+            return ResponseEntity.ok(idConversa);
         }
-    } 
+    }
 
-    public void todosOsChats() {
-
+    @GetMapping("/buscarTodasConversas")
+    public ResponseEntity<?> buscarTodosChats(HttpSession session) {
+        Long idUser = (Long) session.getAttribute("userId");
+        UserRole role = (UserRole) session.getAttribute("UserRole");
+        if (idUser == null || role != UserRole.ADMIN) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Usuario não logado");
+        }
+        List<ConversaDto> dtos = conversaService.buscarTodosChats();
+        if (dtos == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Erro ao buscar conversas");
+        } else {
+            return ResponseEntity.ok(dtos);
+        }
     }
 
     @GetMapping("/buscarMensagens/{idConversa}")

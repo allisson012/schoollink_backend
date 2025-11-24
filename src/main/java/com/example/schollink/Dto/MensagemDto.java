@@ -6,6 +6,7 @@ public class MensagemDto {
     private String nomeAluno;
     private Long idAluno;
     private Long idRemetente;
+    private String tipo;
     public Long getIdMensagem() {
         return idMensagem;
     }
@@ -36,5 +37,10 @@ public class MensagemDto {
     public void setIdRemetente(Long idRemetente) {
         this.idRemetente = idRemetente;
     }
-    
+    public String getTipo() {
+        return tipo;
+    }
+    public void setTipo(String tipo) {
+        this.tipo = tipo;
+    } 
 }
