@@ -107,6 +107,7 @@ public class ConversaService {
             dto.setIdConversa(conversa.getId());
             dto.setNomeAluno(conversa.getAluno().getUser().getNome());
             dto.setIdAluno(conversa.getAluno().getIdAluno());
+            dto.setCaminhoFoto(conversa.getAluno().getUser().getCaminhoFoto());
             dtos.add(dto);
         }
         return dtos;
