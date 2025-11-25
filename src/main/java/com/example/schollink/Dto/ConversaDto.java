@@ -4,6 +4,14 @@ public class ConversaDto {
     private Long idConversa;
     private String nomeAluno;
     private Long idAluno;
+    private String caminhoFoto;
+
+    public String getCaminhoFoto() {
+        return caminhoFoto;
+    }
+    public void setCaminhoFoto(String caminhoFoto) {
+        this.caminhoFoto = caminhoFoto;
+    }
     public Long getIdConversa() {
         return idConversa;
     }
