@@ -50,7 +50,6 @@ public class RfidService {
         LocalDate dataAtual = LocalDate.now();
         LocalTime horaAtual = LocalTime.now();
 
-        // Buscar todas as TurmaDisciplina da turma do aluno
         List<TurmaDisciplina> turmasDisciplinas = turmaDisciplinaRepository.findByTurma(aluno.getTurma());
 
         List<HorarioAula> aulasDoDia = new ArrayList<>();
