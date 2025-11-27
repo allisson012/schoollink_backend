@@ -26,6 +26,7 @@ import com.example.schollink.Dto.BuscarDisciplinasDto;
 import com.example.schollink.Dto.ChamadaRequestDto;
 import com.example.schollink.Dto.DataDto;
 import com.example.schollink.Dto.PontoRetornoDto;
+import com.example.schollink.Dto.PontoSemanaResponseDto;
 import com.example.schollink.Dto.ProfessorDto;
 import com.example.schollink.Dto.ProfessorHorarioDto;
 import com.example.schollink.Dto.ProfessorParaTurmaDto;
@@ -220,13 +221,13 @@ public class ProfessorController {
     }
     
     @GetMapping("/buscarPontos-semana")
-    public ResponseEntity<List<PontoRetornoDto>> buscarPontoSemana(HttpSession session) {
+    public ResponseEntity<PontoSemanaResponseDto> buscarPontoSemana(HttpSession session) {
         Long id = (Long) session.getAttribute("userId");
         if (id == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
         }
-        List<PontoRetornoDto> pontos = professorService.buscarPontoSemana(id);
-        if (pontos.isEmpty()) {
+        PontoSemanaResponseDto pontos = professorService.buscarPontoSemana(id);
+        if (pontos == null || pontos.getPontos().isEmpty()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         } else {
             return ResponseEntity.ok().body(pontos);
