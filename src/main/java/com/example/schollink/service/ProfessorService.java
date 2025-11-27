@@ -1,6 +1,7 @@
 package com.example.schollink.service;
 
 import java.time.DayOfWeek;
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
@@ -18,6 +19,7 @@ import com.example.schollink.Dto.BuscarDisciplinasDto;
 import com.example.schollink.Dto.ChamadaRequestDto;
 import com.example.schollink.Dto.DataDto;
 import com.example.schollink.Dto.PontoRetornoDto;
+import com.example.schollink.Dto.PontoSemanaResponseDto;
 import com.example.schollink.Dto.ProfessorDto;
 import com.example.schollink.Dto.ProfessorParaTurmaDto;
 import com.example.schollink.Dto.UserDto;
@@ -73,6 +75,7 @@ public class ProfessorService {
     private EmailService emailService;
     @Autowired
     private PontoRepository pontoRepository;
+
     @Transactional
     public boolean cadastrarProfessor(ProfessorDto dto) {
         boolean valido = emailService.ValidateEmail(dto.getUserDto().getEmail());
@@ -389,58 +392,72 @@ public class ProfessorService {
         }
         return professorOpt.get();
     }
-    public List<PontoRetornoDto> buscarPontoSemana(Long idUser) {
+
+    public PontoSemanaResponseDto buscarPontoSemana(Long idUser) {
 
         Professor professor = professorRepository.findByUser_Id(idUser);
         if (professor == null) {
             return null;
         }
-    
+
         Funcionario funcionario = professor.getFuncionario();
-    
+
         LocalDate hoje = LocalDate.now();
         LocalDate segunda = hoje.with(DayOfWeek.MONDAY);
         LocalDate domingo = hoje.with(DayOfWeek.SUNDAY);
-    
+
         List<PontoRetornoDto> listaSemana = new ArrayList<>();
-    
+
         LocalDate dia = segunda;
-    
+
+        Duration totalSemana = Duration.ZERO;
+
         while (!dia.isAfter(domingo)) {
-    
+
             Optional<Ponto> pontoOpt = pontoRepository.findByDataAndFuncionario(dia, funcionario);
-    
+
             PontoRetornoDto dto = new PontoRetornoDto();
             dto.setData(dia);
-            dto.setDiaDaSemana(dia.getDayOfWeek().name()); // SEGUNDA, TERCA etc
-    
+            dto.setDiaDaSemana(dia.getDayOfWeek().name());
+
             if (pontoOpt.isPresent()) {
                 Ponto ponto = pontoOpt.get();
                 dto.setExiste(true);
                 dto.setHoraEntrada(ponto.getHorarioEntrada() != null ? ponto.getHorarioEntrada().toString() : null);
                 dto.setHoraSaida(ponto.getHorarioSaida() != null ? ponto.getHorarioSaida().toString() : null);
+                if (ponto.getHorarioEntrada() != null && ponto.getHorarioSaida() != null) {
+                    Duration duracaoDia = Duration.between(ponto.getHorarioEntrada(), ponto.getHorarioSaida());
+                    totalSemana = totalSemana.plus(duracaoDia);
+                }
             } else {
                 dto.setExiste(false);
                 dto.setHoraEntrada(null);
                 dto.setHoraSaida(null);
             }
-    
+
             listaSemana.add(dto);
             dia = dia.plusDays(1);
         }
-    
-        return listaSemana;
+
+        long horas = totalSemana.toHours();
+        long minutos = totalSemana.toMinutes() % 60;
+        long segundos = totalSemana.getSeconds() % 60;
+        String totalFormatado = horas + "h " + minutos + "m " + segundos + "s";
+        PontoSemanaResponseDto dtoRetorno = new PontoSemanaResponseDto();
+        dtoRetorno.setPontos(listaSemana);
+        dtoRetorno.setTotalHoras(totalFormatado);
+        return dtoRetorno;
     }
 
-    public PontoRetornoDto buscarPontoPelaData(Long idUser, LocalDate data){
+    public PontoRetornoDto buscarPontoPelaData(Long idUser, LocalDate data) {
         Professor professor = professorRepository.findByUser_Id(idUser);
         if (professor == null) {
             return null;
         }
-    
+
         Funcionario funcionario = professor.getFuncionario();
         Optional<Ponto> pontoOpt = pontoRepository.findByDataAndFuncionario(data, funcionario);
-    
+
         PontoRetornoDto dto = new PontoRetornoDto();
         dto.setData(data);
         dto.setDiaDaSemana(data.getDayOfWeek().name());
