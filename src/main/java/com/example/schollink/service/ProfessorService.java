@@ -18,6 +18,7 @@ import com.example.schollink.Dto.AulaRetornoDto;
 import com.example.schollink.Dto.BuscarDisciplinasDto;
 import com.example.schollink.Dto.ChamadaRequestDto;
 import com.example.schollink.Dto.DataDto;
+import com.example.schollink.Dto.EnderecoDto;
 import com.example.schollink.Dto.PontoRetornoDto;
 import com.example.schollink.Dto.PontoSemanaResponseDto;
 import com.example.schollink.Dto.ProfessorDto;
@@ -474,4 +475,57 @@ public class ProfessorService {
         }
         return dto;
     }
+
+    public Optional<List<ProfessorDto>> buscar(String nome) {
+        List<Professor> professores = new ArrayList<>();
+
+        if (nome != null && !nome.isEmpty()) {
+            professores = professorRepository.findByUserNomeContainingIgnoreCase(nome);
+        } 
+        if (professores.isEmpty()) {
+            return Optional.empty();
+        }
+
+        List<ProfessorDto> dtos = professores.stream()
+                .map(this::toDto)
+                .toList();
+
+        return Optional.of(dtos);
+    }
+
+    private ProfessorDto toDto(Professor professor) {
+        ProfessorDto dto = new ProfessorDto();
+
+        UserDto userDto = new UserDto();
+        userDto.setNome(professor.getUser().getNome());
+        userDto.setEmail(professor.getUser().getEmail());
+        userDto.setCpf(professor.getUser().getCpf());
+        userDto.setDataNascimento(professor.getUser().getDataNascimento());
+        userDto.setGenero(professor.getUser().getGenero());
+        userDto.setTelefone(professor.getUser().getTelefone());
+        dto.setUserDto(userDto);
+
+        EnderecoDto end = new EnderecoDto();
+        if (professor.getUser() != null && professor.getUser().getEndereco() != null) {
+            end.setCep(professor.getUser().getEndereco().getCep());
+            end.setPais(professor.getUser().getEndereco().getPais());
+            end.setEstado(professor.getUser().getEndereco().getEstado());
+            end.setCidade(professor.getUser().getEndereco().getCidade());
+            end.setRua(professor.getUser().getEndereco().getRua());
+            end.setNumero(professor.getUser().getEndereco().getNumero());
+        }
+        dto.setEnderecoDto(end);
+
+        dto.setDataContratacao(professor.getDataContratacao());
+        dto.setFormacaoAcademica(professor.getFormacaoAcademica());
+        dto.setRegistroProfissional(professor.getRegistroProfissional());
+        dto.setCargaHorariaSem(professor.getCargaHorariaSem());
+        dto.setTurno(professor.getTurno().name());
+        dto.setSalario(professor.getSalario());
+        dto.setRfid(professor.getFuncionario().getRfid());
+
+        return dto;
+    }
+
 }
+    

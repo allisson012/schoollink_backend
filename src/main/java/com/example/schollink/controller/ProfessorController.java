@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -246,6 +248,16 @@ public class ProfessorController {
         } else {
             return ResponseEntity.ok().body(ponto);
         }
+    }
+
+    @GetMapping("/buscar")
+    public ResponseEntity<?> buscarAlunos(@RequestParam(required = false) String nome) {
+
+        Optional<List<ProfessorDto>> professor = professorService.buscar(nome);
+
+        return professor.isPresent()
+                ? ResponseEntity.ok(professor.get())
+                : ResponseEntity.status(404).body("Aluno não encontrado");
     }
 
 }
