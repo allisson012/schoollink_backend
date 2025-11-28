@@ -3,6 +3,7 @@ package com.example.schollink.Dto;
 import java.time.LocalDate;
 
 public class FuncionarioDto {
+    private Long idFuncionario;
     private String rfid;
     private String nome;
     private String email;
@@ -16,6 +17,13 @@ public class FuncionarioDto {
     private double salario;
     private EnderecoDto enderecoDto;
 
+    public Long getIdFuncionario() {
+        return idFuncionario;
+    }
+
+    public void setIdFuncionario(Long idFuncionario) {
+        this.idFuncionario = idFuncionario;
+    }
     public String getRfid() {
         return this.rfid;
     }
