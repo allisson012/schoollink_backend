@@ -349,14 +349,16 @@ public class AlunoService {
         userDto.setCaminhoFoto(aluno.getUser().getCaminhoFoto());
         dto.setUserDto(userDto);
 
-        EnderecoDto end = new EnderecoDto();
-        end.setCep(aluno.getUser().getEndereco().getCep());
-        end.setPais(aluno.getUser().getEndereco().getPais());
-        end.setEstado(aluno.getUser().getEndereco().getEstado());
-        end.setCidade(aluno.getUser().getEndereco().getCidade());
-        end.setRua(aluno.getUser().getEndereco().getRua());
-        end.setNumero(aluno.getUser().getEndereco().getNumero());
-        dto.setEnderecoDto(end);
+        if (aluno.getUser() != null && aluno.getUser().getEndereco() != null) {
+            EnderecoDto end = new EnderecoDto();
+            end.setCep(aluno.getUser().getEndereco().getCep());
+            end.setPais(aluno.getUser().getEndereco().getPais());
+            end.setEstado(aluno.getUser().getEndereco().getEstado());
+            end.setCidade(aluno.getUser().getEndereco().getCidade());
+            end.setRua(aluno.getUser().getEndereco().getRua());
+            end.setNumero(aluno.getUser().getEndereco().getNumero());
+            dto.setEnderecoDto(end);
+        }
 
         return dto;
     }
