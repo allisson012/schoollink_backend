@@ -199,11 +199,13 @@ public class AlunoService {
         }
     }
 
-    public Aluno verAluno(Long id) {
-        Aluno aluno = alunoRepository.findByUserId(id)
+    public AlunoDto detalhesAluno(Long id) {
+        Aluno aluno = alunoRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Aluno não encontrado"));
+                
+        AlunoDto dto = toDto(aluno);
 
-        return aluno;
+        return dto;
     }
 
     public List<AlunoParaTurmaDto> buscarTodos() {
@@ -344,6 +346,7 @@ public class AlunoService {
         userDto.setDataNascimento(aluno.getUser().getDataNascimento());
         userDto.setGenero(aluno.getUser().getGenero());
         userDto.setTelefone(aluno.getUser().getTelefone());
+        userDto.setCaminhoFoto(aluno.getUser().getCaminhoFoto());
         dto.setUserDto(userDto);
 
         EnderecoDto end = new EnderecoDto();
@@ -358,4 +361,10 @@ public class AlunoService {
         return dto;
     }
 
+    public Aluno verAluno(Long id) {
+        Aluno aluno = alunoRepository.findByUserId(id)
+                .orElseThrow(() -> new RuntimeException("Aluno não encontrado"));
+
+        return aluno;
+    }
 }

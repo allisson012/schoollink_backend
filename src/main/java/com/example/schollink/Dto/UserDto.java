@@ -11,6 +11,14 @@ public class UserDto {
     private String telefone;
     private LocalDate dataNascimento;
     private String genero;
+    private String caminhoFoto;
+    
+    public String getCaminhoFoto() {
+        return caminhoFoto;
+    }
+    public void setCaminhoFoto(String caminhoFoto) {
+        this.caminhoFoto = caminhoFoto;
+    }
 
     public String getNome() {
         return this.nome;

@@ -11,4 +11,5 @@ import java.util.Optional;
 @Repository
 public interface FuncionarioRepository extends JpaRepository<Funcionario, Long>{
     Optional<Funcionario> findByRfid(String rfid);
+    Optional<List<Funcionario>> findByNomeContainingIgnoreCase(String nome);
 }
