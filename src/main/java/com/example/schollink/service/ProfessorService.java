@@ -533,6 +533,7 @@ public class ProfessorService {
         dto.setTurno(professor.getTurno().name());
         dto.setSalario(professor.getSalario());
         dto.setRfid(professor.getFuncionario().getRfid());
+        dto.setCaminhoFoto(professor.getUser().getCaminhoFoto());
 
         return dto;
     }
