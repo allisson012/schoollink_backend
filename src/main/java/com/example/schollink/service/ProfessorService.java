@@ -19,6 +19,7 @@ import com.example.schollink.Dto.BuscarDisciplinasDto;
 import com.example.schollink.Dto.ChamadaRequestDto;
 import com.example.schollink.Dto.DataDto;
 import com.example.schollink.Dto.EnderecoDto;
+import com.example.schollink.Dto.FuncionarioDto;
 import com.example.schollink.Dto.PontoRetornoDto;
 import com.example.schollink.Dto.PontoSemanaResponseDto;
 import com.example.schollink.Dto.ProfessorDto;
@@ -491,6 +492,15 @@ public class ProfessorService {
                 .toList();
 
         return Optional.of(dtos);
+    }
+
+    public ProfessorDto detalhesFuncionario(Long id) {
+        Professor professor = professorRepository.findByFuncionario_IdFuncionario(id)
+                .orElseThrow(() -> new RuntimeException("Funcionario não encontrado"));
+                
+        ProfessorDto dto = toDto(professor);
+
+        return dto;
     }
 
     private ProfessorDto toDto(Professor professor) {

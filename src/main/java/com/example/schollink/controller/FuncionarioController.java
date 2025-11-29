@@ -1,8 +1,10 @@
 package com.example.schollink.controller;
 
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -12,16 +14,20 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.schollink.Dto.AlunoDto;
 import com.example.schollink.Dto.FuncionarioDto;
 import com.example.schollink.Dto.PontoRetornoDto;
 import com.example.schollink.Dto.PontoSemanaResponseDto;
+import com.example.schollink.Dto.ProfessorDto;
 import com.example.schollink.model.Endereco;
 import com.example.schollink.model.Funcionario;
 import com.example.schollink.model.Turno;
 import com.example.schollink.model.UserRole;
 import com.example.schollink.service.FuncionarioService;
+import com.example.schollink.service.ProfessorService;
 
 import jakarta.servlet.http.HttpSession;
 
@@ -30,6 +36,8 @@ import jakarta.servlet.http.HttpSession;
 public class FuncionarioController {
     @Autowired
     private FuncionarioService funcionarioService;
+    @Autowired
+    private ProfessorService professorService;
 
     @PostMapping("/cadastrar")
     public ResponseEntity<?> cadastrarFuncionario(@RequestBody FuncionarioDto funcionarioDto) {
@@ -89,6 +97,44 @@ public class FuncionarioController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         } else {
             return ResponseEntity.ok().body(dtoRetorno);
+        }
+    }
+
+    @GetMapping("/buscarPonto/{idFuncionario}/{data}")
+    public ResponseEntity<PontoRetornoDto> buscarPontoPelaData(@PathVariable Long idFuncionario, @PathVariable LocalDate data, HttpSession session) {
+        if (idFuncionario == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        }
+        PontoRetornoDto ponto = funcionarioService.buscarPontoPelaData(idFuncionario, data);
+        if (ponto == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        } else {
+            return ResponseEntity.ok().body(ponto);
+        }
+    }
+
+    @GetMapping("/buscar")
+    public ResponseEntity<?> buscarFuncionarios(
+            @RequestParam(required = false) String nome) {
+
+        Optional<List<FuncionarioDto>> funcionarios = funcionarioService.buscar(nome);
+
+        return funcionarios.isPresent()
+                ? ResponseEntity.ok(funcionarios.get())
+                : ResponseEntity.status(404).body("Funcionário não encontrado");
+    }
+
+    @GetMapping("/buscarFuncionario/{idFuncionario}")
+    public ResponseEntity<?> buscarAluno(HttpSession session, @PathVariable Long idFuncionario) {
+        if (idFuncionario == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("message", "ID do funcionario não informado"));
+        }
+        try {
+            ProfessorDto funcionario = professorService.detalhesFuncionario(idFuncionario);
+            return ResponseEntity.ok().body(funcionario);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", e.getMessage()));
         }
     }
 }

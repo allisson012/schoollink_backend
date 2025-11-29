@@ -178,7 +178,7 @@ public class AlunoController {
                     .body(Map.of("message", "ID do aluno não informado"));
         }
         try {
-            Aluno aluno = alunoService.verAluno(idAluno);
+            AlunoDto aluno = alunoService.detalhesAluno(idAluno);
             return ResponseEntity.ok().body(aluno);
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", e.getMessage()));
