@@ -14,6 +14,15 @@ public class ProfessorDto{
     private double salario;
     private EnderecoDto enderecoDto;
     private String rfid;
+    private String caminhoFoto;
+
+    public String getCaminhoFoto() {
+        return this.caminhoFoto;
+    }
+
+    public void setCaminhoFoto(String caminhoFoto) {
+        this.caminhoFoto = caminhoFoto;
+    }
 
     public String getRfid() {
         return this.rfid;

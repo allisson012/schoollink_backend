@@ -57,7 +57,7 @@ public class EmailService {
         email.setTo(destinatario);
         email.setSubject(assunto);
         email.setText(mensagem);
-        email.setFrom("allissoncastilho@gmail.com");
+        email.setFrom("pedrofialho000@gmail.com");
         mailSender.send(email);
     }
 
